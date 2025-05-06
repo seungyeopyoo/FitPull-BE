@@ -1,6 +1,16 @@
 {
-  "name": "FitPull-BE",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT"
+	"name": "FitPull-BE",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"scripts": {
+		"dev": "node src/app.js"
+	},
+	"dependencies": {
+		"dotenv": "^16.5.0",
+		"express": "^5.1.0",
+		"pg": "^8.15.6",
+		"reflect-metadata": "^0.2.2",
+		"typeorm": "^0.3.22"
+	}
 }
