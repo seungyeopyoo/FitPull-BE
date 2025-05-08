@@ -6,14 +6,13 @@ import {
 	UpdateDateColumn,
 	ManyToOne,
 	JoinColumn,
-	OneToOne,
 } from "typeorm";
 import { User } from "./user.entity.js";
 import { Product } from "./products.entity.js";
-import { CompletedRental } from "./completed_rentals.entity.js";
+import { RentalRequest } from "./rental_requests.entity.js";
 
-@Entity("rental_requests")
-export class RentalRequest {
+@Entity("completed_rentals")
+export class CompletedRental {
 	@PrimaryGeneratedColumn("uuid")
 	id;
 
@@ -23,12 +22,8 @@ export class RentalRequest {
 	@Column({ type: "date" })
 	end_date;
 
-	@Column({
-		type: "enum",
-		enum: ["pending", "approved", "rejected"],
-		default: "pending",
-	})
-	status;
+	@Column({ type: "int" })
+	total_price;
 
 	@CreateDateColumn()
 	created_at;
@@ -41,21 +36,22 @@ export class RentalRequest {
 
 	@ManyToOne(
 		() => User,
-		(user) => user.rental_requests,
+		(user) => user.completed_rentals,
 	)
 	@JoinColumn({ name: "user_id" })
 	user;
 
 	@ManyToOne(
 		() => Product,
-		(product) => product.rental_requests,
+		(product) => product.completed_rentals,
 	)
 	@JoinColumn({ name: "product_id" })
 	product;
 
-	@OneToOne(
-		() => CompletedRental,
-		(rental) => rental.rental_request,
+	@ManyToOne(
+		() => RentalRequest,
+		(request) => request.completed_rental,
 	)
-	completed_rental;
+	@JoinColumn({ name: "rental_request_id" })
+	rental_request;
 }
