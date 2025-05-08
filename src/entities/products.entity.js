@@ -10,6 +10,7 @@ import {
 import { User } from "./user.entity.js";
 import { Category } from "./categories.entity.js";
 import { RentalRequest } from "./rental_requests.entity.js";
+import { CompletedRental } from "./completed_rentals.entity.js";
 
 @Entity("products")
 export class Product {
@@ -66,4 +67,10 @@ export class Product {
 		(request) => request.product,
 	)
 	rental_requests;
+
+	@OneToMany(
+		() => CompletedRental,
+		(rental) => rental.product,
+	)
+	completed_rentals;
 }
