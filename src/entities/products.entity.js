@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./user.entity.js";
 import { Category } from "./categories.entity.js";
+import { RentalRequest } from "./rental_requests.entity.js";
 
 @Entity("products")
 export class Product {
@@ -59,4 +60,10 @@ export class Product {
 	)
 	@JoinColumn({ name: "category_id" })
 	category;
+
+	@OneToMany(
+		() => RentalRequest,
+		(request) => request.product,
+	)
+	rental_requests;
 }
