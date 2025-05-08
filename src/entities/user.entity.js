@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Account } from "./accounts.entity.js";
 import { Product } from "./products.entity.js";
+import { RentalRequest } from "./rental_requests.entity.js";
 
 @Entity("users")
 export class User {
@@ -46,4 +47,10 @@ export class User {
 		(product) => product.owner,
 	)
 	products;
+
+	@OneToMany(
+		() => RentalRequest,
+		(request) => request.user,
+	)
+	rental_requests;
 }
