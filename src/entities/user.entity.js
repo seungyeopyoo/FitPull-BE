@@ -1,0 +1,34 @@
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	CreateDateColumn,
+	UpdateDateColumn,
+} from "typeorm";
+
+@Entity("users")
+export class User {
+	@PrimaryGeneratedColumn("uuid")
+	id;
+
+	@Column()
+	name;
+
+	@Column()
+	phone;
+
+	@Column({ type: "text", nullable: true })
+	profile_image;
+
+	@Column({ type: "enum", enum: ["user", "admin"], default: "user" })
+	role;
+
+	@CreateDateColumn()
+	created_at;
+
+	@UpdateDateColumn()
+	updated_at;
+
+	@Column({ type: "timestamp", nullable: true })
+	deleted_at;
+}
