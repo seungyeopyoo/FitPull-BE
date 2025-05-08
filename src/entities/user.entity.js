@@ -4,7 +4,9 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
+	OneToMany,
 } from "typeorm";
+import { Account } from "./accounts.entity.js";
 
 @Entity("users")
 export class User {
@@ -31,4 +33,10 @@ export class User {
 
 	@Column({ type: "timestamp", nullable: true })
 	deleted_at;
+
+	@OneToMany(
+		() => Account,
+		(account) => account.user,
+	)
+	accounts;
 }
