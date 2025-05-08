@@ -4,6 +4,11 @@
 
 FitPull Overflow는 "모든 것을 대여한다"는 컨셉의 대여 서비스 플랫폼입니다. 물건, 장소, 재능 등 다양한 항목을 대여할 수 있는 서비스를 제공합니다.
 
+## ERD
+
+![FOF ERD 전체](./docs/erd/FOFERD.png)
+[ERD 원본 보기 (ERDCloud)](https://www.erdcloud.com/d/waj7NZ2NAPBamqBPM)
+
 ## 핵심 기능
 
 ### 1. 상품 등록 및 관리
