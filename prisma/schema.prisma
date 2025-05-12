@@ -57,8 +57,8 @@ model Product {
   deletedAt        DateTime?         @map("deleted_at")
   owner            User              @relation(fields: [ownerId], references: [id])
   ownerId          String            @map("owner_id")
-  category         Category          @relation(fields: [categoryId], references: [id])
-  categoryId       String            @map("category_id")
+  category         Category?         @relation(fields: [categoryId], references: [id])
+  categoryId       String?           @map("category_id")
   rentalRequests   RentalRequest[]
   completedRentals CompletedRental[]
 

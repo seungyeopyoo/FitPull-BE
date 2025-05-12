@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import prisma from "./data-source.js";
 import authRoutes from "./routes/auth.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // 라우트 설정
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
 // 기본 라우트
 app.get("/", (_, res) => {
