@@ -3,17 +3,31 @@ import {
 	getAllProducts as getAllProductsRepo,
 	getProductById as getProductByIdRepo,
 	getProductsByUser as getProductsByUserRepo,
+	findEtcCategoryId,
+	findCategoryById,
 } from "../repositories/product.repository.js";
 
 export const createProduct = async (productData) => {
-	// 가격 음수 방지
 	if (productData.price < 0) {
 		throw new Error("가격은 0보다 커야 합니다.");
 	}
 
+	let categoryId = productData.categoryId;
+
+	// categoryId가 없거나 잘못된 경우 → '기타' 카테고리 id로 대체
+	if (!categoryId) {
+		categoryId = await findEtcCategoryId();
+	} else {
+		const categoryExists = await findCategoryById(categoryId);
+		if (!categoryExists) {
+			categoryId = await findEtcCategoryId();
+		}
+	}
+
 	return await createProductRepo({
 		...productData,
-		status: "PENDING", // 초기 등록 상태는 '대기중'
+		categoryId,
+		status: "PENDING",
 	});
 };
 

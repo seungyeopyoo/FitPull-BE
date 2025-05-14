@@ -48,3 +48,15 @@ export const getProductsByUser = async (ownerId) => {
 		},
 	});
 };
+
+export const findCategoryById = (id) => {
+	return prisma.category.findUnique({ where: { id } });
+};
+
+export const findEtcCategoryId = async () => {
+	const category = await prisma.category.findFirst({
+		where: { name: "기타" },
+	});
+	if (!category) throw new Error("'기타' 카테고리가 존재하지 않습니다."); // 이거터지면 아무카테고리도 없다는말 기타는 나중에 seeding으로 심고 DB리셋시 손으로 기타 심자
+	return category.id;
+};
