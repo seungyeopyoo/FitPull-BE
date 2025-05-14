@@ -2,9 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import prisma from "./data-source.js";
-import authRoutes from "./routes/auth.routes.js";
-import productRoutes from "./routes/product.routes.js";
+import authRouter from "./routes/auth.routes.js";
+import productRouter from "./routes/product.routes.js";
 import userRouter from "./routes/user.router.js";
+import categoryRouter from "./routes/category.router.js";
 
 dotenv.config();
 
@@ -15,9 +16,10 @@ app.use(cors());
 app.use(express.json());
 
 // 라우트 설정
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
+app.use("/api/categories", categoryRouter);
 
 // 기본 라우트
 app.get("/", (_, res) => {
