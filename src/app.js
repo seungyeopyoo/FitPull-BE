@@ -27,7 +27,7 @@ app.get("/", (_, res) => {
 const PORT = Number(process.env.PORT || "3000", 10);
 
 // 서버 시작
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
 	console.log(`서버가 ${PORT}번 포트에서 실행 중입니다.`);
 });
 
