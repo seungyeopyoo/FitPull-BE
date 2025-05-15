@@ -6,6 +6,8 @@ import authRouter from "./routes/auth.routes.js";
 import productRouter from "./routes/product.routes.js";
 import userRouter from "./routes/user.router.js";
 import categoryRouter from "./routes/category.router.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./docs/swagger.js";
 
 dotenv.config();
 
@@ -20,6 +22,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/categories", categoryRouter);
+
+// 스웨거 설정
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 기본 라우트
 app.get("/", (_, res) => {
