@@ -1,8 +1,8 @@
 import prisma from "../data-source.js";
 
 export const findUserById = async (userId) => {
-	return await prisma.user.findUnique({
-		where: { id: userId },
+	return await prisma.user.findFirst({
+		where: { id: userId, deletedAt: null },
 	});
 };
 
