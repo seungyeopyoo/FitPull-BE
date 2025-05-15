@@ -16,7 +16,10 @@ export const authenticate = async (req, res, next) => {
 		if (!user) {
 			return res.status(401).json({ message: "탈퇴했거나 존재하지 않는 유저입니다." });
 		}
-		req.user = decoded;
+		req.user = {
+			...decoded,
+			...user
+		};
 		next();
 	} catch (err) {
 		console.error("JWT 인증 에러:", err);
