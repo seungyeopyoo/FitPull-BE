@@ -1,6 +1,7 @@
 import { verifyAccessToken } from "../utils/jwt.js";
+import { findUserById } from "../repositories/user.repository.js";
 
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader || !authHeader.startsWith("Bearer")) {
@@ -11,6 +12,10 @@ export const authenticate = (req, res, next) => {
 
 	try {
 		const decoded = verifyAccessToken(token);
+		const user = await findUserById(decoded.userId);
+		if (!user) {
+			return res.status(401).json({ message: "탈퇴했거나 존재하지 않는 유저입니다." });
+		}
 		req.user = decoded;
 		next();
 	} catch (err) {
