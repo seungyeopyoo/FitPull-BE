@@ -3,7 +3,7 @@ import {
 	createProductController,
 	getAllProductsController,
 	getProductByIdController,
-	getProductsByUserController,
+	getProductsMeController,
 	updateProductController,
 	deleteProductController,
 } from "../controllers/product.controller.js";
@@ -56,24 +56,23 @@ import { authenticate } from "../middlewares/auth.js";
 
 /**
  * @swagger
- * /products/my/{userId}:
+ * /products/me:
  *   get:
- *     summary: 내가 등록한 상품 조회
+ *     summary: 내 상품 조회 (로그인한 사용자)
  *     tags: [Product]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         description: 유저 ID
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: 내 상품 리스트 반환
+ *         description: 로그인한 사용자가 등록한 상품 목록 반환
+ *       401:
+ *         description: 인증 실패
  */
 
 /**
  * @swagger
  * /products/{id}:
- *   put:
+ *   patch:
  *     summary: 상품 수정
  *     tags: [Product]
  *     security:
@@ -134,10 +133,10 @@ const router = express.Router();
 router.post("/", authenticate, createProductController);
 //상품조회전체
 router.get("/", getAllProductsController);
+//내상품조회
+router.get("/me", authenticate, getProductsMeController);
 //상품상세조회
 router.get("/:id", getProductByIdController);
-//내상품조회
-router.get("/my/:userId", getProductsByUserController);
 // 상품 수정
 router.patch("/:id", authenticate, updateProductController);
 // 상품 삭제

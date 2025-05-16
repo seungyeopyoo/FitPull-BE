@@ -42,9 +42,15 @@ export const getProductByIdController = async (req, res) => {
 	}
 };
 
-export const getProductsByUserController = async (req, res) => {
+export const getProductsMeController = async (req, res) => {
 	try {
-		const products = await getProductsByUser(req.params.userId);
+		if (!req.user || !req.user.id) {
+			return res.status(401).json({ message: "인증이 필요합니다." });
+		}
+		const products = await getProductsByUser(req.user.id);
+		if (!products || products.length === 0) {
+			return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+		}
 		res.json(products);
 	} catch (error) {
 		console.error("내 상품 목록 조회 에러:", error);
