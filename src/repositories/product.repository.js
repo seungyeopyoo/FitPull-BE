@@ -7,13 +7,13 @@ export const createProduct = async (data, ownerId) => {
 	}
 
 	const { categoryId, ...restData } = data;
-	
+
 	return await prisma.product.create({
 		data: {
 			...restData,
 			ownerId,
-			categoryId
-		}
+			categoryId,
+		},
 	});
 };
 
@@ -97,5 +97,32 @@ export const deleteProduct = async (id, user) => {
 		data: {
 			deletedAt: new Date(),
 		},
+	});
+};
+
+export const findWaitingProducts = async () => {
+	return await prisma.product.findMany({
+		where: {
+			status: "PENDING",
+			deletedAt: null,
+		},
+		include: {
+			category: true,
+			owner: {
+				select: {
+					id: true,
+					name: true,
+					phone: true,
+				},
+			},
+		},
+		orderBy: { createdAt: "desc" },
+	});
+};
+
+export const updateProductStatus = async (id, status) => {
+	return await prisma.product.update({
+		where: { id },
+		data: { status },
 	});
 };

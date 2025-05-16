@@ -6,8 +6,12 @@ import {
 	getProductsMeController,
 	updateProductController,
 	deleteProductController,
+	getWaitingProductsController,
+	approveProductController,
+	rejectProductController,
 } from "../controllers/product.controller.js";
 import { authenticate } from "../middlewares/auth.js";
+import { adminOnly } from "../middlewares/adminOnly.js";
 
 /**
  * @swagger
@@ -128,6 +132,49 @@ import { authenticate } from "../middlewares/auth.js";
  *         description: 상품을 찾을 수 없음
  */
 
+/**
+ * @swagger
+ * /products/admin/waiting:
+ *   get:
+ *     summary: 관리자 전용 대기 상품 조회
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 대기 상품 목록 반환
+ *
+ * /products/admin/{id}/approve:
+ *   patch:
+ *     summary: 상품 승인
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 상품 ID
+ *     responses:
+ *       200:
+ *         description: 승인 완료
+ *
+ * /products/admin/{id}/reject:
+ *   patch:
+ *     summary: 상품 거절
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 상품 ID
+ *     responses:
+ *       200:
+ *         description: 거절 완료
+ */
+
 const router = express.Router();
 //상품등록
 router.post("/", authenticate, createProductController);
@@ -141,5 +188,25 @@ router.get("/:id", getProductByIdController);
 router.patch("/:id", authenticate, updateProductController);
 // 상품 삭제
 router.delete("/:id", authenticate, deleteProductController);
-
+// 어드민 대기중상품 조회
+router.get(
+	"/admin/waiting",
+	authenticate,
+	adminOnly,
+	getWaitingProductsController,
+);
+// 어드민 상품 승인
+router.patch(
+	"/admin/:id/approve",
+	authenticate,
+	adminOnly,
+	approveProductController,
+);
+// 어드민 상품 거절
+router.patch(
+	"/admin/:id/reject",
+	authenticate,
+	adminOnly,
+	rejectProductController,
+);
 export default router;

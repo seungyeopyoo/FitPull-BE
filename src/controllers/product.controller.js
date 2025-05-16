@@ -5,6 +5,9 @@ import {
 	getProductsByUser,
 	updateProduct,
 	deleteProduct,
+	getWaitingProducts,
+	approveProduct,
+	rejectProduct,
 } from "../services/product.service.js";
 
 export const createProductController = async (req, res) => {
@@ -79,6 +82,36 @@ export const deleteProductController = async (req, res) => {
 		await deleteProduct(id, user);
 		res.json({ message: "상품이 삭제되었습니다." });
 	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+export const getWaitingProductsController = async (_req, res) => {
+	try {
+		const products = await getWaitingProducts();
+		res.json(products);
+	} catch (error) {
+		console.error("대기 상품 조회 에러:", error);
+		res.status(500).json({ message: "대기 상품 조회 중 오류 발생" });
+	}
+};
+
+export const approveProductController = async (req, res) => {
+	try {
+		const result = await approveProduct(req.params.id);
+		res.json({ message: "상품이 승인되었습니다.", result });
+	} catch (error) {
+		console.error("상품 승인 에러:", error);
+		res.status(400).json({ message: error.message });
+	}
+};
+
+export const rejectProductController = async (req, res) => {
+	try {
+		const result = await rejectProduct(req.params.id);
+		res.json({ message: "상품이 거절되었습니다.", result });
+	} catch (error) {
+		console.error("상품 거절 에러:", error);
 		res.status(400).json({ message: error.message });
 	}
 };

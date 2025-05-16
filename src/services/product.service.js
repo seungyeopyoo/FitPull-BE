@@ -5,9 +5,10 @@ import {
 	getProductsByUser as getProductsByUserRepo,
 	updateProduct as updateProductRepo,
 	deleteProduct as deleteProductRepo,
+	findWaitingProducts as findWaitingProductsRepo,
+	updateProductStatus as updateProductStatusRepo,
 	findEtcCategoryId,
 	findCategoryById,
-	
 } from "../repositories/product.repository.js";
 
 export const createProduct = async (productData, user) => {
@@ -31,15 +32,18 @@ export const createProduct = async (productData, user) => {
 		}
 	}
 
-	return await createProductRepo({
-		title: productData.title,
-		description: productData.description,
-		price: productData.price,
-		imageUrls: productData.imageUrls || [],
-		allowPurchase: productData.allowPurchase || false,
-		categoryId,
-		status: "PENDING" // admin 승인 전까지는 PENDING 상태
-	}, user.id);
+	return await createProductRepo(
+		{
+			title: productData.title,
+			description: productData.description,
+			price: productData.price,
+			imageUrls: productData.imageUrls || [],
+			allowPurchase: productData.allowPurchase || false,
+			categoryId,
+			status: "PENDING", // admin 승인 전까지는 PENDING 상태
+		},
+		user.id,
+	);
 };
 
 export const getAllProducts = async ({ skip, take, categoryId } = {}) => {
@@ -51,7 +55,7 @@ export const getAllProducts = async ({ skip, take, categoryId } = {}) => {
 
 	// PENDING 상태의 상품은 제외하고 반환
 	const listedProducts = products
-		.filter(product => product.status === "APPROVED")
+		.filter((product) => product.status === "APPROVED")
 		.map((product) => ({
 			id: product.id,
 			title: product.title,
@@ -102,7 +106,7 @@ export const getProductsByUser = async (ownerId) => {
 
 export const updateProduct = async (id, productData, user) => {
 	const product = await getProductByIdRepo(id);
-	
+
 	if (!product) {
 		throw new Error("상품을 찾을 수 없습니다.");
 	}
@@ -134,7 +138,7 @@ export const updateProduct = async (id, productData, user) => {
 
 export const deleteProduct = async (id, user) => {
 	const product = await getProductByIdRepo(id);
-	
+
 	if (!product) {
 		throw new Error("상품을 찾을 수 없습니다.");
 	}
@@ -145,4 +149,31 @@ export const deleteProduct = async (id, user) => {
 	}
 
 	return await deleteProductRepo(id);
+};
+
+export const getWaitingProducts = async () => {
+	const products = await findWaitingProductsRepo();
+
+	return products.map((product) => ({
+		id: product.id,
+		title: product.title,
+		price: product.price,
+		status: product.status,
+		imageUrl: product.imageUrls?.[0] ?? null,
+		category: { name: product.category?.name ?? "기타" },
+		owner: {
+			id: product.owner?.id,
+			name: product.owner?.name,
+			phone: product.owner?.phone,
+		},
+		createdAt: product.createdAt,
+	}));
+};
+
+export const approveProduct = async (id) => {
+	return await updateProductStatusRepo(id, "APPROVED");
+};
+
+export const rejectProduct = async (id) => {
+	return await updateProductStatusRepo(id, "REJECTED");
 };
