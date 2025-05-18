@@ -43,7 +43,7 @@ FitPull Overflow는 "모든 것을 대여한다"는 컨셉의 대여 서비스 �
 
 -   Backend: Node.js, Express.js
 -   Database: PostgreSQL (AWS RDS)
--   ORM: TypeORM
+-   ORM: Prisma
 -   Container: Docker
 -   AI: (검토 중)
 -   실시간 통신: Socket.io (상품 문의용)
