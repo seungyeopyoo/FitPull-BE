@@ -30,23 +30,23 @@ export const createRentalRequest = async (
 export const getMyRentalRequests = async (userId) => {
 	const requests = await findMyRentalRequestsRepo(userId);
 
-	return requests.map((r) => ({
-		rentalPeriod: `${r.startDate.toISOString().slice(0, 10)} ~ ${r.endDate.toISOString().slice(0, 10)}`,
-		productTitle: r.product.title,
-		status: r.status,
+	return requests.map((request) => ({
+		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
+		productTitle: request.product.title,
+		status: request.status,
 	}));
 };
 
 export const getPendingRequests = async () => {
 	const requests = await findPendingRequestsRepo();
 
-	return requests.map((r) => ({
-		id: r.id,
-		rentalPeriod: `${r.startDate.toISOString().slice(0, 10)} ~ ${r.endDate.toISOString().slice(0, 10)}`,
-		productTitle: r.product.title,
-		userName: r.user.name,
-		userPhone: r.user.phone,
-		status: r.status,
+	return requests.map((request) => ({
+		id: request.id,
+		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
+		productTitle: request.product.title,
+		userName: request.user.name,
+		userPhone: request.user.phone,
+		status: request.status,
 	}));
 };
 
