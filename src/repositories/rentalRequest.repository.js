@@ -94,3 +94,9 @@ export const findRentalRequestSummaryById = async (id) => {
 		status: request.status,
 	};
 };
+
+export const getRentalRequestById = async (id) => {
+	return await prisma.rentalRequest.findUnique({
+		where: { id },
+	});
+};
