@@ -12,6 +12,7 @@ import {
 } from "../controllers/product.controller.js";
 import { authenticate } from "../middlewares/auth.js";
 import { adminOnly } from "../middlewares/adminOnly.js";
+import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
 
 /**
  * @swagger
@@ -24,8 +25,35 @@ import { adminOnly } from "../middlewares/adminOnly.js";
  * @swagger
  * /products:
  *   post:
- *     summary: 상품 등록
+ *     summary: 상품 등록 (이미지 업로드 지원)
  *     tags: [Product]
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: 상품명
+ *               description:
+ *                 type: string
+ *                 description: 상품 설명
+ *               price:
+ *                 type: number
+ *                 description: 가격
+ *               categoryId:
+ *                 type: string
+ *                 description: 카테고리 ID
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: 상품 이미지 파일들 (최대 5장)
  *     responses:
  *       201:
  *         description: 상품 등록 성공
@@ -176,8 +204,13 @@ import { adminOnly } from "../middlewares/adminOnly.js";
  */
 
 const router = express.Router();
-//상품등록
-router.post("/", authenticate, createProductController);
+//상품등록 (이미지 업로드 및 S3 연동)
+router.post(
+	"/",
+	authenticate,
+	...s3ImageUpload,
+	createProductController
+);
 //상품조회전체
 router.get("/", getAllProductsController);
 //내상품조회

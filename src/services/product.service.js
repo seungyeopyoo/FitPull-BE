@@ -36,7 +36,7 @@ export const createProduct = async (productData, user) => {
 		{
 			title: productData.title,
 			description: productData.description,
-			price: productData.price,
+			price: Number(productData.price),
 			imageUrls: productData.imageUrls || [],
 			allowPurchase: productData.allowPurchase || false,
 			categoryId,
@@ -116,8 +116,12 @@ export const updateProduct = async (id, productData, user) => {
 		throw new Error("상품을 수정할 권한이 없습니다.");
 	}
 
-	if (productData.price && productData.price < 0) {
-		throw new Error("가격은 0보다 커야 합니다.");
+	// price가 존재하면 항상 Number로 변환
+	if (productData.price !== undefined) {
+		productData.price = Number(productData.price);
+		if (productData.price < 0) {
+			throw new Error("가격은 0보다 커야 합니다.");
+		}
 	}
 
 	let categoryId = productData.categoryId;

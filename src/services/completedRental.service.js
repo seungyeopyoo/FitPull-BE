@@ -14,7 +14,7 @@ export const completeRentalService = async (rentalRequestId) => {
 		throw new Error("승인된 요청만 완료할 수 있습니다.");
 
 	const product = await getProductById(rental.productId);
-	const pricePerDay = product.price;
+	const pricePerDay = Number(product.price);
 
 	const days = Math.ceil(
 		(rental.endDate - rental.startDate) / (1000 * 60 * 60 * 24),
@@ -27,7 +27,7 @@ export const completeRentalService = async (rentalRequestId) => {
 		productId: rental.productId,
 		startDate: rental.startDate,
 		endDate: rental.endDate,
-		totalPrice,
+		totalPrice: Number(totalPrice),
 	});
 
 	return await findCompletedRentalInfoByRequestId(rentalRequestId);
@@ -39,7 +39,7 @@ export const getMyCompletedRentals = async (userId) => {
 	return rentals.map((rental) => ({
 		productTitle: rental.product.title,
 		rentalPeriod: `${rental.startDate.toISOString().slice(0, 10)} ~ ${rental.endDate.toISOString().slice(0, 10)}`,
-		totalPrice: rental.totalPrice,
+		totalPrice: Number(rental.totalPrice),
 	}));
 };
 
@@ -51,6 +51,6 @@ export const getAllCompletedRentals = async () => {
 		userName: rental.user.name,
 		userPhone: rental.user.phone,
 		rentalPeriod: `${rental.startDate.toISOString().slice(0, 10)} ~ ${rental.endDate.toISOString().slice(0, 10)}`,
-		totalPrice: rental.totalPrice,
+		totalPrice: Number(rental.totalPrice),
 	}));
 };
