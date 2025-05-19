@@ -7,6 +7,7 @@ import productRouter from "./routes/product.routes.js";
 import userRouter from "./routes/user.router.js";
 import categoryRouter from "./routes/category.router.js";
 import rentalRequestRouter from "./routes/rentalRequest.routes.js";
+import completedRentalRouter from "./routes/completedRental.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 
@@ -35,6 +36,7 @@ app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/rental-requests", rentalRequestRouter);
+app.use("/api/completed-rentals", completedRentalRouter);
 
 // 기본 라우트
 app.get("/", (_, res) => {
