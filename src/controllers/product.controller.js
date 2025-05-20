@@ -67,9 +67,24 @@ export const updateProductController = async (req, res) => {
 		const productData = req.body;
 		const user = req.user;
 
+		// 이미지가 업로드된 경우, imageUrls 추가
+		if (req.files && Array.isArray(req.files)) {
+			productData.imageUrls = [...(productData.imageUrls || []), ...req.files.map(file => file.location)];
+		}
+		// undefined/null 제거
+		if (productData.imageUrls) {
+			productData.imageUrls = productData.imageUrls.filter(Boolean);
+		}
+
+		// categoryId 빈 문자열 처리
+		if (productData.categoryId === "") {
+			productData.categoryId = undefined;
+		}
+
 		const updatedProduct = await updateProduct(id, productData, user);
-		res.json(updatedProduct);
+		res.json({ message: "상품이 수정되었습니다.", product: updatedProduct });
 	} catch (error) {
+		console.error("상품 수정 에러:", error);
 		res.status(400).json({ message: error.message });
 	}
 };

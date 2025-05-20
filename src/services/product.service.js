@@ -10,6 +10,7 @@ import {
 	findEtcCategoryId,
 	findCategoryById,
 } from "../repositories/product.repository.js";
+import { deleteFromS3 } from "../utils/s3.js";
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
@@ -134,10 +135,36 @@ export const updateProduct = async (id, productData, user) => {
 		}
 	}
 
-	return await updateProductRepo(id, {
+	// 이미지 URL이 변경된 경우, 기존 이미지 삭제
+	if (productData.imageUrls && Array.isArray(productData.imageUrls)) {
+		// 기존 이미지 중 새 이미지 목록에 없는 것들을 삭제
+		const imagesToDelete = product.imageUrls.filter(
+			(oldUrl) => !productData.imageUrls.includes(oldUrl)
+		);
+		
+		// S3에서 사용하지 않는 이미지 삭제
+		await Promise.all(
+			imagesToDelete.map((imageUrl) => deleteFromS3(imageUrl))
+		);
+	}
+
+	const updated = await updateProductRepo(id, {
 		...productData,
 		...(categoryId && { categoryId }),
 	});
+
+	return {
+		id: updated.id,
+		title: updated.title,
+		description: updated.description,
+		price: updated.price,
+		imageUrls: updated.imageUrls,
+		status: updated.status,
+		allowPurchase: updated.allowPurchase,
+		createdAt: updated.createdAt,
+		updatedAt: updated.updatedAt,
+		categoryId: updated.categoryId,
+	};
 };
 
 export const deleteProduct = async (id, user) => {
@@ -150,6 +177,13 @@ export const deleteProduct = async (id, user) => {
 	// 본인 상품이거나 admin인 경우에만 삭제 가능
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
 		throw new Error("상품을 삭제할 권한이 없습니다.");
+	}
+
+	// S3에서 모든 이미지 삭제
+	if (product.imageUrls && Array.isArray(product.imageUrls)) {
+		await Promise.all(
+			product.imageUrls.map((imageUrl) => deleteFromS3(imageUrl))
+		);
 	}
 
 	return await deleteProductRepo(id);
