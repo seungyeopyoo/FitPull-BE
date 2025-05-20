@@ -105,7 +105,7 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  * @swagger
  * /products/{id}:
  *   patch:
- *     summary: 상품 수정
+ *     summary: 상품 수정 (이미지 업로드 지원)
  *     tags: [Product]
  *     security:
  *       - bearerAuth: []
@@ -114,21 +114,33 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *         name: id
  *         required: true
  *         description: 상품 ID
+ *     consumes:
+ *       - multipart/form-data
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               title:
  *                 type: string
- *               price:
- *                 type: number
+ *                 description: 상품명
  *               description:
  *                 type: string
+ *                 description: 상품 설명
+ *               price:
+ *                 type: number
+ *                 description: 가격
  *               categoryId:
  *                 type: string
+ *                 description: 카테고리 ID
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: 상품 이미지 파일들 (최대 5장)
  *     responses:
  *       200:
  *         description: 상품 수정 성공
@@ -218,7 +230,7 @@ router.get("/me", authenticate, getProductsMeController);
 //상품상세조회
 router.get("/:id", getProductByIdController);
 // 상품 수정
-router.patch("/:id", authenticate, updateProductController);
+router.patch("/:id", authenticate, s3ImageUpload, updateProductController);
 // 상품 삭제
 router.delete("/:id", authenticate, deleteProductController);
 // 어드민 대기중상품 조회
