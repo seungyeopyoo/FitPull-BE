@@ -9,11 +9,12 @@ import {
 	approveProduct,
 	rejectProduct,
 } from "../services/product.service.js";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages.js";
 
 export const createProductController = async (req, res) => {
 	try {
 		const product = await createProduct(req.body, req.user);
-		res.status(201).json({ message: "상품이 등록되었습니다.", product });
+		res.status(201).json({ message: SUCCESS_MESSAGES.PRODUCT_CREATED, product });
 	} catch (error) {
 		console.error("상품 등록 에러:", error);
 		res.status(400).json({ message: error.message });
@@ -34,10 +35,10 @@ export const getProductByIdController = async (req, res) => {
 	try {
 		const product = await getProductById(req.params.id);
 		if (!product)
-			return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+			return res.status(404).json({ message: ERROR_MESSAGES.PRODUCT_NOT_FOUND });
 		res.json(product);
 	} catch (error) {
-		if (error.message === "상품을 찾을 수 없습니다.") {
+		if (error.message === ERROR_MESSAGES.PRODUCT_NOT_FOUND) {
 			return res.status(404).json({ message: error.message });
 		}
 		console.error("상품 상세조회 에러:", error);
@@ -48,11 +49,11 @@ export const getProductByIdController = async (req, res) => {
 export const getProductsMeController = async (req, res) => {
 	try {
 		if (!req.user || !req.user.id) {
-			return res.status(401).json({ message: "인증이 필요합니다." });
+			return res.status(401).json({ message: ERROR_MESSAGES.AUTH_REQUIRED });
 		}
 		const products = await getProductsByUser(req.user.id);
 		if (!products || products.length === 0) {
-			return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+			return res.status(404).json({ message: ERROR_MESSAGES.PRODUCT_NOT_FOUND });
 		}
 		res.json(products);
 	} catch (error) {
@@ -82,7 +83,7 @@ export const updateProductController = async (req, res) => {
 		}
 
 		const updatedProduct = await updateProduct(id, productData, user);
-		res.json({ message: "상품이 수정되었습니다.", product: updatedProduct });
+		res.json({ message: SUCCESS_MESSAGES.PRODUCT_UPDATED, product: updatedProduct });
 	} catch (error) {
 		console.error("상품 수정 에러:", error);
 		res.status(400).json({ message: error.message });
@@ -95,7 +96,7 @@ export const deleteProductController = async (req, res) => {
 		const user = req.user;
 
 		await deleteProduct(id, user);
-		res.json({ message: "상품이 삭제되었습니다." });
+		res.json({ message: SUCCESS_MESSAGES.PRODUCT_DELETED });
 	} catch (error) {
 		res.status(400).json({ message: error.message });
 	}
@@ -114,7 +115,7 @@ export const getWaitingProductsController = async (_req, res) => {
 export const approveProductController = async (req, res) => {
 	try {
 		const result = await approveProduct(req.params.id);
-		res.json({ message: "상품이 승인되었습니다.", result });
+		res.json({ message: SUCCESS_MESSAGES.PRODUCT_APPROVED, result });
 	} catch (error) {
 		console.error("상품 승인 에러:", error);
 		res.status(400).json({ message: error.message });
@@ -124,7 +125,7 @@ export const approveProductController = async (req, res) => {
 export const rejectProductController = async (req, res) => {
 	try {
 		const result = await rejectProduct(req.params.id);
-		res.json({ message: "상품이 거절되었습니다.", result });
+		res.json({ message: SUCCESS_MESSAGES.PRODUCT_REJECTED, result });
 	} catch (error) {
 		console.error("상품 거절 에러:", error);
 		res.status(400).json({ message: error.message });

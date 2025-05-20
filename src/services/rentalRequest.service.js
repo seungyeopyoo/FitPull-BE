@@ -7,6 +7,8 @@ import {
 	findProductTitleById,
 	findRentalRequestSummaryById,
 } from "../repositories/rentalRequest.repository.js";
+import { RENTAL_STATUS } from "../constants/status.js";
+import { ERROR_MESSAGES } from "../constants/messages.js";
 
 export const createRentalRequest = async (
 	productId,
@@ -15,7 +17,7 @@ export const createRentalRequest = async (
 	userId,
 ) => {
 	const conflict = await checkRentalDateConflict(productId, startDate, endDate);
-	if (conflict) throw new Error("해당 기간은 이미 예약되어 있습니다.");
+	if (conflict) throw new Error(ERROR_MESSAGES.RENTAL_DATE_CONFLICT);
 
 	await createRentalRequestRepo(productId, startDate, endDate, userId);
 
@@ -51,11 +53,11 @@ export const getPendingRequests = async () => {
 };
 
 export const approveRentalRequest = async (id) => {
-	await updateRentalRequestStatusRepo(id, "APPROVED");
+	await updateRentalRequestStatusRepo(id, RENTAL_STATUS.APPROVED);
 	return await findRentalRequestSummaryById(id);
 };
 
 export const rejectRentalRequest = async (id) => {
-	await updateRentalRequestStatusRepo(id, "REJECTED");
+	await updateRentalRequestStatusRepo(id, RENTAL_STATUS.REJECTED);
 	return await findRentalRequestSummaryById(id);
 };
