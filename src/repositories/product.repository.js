@@ -72,7 +72,6 @@ export const findEtcCategoryId = async () => {
 	const category = await prisma.category.findFirst({
 		where: { name: DEFAULT_CATEGORY_NAME },
 	});
-	if (!category) throw new Error(`'${DEFAULT_CATEGORY_NAME}' 카테고리가 존재하지 않습니다.`); // 이거터지면 아무카테고리도 없다는말 기타는 나중에 seeding으로 심고 DB리셋시 손으로 기타 심자
 	return category.id;
 };
 
