@@ -1,4 +1,6 @@
 import prisma from "../data-source.js";
+import { DEFAULT_CATEGORY_NAME } from "../constants/category.js";
+import { PRODUCT_STATUS } from "../constants/status.js";
 
 // 상품 생성
 export const createProduct = async (data, ownerId) => {
@@ -20,7 +22,7 @@ export const createProduct = async (data, ownerId) => {
 // 승인된 상품 목록조회 // 페이징 + 카테고리 필터
 export const getAllProducts = async ({ skip = 0, take = 10, categoryId }) => {
 	const where = {
-		status: "APPROVED",
+		status: PRODUCT_STATUS.APPROVED,
 		deletedAt: null,
 		...(categoryId && { categoryId }),
 	};
@@ -68,9 +70,9 @@ export const findCategoryById = (id) => {
 
 export const findEtcCategoryId = async () => {
 	const category = await prisma.category.findFirst({
-		where: { name: "기타" },
+		where: { name: DEFAULT_CATEGORY_NAME },
 	});
-	if (!category) throw new Error("'기타' 카테고리가 존재하지 않습니다."); // 이거터지면 아무카테고리도 없다는말 기타는 나중에 seeding으로 심고 DB리셋시 손으로 기타 심자
+	if (!category) throw new Error(`'${DEFAULT_CATEGORY_NAME}' 카테고리가 존재하지 않습니다.`); // 이거터지면 아무카테고리도 없다는말 기타는 나중에 seeding으로 심고 DB리셋시 손으로 기타 심자
 	return category.id;
 };
 
@@ -103,7 +105,7 @@ export const deleteProduct = async (id, user) => {
 export const findWaitingProducts = async () => {
 	return await prisma.product.findMany({
 		where: {
-			status: "PENDING",
+			status: PRODUCT_STATUS.PENDING,
 			deletedAt: null,
 		},
 		include: {

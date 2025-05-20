@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3_PREFIX } from "../constants/s3.js";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -11,7 +12,7 @@ const s3 = new S3Client({
 export const uploadToS3 = async (file) => {
   const params = {
     Bucket: process.env.AWS_S3_BUCKET,
-    Key: `products/${Date.now()}_${file.originalname}`,
+    Key: `${S3_PREFIX}${Date.now()}_${file.originalname}`,
     Body: file.buffer,
     ContentType: file.mimetype,
   };

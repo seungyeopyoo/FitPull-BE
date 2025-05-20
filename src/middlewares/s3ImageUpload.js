@@ -1,9 +1,10 @@
 import upload from "./upload.js";
 import { uploadToS3 } from "../utils/s3.js";
+import { MAX_PRODUCT_IMAGES } from "../constants/limits.js";
 
 // 여러 장 이미지 업로드 및 S3 저장 미들웨어
 export const s3ImageUpload = [
-  upload.array("images", 5), // 최대 5장
+  upload.array("images", MAX_PRODUCT_IMAGES), // 최대 5장
   async (req, res, next) => {
     try {
       const imageUrls = [];

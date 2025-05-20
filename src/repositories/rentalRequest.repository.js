@@ -1,4 +1,6 @@
 import prisma from "../data-source.js";
+import { RENTAL_STATUS } from "../constants/status.js";
+import { ERROR_MESSAGES } from "../constants/messages.js";
 
 export const createRentalRequestRepo = async (
 	productId,
@@ -37,7 +39,7 @@ export const findMyRentalRequestsRepo = async (userId) => {
 
 export const findPendingRequestsRepo = async () => {
 	return await prisma.rentalRequest.findMany({
-		where: { status: "PENDING", deletedAt: null },
+		where: { status: RENTAL_STATUS.PENDING, deletedAt: null },
 		include: {
 			product: true,
 			user: {
@@ -63,7 +65,7 @@ export const checkRentalDateConflict = async (
 	const overlapping = await prisma.rentalRequest.findFirst({
 		where: {
 			productId,
-			status: "APPROVED",
+			status: RENTAL_STATUS.APPROVED,
 			OR: [
 				{
 					startDate: { lte: new Date(endDate) },
@@ -85,7 +87,7 @@ export const findRentalRequestSummaryById = async (id) => {
 		},
 	});
 
-	if (!request) throw new Error("요청 정보를 찾을 수 없습니다.");
+	if (!request) throw new Error(ERROR_MESSAGES.RENTAL_NOT_FOUND);
 
 	return {
 		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
