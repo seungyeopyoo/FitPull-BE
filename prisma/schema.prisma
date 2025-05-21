@@ -14,61 +14,57 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(uuid())
-  name             String
-  phone            String
-  profileImage     String?
-  role             Role              @default(USER)
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-  deletedAt        DateTime?         @map("deleted_at")
-  accounts         Account[]
-  products         Product[]
-  rentalRequests   RentalRequest[]
-  completedRentals CompletedRental[]
+  id                  String    @id @default(uuid())
+  name                String
+  phone               String
+  verifiedPhone       Boolean   @default(false)
+  profileImage        String?   @map("profile_image")
+  role                Role      @default(USER)
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
+  bankAccount         String?
+  bankName            String?
+  accountHolder       String?
+  verifiedBankAccount Boolean   @default(false)
 
-  @@map("users")
+  accounts          Account[]
+  products          Product[]
+  rentalRequests    RentalRequest[]
+  completedRentals  CompletedRental[]
+  paymentLogs       PaymentLog[]
+  notifications     Notification[]
+  rentalReviews     RentalReview[]
+  productStatusLogs ProductStatusLog[]
+  aiReviews         AiReview[]
+  aiRecommends      AiRecommend[]
+  sentMessages      Message[]          @relation("SentMessages")
+  receivedMessages  Message[]          @relation("ReceivedMessages")
+  packages          Package[]
+  influencerPromos  InfluencerPromo[]
 }
 
 model Account {
   id           String    @id @default(uuid())
   provider     Provider
-  email        String    @unique
+  providerId   String?   @map("provider_id")
+  email        String
   passwordHash String?   @map("password_hash")
+  accessToken  String?   @map("access_token")
+  refreshToken String?   @map("refresh_token")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
-  user         User      @relation(fields: [userId], references: [id])
   userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id])
 
   @@map("accounts")
-}
-
-model Product {
-  id               String            @id @default(uuid())
-  title            String
-  description      String?
-  price            Int
-  status           ProductStatus     @default(PENDING)
-  allowPurchase    Boolean           @default(false) @map("allow_purchase")
-  imageUrls        String[]          @map("image_urls")
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
-  deletedAt        DateTime?         @map("deleted_at")
-  owner            User              @relation(fields: [ownerId], references: [id])
-  ownerId          String            @map("owner_id")
-  category         Category?         @relation(fields: [categoryId], references: [id])
-  categoryId       String?           @map("category_id")
-  rentalRequests   RentalRequest[]
-  completedRentals CompletedRental[]
-
-  @@map("products")
 }
 
 model Category {
   id          String    @id @default(uuid())
   name        String
-  description String?
+  description String?   @db.Text
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
@@ -77,19 +73,54 @@ model Category {
   @@map("categories")
 }
 
+model Product {
+  id               String             @id @default(uuid())
+  title            String
+  description      String?            @db.Text
+  price            Int
+  status           ProductStatus
+  imageUrls        String[]           @map("image_urls")
+  allowPurchase    Boolean            @default(false) @map("allow_purchase")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  deletedAt        DateTime?          @map("deleted_at")
+  ownerId          String             @map("user_id")
+  categoryId       String             @map("category_id")
+  owner            User               @relation(fields: [ownerId], references: [id])
+  category         Category           @relation(fields: [categoryId], references: [id])
+  rentalRequests   RentalRequest[]
+  statusLogs       ProductStatusLog[]
+  completedRentals CompletedRental[]
+  aiReviews        AiReview[]
+  aiRecommends     AiRecommend[]
+  messages         Message[]
+  influencerPromos InfluencerPromo[]
+  packageItems     PackageItem[]
+  Notification     Notification[]
+  RentalReview     RentalReview[]
+
+  @@map("products")
+}
+
 model RentalRequest {
   id              String           @id @default(uuid())
   startDate       DateTime         @map("start_date")
   endDate         DateTime         @map("end_date")
-  status          RentalStatus     @default(PENDING)
+  status          RequestStatus
+  totalPrice      Int              @map("total_price")
+  howToReceive    ReceiveMethod    @map("how_to_receive")
+  memo            String?          @db.Text
+  isPaid          Boolean          @default(false) @map("isPaid")
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
   deletedAt       DateTime?        @map("deleted_at")
-  user            User             @relation(fields: [userId], references: [id])
   userId          String           @map("user_id")
-  product         Product          @relation(fields: [productId], references: [id])
   productId       String           @map("product_id")
+  user            User             @relation(fields: [userId], references: [id])
+  product         Product          @relation(fields: [productId], references: [id])
   completedRental CompletedRental?
+  paymentLogs     PaymentLog[]
+  notifications   Notification[]
 
   @@map("rental_requests")
 }
@@ -102,14 +133,169 @@ model CompletedRental {
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
   deletedAt       DateTime?     @map("deleted_at")
-  user            User          @relation(fields: [userId], references: [id])
   userId          String        @map("user_id")
-  product         Product       @relation(fields: [productId], references: [id])
   productId       String        @map("product_id")
+  rentalRequestId String        @unique @map("rental_requests_id")
+  user            User          @relation(fields: [userId], references: [id])
+  product         Product       @relation(fields: [productId], references: [id])
   rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
-  rentalRequestId String        @unique @map("rental_request_id")
+  rentalReview    RentalReview?
 
   @@map("completed_rentals")
+}
+
+model PaymentLog {
+  id              String        @id @default(uuid())
+  amount          Int
+  paymentType     PaymentType
+  paidAt          DateTime?
+  memo            String?
+  createdAt       DateTime      @default(now()) @map("created_at")
+  rentalRequestId String        @map("rental_requests_id")
+  rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
+  userId          String        @map("user_id")
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@map("payment_logs")
+}
+
+model Notification {
+  id                 String            @id @default(uuid())
+  type               NotificationType
+  message            String
+  url                String?
+  isRead             Boolean           @default(false) @map("is_read")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  readAt             DateTime?         @map("read_at")
+  userId             String            @map("user_id")
+  user               User              @relation(fields: [userId], references: [id])
+  productId          String?           @map("product_id")
+  product            Product?          @relation(fields: [productId], references: [id])
+  rentalRequestId    String?           @map("rental_requests_id")
+  rentalRequest      RentalRequest?    @relation(fields: [rentalRequestId], references: [id])
+  reviewId           String?           @map("review_id")
+  review             RentalReview?     @relation(fields: [reviewId], references: [id])
+  messageId          String?           @map("messages_id")
+  messageEntity      Message?          @relation(fields: [messageId], references: [id])
+  productStatusLogId String?           @map("product_status_logs_id")
+  productStatusLog   ProductStatusLog? @relation(fields: [productStatusLogId], references: [id])
+
+  @@map("notifications")
+}
+
+model RentalReview {
+  id                String          @id @default(uuid())
+  rating            Int
+  comment           String?         @db.Text
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+  userId            String          @map("user_id")
+  completedRentalId String          @unique @map("completed_rental_id")
+  productId         String          @map("products_id")
+  user              User            @relation(fields: [userId], references: [id])
+  completedRental   CompletedRental @relation(fields: [completedRentalId], references: [id])
+  product           Product         @relation(fields: [productId], references: [id])
+  notifications     Notification[]
+
+  @@map("reviews")
+}
+
+model Message {
+  id            String         @id @default(uuid())
+  content       String         @db.Text
+  isRead        Boolean        @default(false) @map("is_read")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  deletedAt     DateTime?      @map("deleted_at")
+  senderId      String         @map("sender_id")
+  receiverId    String         @map("receiver_id")
+  productId     String?        @map("products_id")
+  sender        User           @relation("SentMessages", fields: [senderId], references: [id])
+  receiver      User           @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  product       Product?       @relation(fields: [productId], references: [id])
+  notifications Notification[]
+
+  @@map("messages")
+}
+
+model ProductStatusLog {
+  id            String         @id @default(uuid())
+  type          ProductLogType
+  photoUrls     String[]       @map("photo_urls")
+  notes         String?        @db.Text
+  createdAt     DateTime       @default(now()) @map("created_at")
+  userId        String         @map("user_id")
+  productId     String         @map("product_id")
+  user          User           @relation(fields: [userId], references: [id])
+  product       Product        @relation(fields: [productId], references: [id])
+  notifications Notification[]
+
+  @@map("product_status_logs")
+}
+
+model AiReview {
+  id             String   @id @default(uuid())
+  estimatedPrice Int      @map("estimated_price")
+  isValid        Boolean  @default(false) @map("is_valid")
+  sources        Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  productId      String   @map("product_id")
+  userId         String   @map("user_id")
+  product        Product  @relation(fields: [productId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("ai_reviews")
+}
+
+model AiRecommend {
+  id                  String   @id @default(uuid())
+  prompt              String   @db.Text
+  recommendedProducts String[] @map("recommended_products")
+  recommendReason     String   @map("recommend_reason") @db.Text
+  createdAt           DateTime @default(now()) @map("created_at")
+  productId           String   @map("product_id")
+  product             Product  @relation(fields: [productId], references: [id])
+  user                User?    @relation(fields: [userId], references: [id])
+  userId              String?
+
+  @@map("ai_recommend")
+}
+
+model Package {
+  id           String        @id @default(uuid())
+  title        String
+  description  String?       @db.Text
+  discountRate Float?        @map("discount_rate")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  userId       String        @map("user_id")
+  user         User          @relation(fields: [userId], references: [id])
+  items        PackageItem[]
+
+  @@map("packages")
+}
+
+model PackageItem {
+  packageId String  @map("package_id")
+  productId String  @map("product_id")
+  package   Package @relation(fields: [packageId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@id([packageId, productId])
+  @@map("package_items")
+}
+
+model InfluencerPromo {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  videoUrl    String?  @map("video_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  productId   String   @map("product_id")
+  product     Product  @relation(fields: [productId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+
+  @@map("influencer_promos")
 }
 
 enum Role {
@@ -119,8 +305,8 @@ enum Role {
 
 enum Provider {
   LOCAL
-  KAKAO
-  GOOGLE
+  kakao
+  google
 }
 
 enum ProductStatus {
@@ -130,8 +316,42 @@ enum ProductStatus {
   CANCELED
 }
 
-enum RentalStatus {
+enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+  ON_RENTING
+}
+
+enum ReceiveMethod {
+  DIRECT
+  PARCEL
+}
+
+enum PaymentType {
+  RENTAL_PAYMENT
+  STORAGE_FEE
+  DAMAGE_COMPENSATION
+  OWNER_PAYOUT
+  REFUND
+  ETC
+}
+
+enum NotificationType {
+  SYSTEM
+  APPROVAL
+  RENTAL_STATUS
+  CHAT
+  FEE
+  REVIEW
+  ETC
+}
+
+enum ProductLogType {
+  PRE_RENTAL
+  ON_RENTAL
+  DAMAGE_REPORTED
+  WITHDRAWN
+  STORAGE_FEE_NOTICE
+  ETC
 }
