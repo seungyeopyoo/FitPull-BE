@@ -6,7 +6,7 @@ FitPull Overflow는 "모든 것을 대여한다"는 컨셉의 대여 서비스 �
 
 ## ERD
 
-![FOF ERD 전체](./docs/erd/FOFERD.png)
+![FOF ERD 전체](./docs/erd/FOFSECONDERD.png)
 [ERD 원본 보기 (ERDCloud)](https://www.erdcloud.com/d/waj7NZ2NAPBamqBPM)
 
 ## 핵심 기능
