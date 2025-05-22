@@ -106,7 +106,7 @@ model RentalRequest {
   id              String           @id @default(uuid())
   startDate       DateTime         @map("start_date")
   endDate         DateTime         @map("end_date")
-  status          RequestStatus
+  status          RequestStatus    @default(PENDING)
   totalPrice      Int              @map("total_price")
   howToReceive    ReceiveMethod    @map("how_to_receive")
   memo            String?          @db.Text
@@ -135,7 +135,7 @@ model CompletedRental {
   deletedAt       DateTime?     @map("deleted_at")
   userId          String        @map("user_id")
   productId       String        @map("product_id")
-  rentalRequestId String        @unique @map("rental_requests_id")
+  rentalRequestId String        @unique @map("rental_request_id")
   user            User          @relation(fields: [userId], references: [id])
   product         Product       @relation(fields: [productId], references: [id])
   rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
@@ -151,7 +151,7 @@ model PaymentLog {
   paidAt          DateTime?
   memo            String?
   createdAt       DateTime      @default(now()) @map("created_at")
-  rentalRequestId String        @map("rental_requests_id")
+  rentalRequestId String        @map("rental_request_id")
   rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
   userId          String        @map("user_id")
   user            User          @relation(fields: [userId], references: [id])
@@ -171,7 +171,7 @@ model Notification {
   user               User              @relation(fields: [userId], references: [id])
   productId          String?           @map("product_id")
   product            Product?          @relation(fields: [productId], references: [id])
-  rentalRequestId    String?           @map("rental_requests_id")
+  rentalRequestId    String?           @map("rental_request_id")
   rentalRequest      RentalRequest?    @relation(fields: [rentalRequestId], references: [id])
   reviewId           String?           @map("review_id")
   review             RentalReview?     @relation(fields: [reviewId], references: [id])

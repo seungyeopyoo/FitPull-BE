@@ -9,17 +9,47 @@ import {
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
+import { getProductById } from "../repositories/product.repository.js";
 
 export const createRentalRequest = async (
 	productId,
 	startDate,
 	endDate,
 	userId,
+	howToReceive,
+	memo
 ) => {
+	// 예약일 30일 제한
+	const now = new Date();
+	const oneMonthLater = new Date();
+	oneMonthLater.setDate(now.getDate() + 30);
+	if (new Date(startDate) > oneMonthLater) {
+		throw new Error("예약 시작일은 30일 이내여야 합니다.");
+	}
+
+	// 날짜 중복 체크
 	const conflict = await checkRentalDateConflict(productId, startDate, endDate);
 	if (conflict) throw new Error(ERROR_MESSAGES.RENTAL_DATE_CONFLICT);
 
-	await createRentalRequestRepo(productId, startDate, endDate, userId);
+	if (!howToReceive) throw new Error("수령 방법을 선택해주세요.");
+
+	const product = await getProductById(productId);
+	if (!product) throw new Error("상품을 찾을 수 없습니다.");
+
+	const dayCount = Math.ceil(
+		(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+	);
+	const totalPrice = product.price * dayCount;
+
+	await createRentalRequestRepo(
+		productId,
+		startDate,
+		endDate,
+		userId,
+		totalPrice,
+		howToReceive,
+		memo
+	);
 
 	const title = await findProductTitleById(productId);
 

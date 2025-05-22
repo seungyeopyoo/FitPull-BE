@@ -28,3 +28,5 @@ STORAGE_FEE (장기 보관료)
 DAMAGE_COMPENSATION (파손/손상 보상금)
 OWNER_PAYOUT (소유주 정산금 지급)
 REFUND (환불)
+
+반사적으로 박았는데 사실 profileimage라는건 필요없는게 아닐까 user에 어차피 admin하고만 노는데 근데 확장가능성있으니 넣어두고 반환값을 수정하자 안보이게 잘 숨겨서 ㅇㅇ
