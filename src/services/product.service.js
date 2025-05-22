@@ -198,13 +198,18 @@ export const deleteProduct = async (id, user) => {
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
 		throw new Error(ERROR_MESSAGES.NO_PERMISSION);
 	}
-
+	const now = new Date();
+	const oneMonthLater = new Date();
+	oneMonthLater.setDate(now.getDate() + 30);
 	// 예약되었거나 대여중이면 삭제 금지
 	const activeRental = await prisma.rentalRequest.findFirst({
 		where: {
 			productId: id,
 			status: {
 				in: ["APPROVED", "ON_RENTING"],
+			},
+			startDate: {
+				lte: oneMonthLater,
 			},
 		},
 	});
