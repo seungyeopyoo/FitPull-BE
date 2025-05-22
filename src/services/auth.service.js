@@ -28,10 +28,9 @@ export const signup = async ({
 	const { accessToken, refreshToken } = generateTokens(payload);
 
 	return {
-		message: "회원가입이 완료되었습니다.",
-		user: account.user,
+			id: account.user.id,
+			name: account.user.name,
 		accessToken,
-		refreshToken,
 	};
 };
 
@@ -53,8 +52,8 @@ export const login = async ({ email, password }) => {
 
 	return {
 		message: "로그인 성공",
-		user: account.user,
-		accessToken,
-		refreshToken,
+		id: account.user.id,
+			name: account.user.name,
+			accessToken,
 	};
 };

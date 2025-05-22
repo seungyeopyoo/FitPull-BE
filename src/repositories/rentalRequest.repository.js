@@ -102,3 +102,27 @@ export const getRentalRequestById = async (id) => {
 		where: { id },
 	});
 };
+
+export const findActiveRentalByProductId = async (productId) => {
+	return await prisma.rentalRequest.findFirst({
+		where: {
+			productId,
+			status: "ON_RENTING",
+		},
+	});
+};
+
+export const findActiveRentalForDelete = async (productId, oneMonthLater) => {
+	return await prisma.rentalRequest.findFirst({
+		where: {
+			productId,
+			status: {
+				in: ["APPROVED", "ON_RENTING"],
+			},
+			startDate: {
+				lte: oneMonthLater,
+			},
+		},
+	});
+};
+
