@@ -50,6 +50,8 @@ export const getProductById = async (id) => {
 		include: {
 			owner: true,
 			category: true,
+			RentalReview: true,
+			statusLogs: true,
 		},
 	});
 };

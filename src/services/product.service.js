@@ -111,12 +111,40 @@ export const updateProduct = async (id, productData, user) => {
 		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
-	// 본인 상품이거나 admin인 경우에만 수정 가능
+	// 본인 상품이거나 관리자만 수정 가능
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
 		throw new Error(ERROR_MESSAGES.NO_PERMISSION);
 	}
 
-	// price가 존재하면 항상 Number로 변환
+	// 대여중이면 수정 불가
+	const rentalActive = await prisma.rentalRequest.findFirst({
+		where: {
+			productId: id,
+			status: "ON_RENTING", // enum 값 그대로 문자열
+		},
+	});
+
+	if (rentalActive) {
+		throw new Error("현재 대여중인 상품은 수정할 수 없습니다.");
+	}
+
+	// 상품 상태에 따라 수정 제한
+	if (user.role !== "ADMIN") {
+		// 일반 유저는 상태값 못 바꿈
+		delete productData.status;
+
+		// 거절되거나 취소된 상품은 수정 불가
+		if (["REJECTED", "CANCELED"].includes(product.status)) {
+			throw new Error("거절되었거나 취소된 상품은 수정할 수 없습니다.");
+		}
+
+		// 승인된 상품은 다시 승인 대기로 전환
+		if (product.status === "APPROVED") {
+			productData.status = "PENDING";
+		}
+	}
+
+	// price 검증
 	if (productData.price !== undefined) {
 		productData.price = Number(productData.price);
 		if (productData.price < 0) {
@@ -126,7 +154,6 @@ export const updateProduct = async (id, productData, user) => {
 
 	let categoryId = productData.categoryId;
 
-	// categoryId가 변경되었고, 잘못된 경우 → '기타' 카테고리 id로 대체
 	if (categoryId && categoryId !== product.categoryId) {
 		const categoryExists = await findCategoryById(categoryId);
 		if (!categoryExists) {
@@ -134,17 +161,12 @@ export const updateProduct = async (id, productData, user) => {
 		}
 	}
 
-	// 이미지 URL이 변경된 경우, 기존 이미지 삭제
+	// 이미지 변경 처리 (기존 이미지 정리)
 	if (productData.imageUrls && Array.isArray(productData.imageUrls)) {
-		// 기존 이미지 중 새 이미지 목록에 없는 것들을 삭제
 		const imagesToDelete = product.imageUrls.filter(
 			(oldUrl) => !productData.imageUrls.includes(oldUrl)
 		);
-		
-		// S3에서 사용하지 않는 이미지 삭제
-		await Promise.all(
-			imagesToDelete.map((imageUrl) => deleteFromS3(imageUrl))
-		);
+		await Promise.all(imagesToDelete.map(deleteFromS3));
 	}
 
 	const updated = await updateProductRepo(id, {
@@ -173,20 +195,32 @@ export const deleteProduct = async (id, user) => {
 		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
-	// 본인 상품이거나 admin인 경우에만 삭제 가능
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
 		throw new Error(ERROR_MESSAGES.NO_PERMISSION);
 	}
 
-	// S3에서 모든 이미지 삭제
+	// 예약되었거나 대여중이면 삭제 금지
+	const activeRental = await prisma.rentalRequest.findFirst({
+		where: {
+			productId: id,
+			status: {
+				in: ["APPROVED", "ON_RENTING"],
+			},
+		},
+	});
+
+	if (activeRental) {
+		throw new Error("예약 중이거나 대여 중인 상품은 삭제할 수 없습니다.");
+	}
+
+	// 이미지 삭제
 	if (product.imageUrls && Array.isArray(product.imageUrls)) {
-		await Promise.all(
-			product.imageUrls.map((imageUrl) => deleteFromS3(imageUrl))
-		);
+		await Promise.all(product.imageUrls.map(deleteFromS3));
 	}
 
 	return await deleteProductRepo(id);
 };
+
 
 export const getWaitingProducts = async () => {
 	const products = await findWaitingProductsRepo();
