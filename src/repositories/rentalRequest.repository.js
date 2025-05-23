@@ -108,6 +108,10 @@ export const findRentalRequestSummaryById = async (id) => {
 export const getRentalRequestById = async (id) => {
 	return await prisma.rentalRequest.findUnique({
 		where: { id },
+		include: {
+			product: true,
+			user: true,
+		},
 	});
 };
 
