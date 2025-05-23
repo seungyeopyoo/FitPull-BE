@@ -7,6 +7,9 @@ export const createRentalRequestRepo = async (
 	startDate,
 	endDate,
 	userId,
+	totalPrice,
+	howToReceive,
+	memo
 ) => {
 	return await prisma.rentalRequest.create({
 		data: {
@@ -14,6 +17,9 @@ export const createRentalRequestRepo = async (
 			userId,
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
+			totalPrice,
+			howToReceive,
+			memo,
 		},
 	});
 };
@@ -94,11 +100,41 @@ export const findRentalRequestSummaryById = async (id) => {
 		productTitle: request.product.title,
 		userName: request.user.name,
 		status: request.status,
+		howToReceive: request.howToReceive,
+		memo: request.memo,
 	};
 };
 
 export const getRentalRequestById = async (id) => {
 	return await prisma.rentalRequest.findUnique({
 		where: { id },
+		include: {
+			product: true,
+			user: true,
+		},
 	});
 };
+
+export const findActiveRentalByProductId = async (productId) => {
+	return await prisma.rentalRequest.findFirst({
+		where: {
+			productId,
+			status: "ON_RENTING",
+		},
+	});
+};
+
+export const findActiveRentalForDelete = async (productId, oneMonthLater) => {
+	return await prisma.rentalRequest.findFirst({
+		where: {
+			productId,
+			status: {
+				in: ["APPROVED", "ON_RENTING"],
+			},
+			startDate: {
+				lte: oneMonthLater,
+			},
+		},
+	});
+};
+

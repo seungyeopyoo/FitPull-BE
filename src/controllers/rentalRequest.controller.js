@@ -8,13 +8,15 @@ import {
 
 export const createRentalRequestController = async (req, res) => {
 	try {
-		const { productId, startDate, endDate } = req.body;
+		const { productId, startDate, endDate, howToReceive, memo } = req.body;
 		const user = req.user;
 		const rentalRequest = await createRentalRequest(
 			productId,
 			startDate,
 			endDate,
 			user.id,
+			howToReceive,
+			memo
 		);
 		res.status(201).json(rentalRequest);
 	} catch (error) {

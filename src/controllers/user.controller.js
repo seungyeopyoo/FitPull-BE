@@ -16,12 +16,13 @@ export const getMyProfile = async (req, res) => {
 export const updateMyProfile = async (req, res) => {
 	try {
 		const userId = req.user.userId;
-		const { name, phone, profileImage } = req.body;
+		const { name, bankAccount, bankName, accountHolder } = req.body;
 
 		const updatedUser = await updateUserInfo(userId, {
 			name,
-			phone,
-			profileImage,
+			bankAccount,
+			bankName,
+			accountHolder,
 		});
 
 		res.json({ message: "내 정보가 수정되었습니다.", user: updatedUser });

@@ -1,6 +1,7 @@
 import prisma from "../data-source.js";
 
 export const createCompletedRentalRepo = async ({
+	completedRentalId,
 	rentalRequestId,
 	userId,
 	productId,
@@ -31,6 +32,8 @@ export const findCompletedRentalInfoByRequestId = async (rentalRequestId) => {
 	if (!result) throw new Error("완료된 대여 정보를 찾을 수 없습니다.");
 
 	return {
+		completedRentalId: result.id,
+		rentalRequestId: result.rentalRequestId,
 		productTitle: result.product.title,
 		userName: result.user.name,
 		userPhone: result.user.phone,
@@ -68,5 +71,11 @@ export const findAllCompletedRentals = async () => {
 			},
 		},
 		orderBy: { createdAt: "desc" },
+	});
+};
+
+export const findCompletedRentalByRequestId = async (rentalRequestId) => {
+	return await prisma.completedRental.findUnique({
+		where: { rentalRequestId }
 	});
 };

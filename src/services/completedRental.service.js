@@ -3,6 +3,7 @@ import {
 	findCompletedRentalInfoByRequestId,
 	findCompletedRentalsByUser,
 	findAllCompletedRentals,
+	findCompletedRentalByRequestId,
 } from "../repositories/completedRental.repository.js";
 import { getRentalRequestById } from "../repositories/rentalRequest.repository.js";
 import { getProductById } from "../repositories/product.repository.js";
@@ -21,7 +22,12 @@ export const completeRentalService = async (rentalRequestId) => {
 	);
 	const totalPrice = pricePerDay * days;
 
-	await createCompletedRentalRepo({
+	const alreadyCompleted = await findCompletedRentalByRequestId(rentalRequestId);
+	if (alreadyCompleted) {
+		return { message: "이미 완료된 대여입니다." };
+	}
+
+	const completedRental = await createCompletedRentalRepo({
 		rentalRequestId,
 		userId: rental.userId,
 		productId: rental.productId,
@@ -30,13 +36,25 @@ export const completeRentalService = async (rentalRequestId) => {
 		totalPrice: Number(totalPrice),
 	});
 
-	return await findCompletedRentalInfoByRequestId(rentalRequestId);
+	return {
+
+			completedRentalId: completedRental.id,
+			rentalRequestId: completedRental.rentalRequestId,
+			productTitle: rental.product.title,
+			userName: rental.user.name,
+			userPhone: rental.user.phone,
+			rentalPeriod: `${rental.startDate.toISOString().slice(0, 10)} ~ ${rental.endDate.toISOString().slice(0, 10)}`,
+			totalPrice: Number(totalPrice),
+		
+	};
 };
 
 export const getMyCompletedRentals = async (userId) => {
 	const rentals = await findCompletedRentalsByUser(userId);
 
 	return rentals.map((rental) => ({
+		completedRentalId: rental.id,
+		rentalRequestId: rental.rentalRequestId,
 		productTitle: rental.product.title,
 		rentalPeriod: `${rental.startDate.toISOString().slice(0, 10)} ~ ${rental.endDate.toISOString().slice(0, 10)}`,
 		totalPrice: Number(rental.totalPrice),
@@ -47,6 +65,8 @@ export const getAllCompletedRentals = async () => {
 	const rentals = await findAllCompletedRentals();
 
 	return rentals.map((rental) => ({
+		completedRentalId: rental.id,
+		rentalRequestId: rental.rentalRequestId,
 		productTitle: rental.product.title,
 		userName: rental.user.name,
 		userPhone: rental.user.phone,

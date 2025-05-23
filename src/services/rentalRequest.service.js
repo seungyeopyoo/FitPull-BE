@@ -56,6 +56,9 @@ export const createRentalRequest = async (
 	return {
 		rentalPeriod: `${startDate} ~ ${endDate}`,
 		productTitle: title,
+		howToReceive: howToReceive,
+		totalPrice: totalPrice,
+		memo: memo,
 	};
 };
 
@@ -63,9 +66,12 @@ export const getMyRentalRequests = async (userId) => {
 	const requests = await findMyRentalRequestsRepo(userId);
 
 	return requests.map((request) => ({
+		id: request.id,
 		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
 		productTitle: request.product.title,
 		status: request.status,
+		howToReceive: request.howToReceive,
+		memo: request.memo,
 	}));
 };
 
@@ -76,6 +82,8 @@ export const getPendingRequests = async () => {
 		id: request.id,
 		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
 		productTitle: request.product.title,
+		howToReceive: request.howToReceive,
+		memo: request.memo,
 		userName: request.user.name,
 		userPhone: request.user.phone,
 		status: request.status,

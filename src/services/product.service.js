@@ -14,6 +14,7 @@ import { deleteFromS3 } from "../utils/s3.js";
 import { DEFAULT_CATEGORY_NAME } from "../constants/category.js";
 import { PRODUCT_STATUS } from "../constants/status.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
+import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repositories/rentalRequest.repository.js";
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
@@ -36,7 +37,7 @@ export const createProduct = async (productData, user) => {
 		}
 	}
 
-	return await createProductRepo(
+	const product = await createProductRepo(
 		{
 			title: productData.title,
 			description: productData.description,
@@ -48,6 +49,21 @@ export const createProduct = async (productData, user) => {
 		},
 		user.id,
 	);
+
+	const category = await findCategoryById(product.categoryId);
+
+	return {
+		product: {
+			id: product.id,
+			title: product.title,
+			description: product.description,
+			price: product.price,
+			status: product.status,
+			imageUrls: product.imageUrls,
+			allowPurchase: product.allowPurchase,
+			category: { name: category?.name ?? DEFAULT_CATEGORY_NAME },
+		},
+	};
 };
 
 export const getAllProducts = async ({ skip, take, categoryId } = {}) => {
@@ -92,13 +108,12 @@ export const getProductsByUser = async (ownerId) => {
 	const products = await getProductsByUserRepo(ownerId);
 
 	const listedProducts = products.map((product) => ({
+		id: product.id,
 		title: product.title,
 		price: product.price,
 		status: product.status,
 		imageUrl: product.imageUrls?.[0] ?? null,
 		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
-		createdAt: product.createdAt,
-		updatedAt: product.updatedAt,
 	}));
 
 	return listedProducts;
@@ -117,12 +132,7 @@ export const updateProduct = async (id, productData, user) => {
 	}
 
 	// 대여중이면 수정 불가
-	const rentalActive = await prisma.rentalRequest.findFirst({
-		where: {
-			productId: id,
-			status: "ON_RENTING", // enum 값 그대로 문자열
-		},
-	});
+	const rentalActive = await findActiveRentalByProductId(id);
 
 	if (rentalActive) {
 		throw new Error("현재 대여중인 상품은 수정할 수 없습니다.");
@@ -174,6 +184,8 @@ export const updateProduct = async (id, productData, user) => {
 		...(categoryId && { categoryId }),
 	});
 
+	const category = await findCategoryById(updated.categoryId);
+
 	return {
 		id: updated.id,
 		title: updated.title,
@@ -182,9 +194,7 @@ export const updateProduct = async (id, productData, user) => {
 		imageUrls: updated.imageUrls,
 		status: updated.status,
 		allowPurchase: updated.allowPurchase,
-		createdAt: updated.createdAt,
-		updatedAt: updated.updatedAt,
-		categoryId: updated.categoryId,
+		category: { name: category?.name ?? DEFAULT_CATEGORY_NAME },
 	};
 };
 
@@ -201,18 +211,9 @@ export const deleteProduct = async (id, user) => {
 	const now = new Date();
 	const oneMonthLater = new Date();
 	oneMonthLater.setDate(now.getDate() + 30);
+	
 	// 예약되었거나 대여중이면 삭제 금지
-	const activeRental = await prisma.rentalRequest.findFirst({
-		where: {
-			productId: id,
-			status: {
-				in: ["APPROVED", "ON_RENTING"],
-			},
-			startDate: {
-				lte: oneMonthLater,
-			},
-		},
-	});
+	const activeRental = await findActiveRentalForDelete(id, oneMonthLater);
 
 	if (activeRental) {
 		throw new Error("예약 중이거나 대여 중인 상품은 삭제할 수 없습니다.");
@@ -247,9 +248,41 @@ export const getWaitingProducts = async () => {
 };
 
 export const approveProduct = async (id) => {
-	return await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
+	const product = await updateProductStatusRepo(id);
+
+	return {
+		message: PRODUCT_STATUS.APPROVED,
+		id: product.id,
+		title: product.title,
+		price: product.price,
+		status: product.status,
+		imageUrl: product.imageUrls?.[0] ?? null,
+		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+		owner: {
+			id: product.owner?.id,
+			name: product.owner?.name,
+			phone: product.owner?.phone,
+		},
+		createdAt: product.createdAt,
+	};
 };
 
 export const rejectProduct = async (id) => {
-	return await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
+	const product = await updateProductStatusRepo(id);
+
+	return {
+		message: PRODUCT_STATUS.REJECTED,
+		id: product.id,
+		title: product.title,
+		price: product.price,
+		status: product.status,
+		imageUrl: product.imageUrls?.[0] ?? null,
+		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+		owner: {
+			id: product.owner?.id,
+			name: product.owner?.name,
+			phone: product.owner?.phone,
+		},
+		createdAt: product.createdAt,
+	};
 };
