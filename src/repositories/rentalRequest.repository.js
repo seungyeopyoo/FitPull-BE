@@ -7,6 +7,9 @@ export const createRentalRequestRepo = async (
 	startDate,
 	endDate,
 	userId,
+	totalPrice,
+	howToReceive,
+	memo
 ) => {
 	return await prisma.rentalRequest.create({
 		data: {
@@ -14,6 +17,9 @@ export const createRentalRequestRepo = async (
 			userId,
 			startDate: new Date(startDate),
 			endDate: new Date(endDate),
+			totalPrice,
+			howToReceive,
+			memo,
 		},
 	});
 };
@@ -94,6 +100,8 @@ export const findRentalRequestSummaryById = async (id) => {
 		productTitle: request.product.title,
 		userName: request.user.name,
 		status: request.status,
+		howToReceive: request.howToReceive,
+		memo: request.memo,
 	};
 };
 
