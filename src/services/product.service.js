@@ -50,6 +50,8 @@ export const createProduct = async (productData, user) => {
 		user.id,
 	);
 
+	const category = await findCategoryById(product.categoryId);
+
 	return {
 		product: {
 			id: product.id,
@@ -59,7 +61,7 @@ export const createProduct = async (productData, user) => {
 			status: product.status,
 			imageUrls: product.imageUrls,
 			allowPurchase: product.allowPurchase,
-			category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+			category: { name: category?.name ?? DEFAULT_CATEGORY_NAME },
 		},
 	};
 };
@@ -182,6 +184,8 @@ export const updateProduct = async (id, productData, user) => {
 		...(categoryId && { categoryId }),
 	});
 
+	const category = await findCategoryById(updated.categoryId);
+
 	return {
 		id: updated.id,
 		title: updated.title,
@@ -190,7 +194,7 @@ export const updateProduct = async (id, productData, user) => {
 		imageUrls: updated.imageUrls,
 		status: updated.status,
 		allowPurchase: updated.allowPurchase,
-		category: { name: updated.category?.name ?? DEFAULT_CATEGORY_NAME },
+		category: { name: category?.name ?? DEFAULT_CATEGORY_NAME },
 	};
 };
 

@@ -15,19 +15,19 @@ export const createCategoryController = async (req, res) => {
 	if (!name)
 		return res.status(400).json({ message: "카테고리 이름이 필요합니다." });
 
-	const newCategory = await createCategory(name);
-	res.status(201).json(newCategory);
+	const result = await createCategory(name);
+	res.status(201).json(result);
 };
 
 export const updateCategoryController = async (req, res) => {
 	const { id } = req.params;
-	const { name } = req.body;
+	const { name, description } = req.body;
 	if (!name)
 		return res.status(400).json({ message: "수정할 이름이 필요합니다." });
 
 	try {
-		const updated = await updateCategory(id, name);
-		res.json(updated);
+		const result = await updateCategory(id, name, description);
+		res.json(result);
 	} catch (error) {
 		console.error("카테고리 수정 에러:", error);
 		const status = error.status || 500;
@@ -38,8 +38,8 @@ export const updateCategoryController = async (req, res) => {
 export const deleteCategoryController = async (req, res) => {
 	const { id } = req.params;
 	try {
-		await deleteCategory(id);
-		res.status(204).end();
+		const result = await deleteCategory(id);
+		res.status(200).json(result);
 	} catch (error) {
 		console.error("카테고리 삭제 에러:", error);
 		const status = error.status || 500;
