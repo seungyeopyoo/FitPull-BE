@@ -4,6 +4,7 @@ import {
 	getPendingRequests,
 	approveRentalRequest,
 	rejectRentalRequest,
+	cancelRentalRequest,
 } from "../services/rentalRequest.service.js";
 
 export const createRentalRequestController = async (req, res) => {
@@ -55,6 +56,17 @@ export const rejectRentalRequestController = async (req, res) => {
 	try {
 		const request = await rejectRentalRequest(req.params.id);
 		res.json({ message: "거절되었습니다.", request });
+	} catch (error) {
+		res.status(400).json({ message: error.message });
+	}
+};
+
+export const cancelRentalRequestController = async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const { id } = req.params;
+		const request = await cancelRentalRequest(id, userId);
+		res.json({ message: "고객 요청으로 거절되었습니다.", request });
 	} catch (error) {
 		res.status(400).json({ message: error.message });
 	}

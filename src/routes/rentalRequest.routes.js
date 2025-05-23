@@ -5,6 +5,7 @@ import {
 	getPendingRequestsController,
 	approveRentalRequestController,
 	rejectRentalRequestController,
+	cancelRentalRequestController,
 } from "../controllers/rentalRequest.controller.js";
 import { authenticate } from "../middlewares/auth.js";
 import { adminOnly } from "../middlewares/adminOnly.js";
@@ -92,6 +93,21 @@ import { adminOnly } from "../middlewares/adminOnly.js";
  *     responses:
  *       200:
  *         description: 거절 완료
+ *
+ * /rental-requests/{id}/cancel:
+ *   patch:
+ *     summary: 대여 요청 취소 (고객)
+ *     tags: [RentalRequest]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 요청 ID
+ *     responses:
+ *       200:
+ *         description: 고객 요청으로 거절됨
  */
 
 const router = express.Router();
@@ -119,6 +135,13 @@ router.patch(
 	authenticate,
 	adminOnly,
 	rejectRentalRequestController,
+);
+
+// 대여요청취소 (본인만)
+router.patch(
+	"/:id/cancel",
+	authenticate,
+	cancelRentalRequestController,
 );
 
 export default router;
