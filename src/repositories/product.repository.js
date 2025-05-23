@@ -127,5 +127,9 @@ export const updateProductStatus = async (id, status) => {
 	return await prisma.product.update({
 		where: { id },
 		data: { status },
+		include: {
+			owner: true,
+			category: true,
+		},
 	});
 };

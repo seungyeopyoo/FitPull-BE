@@ -248,9 +248,41 @@ export const getWaitingProducts = async () => {
 };
 
 export const approveProduct = async (id) => {
-	return await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
+	const product = await updateProductStatusRepo(id);
+
+	return {
+		message: PRODUCT_STATUS.APPROVED,
+		id: product.id,
+		title: product.title,
+		price: product.price,
+		status: product.status,
+		imageUrl: product.imageUrls?.[0] ?? null,
+		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+		owner: {
+			id: product.owner?.id,
+			name: product.owner?.name,
+			phone: product.owner?.phone,
+		},
+		createdAt: product.createdAt,
+	};
 };
 
 export const rejectProduct = async (id) => {
-	return await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
+	const product = await updateProductStatusRepo(id);
+
+	return {
+		message: PRODUCT_STATUS.REJECTED,
+		id: product.id,
+		title: product.title,
+		price: product.price,
+		status: product.status,
+		imageUrl: product.imageUrls?.[0] ?? null,
+		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+		owner: {
+			id: product.owner?.id,
+			name: product.owner?.name,
+			phone: product.owner?.phone,
+		},
+		createdAt: product.createdAt,
+	};
 };
