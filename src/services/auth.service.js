@@ -1,6 +1,7 @@
 import { findByEmail, createUser } from "../repositories/auth.repository.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
+import { setRefreshToken, deleteRefreshToken, getRefreshToken } from "../utils/redis.js";
 
 export const signup = async ({
 	email,
@@ -27,10 +28,14 @@ export const signup = async ({
 
 	const { accessToken, refreshToken } = generateTokens(payload);
 
+	// refreshToken을 redis에 저장
+	await setRefreshToken(account.user.id, refreshToken);
+
 	return {
-			id: account.user.id,
-			name: account.user.name,
+		id: account.user.id,
+		name: account.user.name,
 		accessToken,
+		refreshToken, // 컨트롤러에서 쿠키로 전달할 수 있도록 포함
 	};
 };
 
@@ -50,10 +55,16 @@ export const login = async ({ email, password }) => {
 
 	const { accessToken, refreshToken } = generateTokens(payload);
 
+	// refreshToken을 redis에 저장
+	await setRefreshToken(account.user.id, refreshToken);
+
 	return {
 		message: "로그인 성공",
 		id: account.user.id,
-			name: account.user.name,
-			accessToken,
+		name: account.user.name,
+		accessToken,
+		refreshToken, // 컨트롤러에서 쿠키로 전달할 수 있도록 포함
 	};
 };
+
+// refreshToken 검증 및 재발급을 위한 서비스 함수 추가 예정
