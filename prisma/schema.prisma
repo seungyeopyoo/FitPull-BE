@@ -126,20 +126,24 @@ model RentalRequest {
 }
 
 model CompletedRental {
-  id              String        @id @default(uuid())
-  startDate       DateTime      @map("start_date")
-  endDate         DateTime      @map("end_date")
-  totalPrice      Int           @map("total_price")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  deletedAt       DateTime?     @map("deleted_at")
-  userId          String        @map("user_id")
-  productId       String        @map("product_id")
-  rentalRequestId String        @unique @map("rental_request_id")
-  user            User          @relation(fields: [userId], references: [id])
-  product         Product       @relation(fields: [productId], references: [id])
-  rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
-  rentalReview    RentalReview?
+  id               String             @id @default(uuid())
+  startDate        DateTime           @map("start_date")
+  endDate          DateTime           @map("end_date")
+  totalPrice       Int                @map("total_price")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  deletedAt        DateTime?          @map("deleted_at")
+  userId           String             @map("user_id")
+  productId        String             @map("product_id")
+  rentalRequestId  String             @unique @map("rental_request_id")
+  returnMethod     ReturnMethod       @default(DELIVERY) @map("return_method")
+  isReturned       Boolean            @default(false) @map("is_returned")
+  returnedAt       DateTime?          @map("returned_at")
+  user             User               @relation(fields: [userId], references: [id])
+  product          Product            @relation(fields: [productId], references: [id])
+  rentalRequest    RentalRequest      @relation(fields: [rentalRequestId], references: [id])
+  rentalReview     RentalReview?
+  ProductStatusLog ProductStatusLog[]
 
   @@map("completed_rentals")
 }
@@ -219,16 +223,18 @@ model Message {
 }
 
 model ProductStatusLog {
-  id            String         @id @default(uuid())
-  type          ProductLogType
-  photoUrls     String[]       @map("photo_urls")
-  notes         String?        @db.Text
-  createdAt     DateTime       @default(now()) @map("created_at")
-  userId        String         @map("user_id")
-  productId     String         @map("product_id")
-  user          User           @relation(fields: [userId], references: [id])
-  product       Product        @relation(fields: [productId], references: [id])
-  notifications Notification[]
+  id                String           @id @default(uuid())
+  type              ProductLogType
+  photoUrls         String[]         @map("photo_urls")
+  notes             String?          @db.Text
+  createdAt         DateTime         @default(now()) @map("created_at")
+  userId            String           @map("user_id")
+  completedRentalId String?          @map("completed_rental_id")
+  productId         String           @map("product_id")
+  user              User             @relation(fields: [userId], references: [id])
+  product           Product          @relation(fields: [productId], references: [id])
+  completedRental   CompletedRental? @relation(fields: [completedRentalId], references: [id])
+  notifications     Notification[]
 
   @@map("product_status_logs")
 }
@@ -354,4 +360,9 @@ enum ProductLogType {
   WITHDRAWN
   STORAGE_FEE_NOTICE
   ETC
+}
+
+enum ReturnMethod {
+  DELIVERY
+  VISIT
 }
