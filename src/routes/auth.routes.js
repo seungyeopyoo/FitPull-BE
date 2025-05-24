@@ -3,13 +3,14 @@ import {
 	signupController,
 	loginController,
 	logoutController,
+	refreshTokenController,
 } from "../controllers/auth.controller.js";
 
 /**
  * @swagger
  * tags:
  *   name: Auth
- *   description: 회원가입 / 로그인 / 로그아웃 API
+ *   description: 회원가입 / 로그인 / 로그아웃 / 토큰 재발급 API
  */
 
 /**
@@ -45,6 +46,19 @@ import {
  *         description: 로그아웃 성공
  */
 
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     summary: refreshToken으로 accessToken 재발급
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: accessToken 재발급 성공
+ *       401:
+ *         description: refreshToken이 유효하지 않음
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
@@ -52,5 +66,7 @@ router.post("/signup", signupController);
 router.post("/login", loginController);
 //로그아웃
 router.post("/logout", logoutController);
+//토큰 재발급
+router.post("/refresh", refreshTokenController);
 
 export default router;

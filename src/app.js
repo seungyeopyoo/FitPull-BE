@@ -10,7 +10,7 @@ import rentalRequestRouter from "./routes/rentalRequest.routes.js";
 import completedRentalRouter from "./routes/completedRental.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
-
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
@@ -18,6 +18,7 @@ const app = express();
 // 미들웨어 설정
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 //스웨거
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
