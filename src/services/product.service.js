@@ -15,6 +15,7 @@ import { DEFAULT_CATEGORY_NAME } from "../constants/category.js";
 import { PRODUCT_STATUS } from "../constants/status.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
 import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repositories/rentalRequest.repository.js";
+import { findLogsByProductRepo } from "../repositories/productStatusLog.repository.js";
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
@@ -94,6 +95,16 @@ export const getProductById = async (id) => {
 		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
+	// 상태 로그 5개 조회
+	const statusLogsRaw = await findLogsByProductRepo(id, 5);
+	const statusLogs = statusLogsRaw.map(log => ({
+		id: log.id,
+		type: log.type,
+		createdAt: log.createdAt,
+		notes: log.notes,
+		photoUrls: log.photoUrls,
+	}));
+
 	return {
 		title: product.title,
 		description: product.description,
@@ -101,6 +112,7 @@ export const getProductById = async (id) => {
 		allowPurchase: product.allowPurchase,
 		imageUrls: product.imageUrls,
 		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+		statusLogs,
 	};
 };
 

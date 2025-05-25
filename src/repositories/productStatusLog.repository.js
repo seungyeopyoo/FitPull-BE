@@ -6,10 +6,11 @@ export const createStatusLogRepo = async (data) => {
   };
   
   // 로그 조회 (상품 기준)
-  export const findLogsByProductRepo = async (productId) => {
+  export const findLogsByProductRepo = async (productId, take = 5) => {
     return await prisma.productStatusLog.findMany({
       where: { productId },
       orderBy: { createdAt: "desc" },
+      take,
     });
   };
   

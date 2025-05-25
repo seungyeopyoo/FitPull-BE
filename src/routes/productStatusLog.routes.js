@@ -100,19 +100,22 @@ const router = express.Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               type:
  *                 type: string
  *                 enum: [PRE_RENTAL, ON_RENTAL, DAMAGE_REPORTED, WITHDRAWN, STORAGE_FEE_NOTICE, ETC]
- *               photoUrls:
+ *               notes:
+ *                 type: string
+ *               completedRentalId:
+ *                 type: string
+ *               images:
  *                 type: array
  *                 items:
  *                   type: string
- *               notes:
- *                 type: string
+ *                   format: binary
  *     responses:
  *       200:
  *         description: 상태 로그 수정 성공
@@ -146,7 +149,13 @@ router.post(
   ...s3ImageUpload,
   createStatusLogController
 );
-router.patch("/logs/:id", authenticate, adminOnly, updateStatusLogController);
+router.patch(
+  "/logs/:id",
+  authenticate,
+  adminOnly,
+  ...s3ImageUpload,
+  updateStatusLogController
+);
 router.delete("/logs/:id", authenticate, adminOnly, deleteStatusLogController);
 
 export default router;
