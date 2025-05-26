@@ -272,41 +272,55 @@ export const getWaitingProducts = async () => {
 };
 
 export const approveProduct = async (id) => {
-	const product = await updateProductStatusRepo(id);
+	try {
+		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
 
-	return {
-		message: PRODUCT_STATUS.APPROVED,
-		id: product.id,
-		title: product.title,
-		price: product.price,
-		status: product.status,
-		imageUrl: product.imageUrls?.[0] ?? null,
-		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
-		owner: {
-			id: product.owner?.id,
-			name: product.owner?.name,
-			phone: product.owner?.phone,
-		},
-		createdAt: product.createdAt,
-	};
+		return {
+			message: PRODUCT_STATUS.APPROVED,
+			id: product.id,
+			title: product.title,
+			price: product.price,
+			status: product.status,
+			imageUrl: product.imageUrls?.[0] ?? null,
+			category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+			owner: {
+				id: product.owner?.id,
+				name: product.owner?.name,
+				phone: product.owner?.phone,
+			},
+			createdAt: product.createdAt,
+		};
+	} catch (err) {
+		if (err.code === "P2025") {
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		}
+		throw err;
+	}
 };
 
 export const rejectProduct = async (id) => {
-	const product = await updateProductStatusRepo(id);
+	try {
+		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
 
-	return {
-		message: PRODUCT_STATUS.REJECTED,
-		id: product.id,
-		title: product.title,
-		price: product.price,
-		status: product.status,
-		imageUrl: product.imageUrls?.[0] ?? null,
-		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
-		owner: {
-			id: product.owner?.id,
-			name: product.owner?.name,
-			phone: product.owner?.phone,
-		},
-		createdAt: product.createdAt,
-	};
+		return {
+			message: PRODUCT_STATUS.REJECTED,
+			id: product.id,
+			title: product.title,
+			price: product.price,
+			status: product.status,
+			imageUrl: product.imageUrls?.[0] ?? null,
+			category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+			owner: {
+				id: product.owner?.id,
+				name: product.owner?.name,
+				phone: product.owner?.phone,
+			},
+			createdAt: product.createdAt,
+		};
+	} catch (err) {
+		if (err.code === "P2025") {
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		}
+		throw err;
+	}
 };
