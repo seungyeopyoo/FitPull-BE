@@ -56,6 +56,11 @@ export const getProductById = async (id) => {
 	});
 };
 
+// 상품 ID로 soft delete 포함 단일 상품 조회 (리뷰 생성 등에서 사용)
+export const findProductByIdRepo = async (id) => {
+	return await prisma.product.findUnique({ where: { id } });
+};
+
 // 특정 유저가 등록한 모든 상품
 export const getProductsByUser = async (ownerId) => {
 	return await prisma.product.findMany({

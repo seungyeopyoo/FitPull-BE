@@ -1,0 +1,103 @@
+import {
+  createReviewRepo,
+  getReviewByIdRepo,
+  getReviewsByProductIdRepo,
+  checkOneRentalOneReviewRepo,
+  getCompletedRentalByUserRepo,
+  updateReviewRepo,
+  deleteReviewRepo,
+} from "../repositories/review.repository.js";
+import { ERROR_MESSAGES } from "../constants/messages.js";
+import { findProductByIdRepo } from "../repositories/product.repository.js";
+
+// 이름 마스킹 함수 
+export function maskName(name) {
+  if (!name) return "";
+  if (name.length <= 1) return "*";
+  return name[0] + "*".repeat(name.length - 1);
+}
+
+export const createReview = async (user, { rating, comment, imageUrls, completedRentalId, productId }) => {
+  const ratingInt = Number(rating);
+  if (!completedRentalId || !productId || !ratingInt) {
+    throw new Error(ERROR_MESSAGES.RENTAL_NOT_FOUND);
+  }
+  if (ratingInt < 1 || ratingInt > 5) {
+    throw new Error(ERROR_MESSAGES.INVALID_RATING);
+  }
+  if (imageUrls && imageUrls.length > 3) {
+    throw new Error(ERROR_MESSAGES.IMAGE_LIMIT_EXCEEDED);
+  }
+  // 이미 리뷰 작성했는지 체크
+  const exists = await checkOneRentalOneReviewRepo(user.id, completedRentalId);
+  if (exists) {
+    throw new Error(ERROR_MESSAGES.ALREADY_REVIEWED);
+  }
+  // 본인 대여건인지 확인 
+  const rental = await getCompletedRentalByUserRepo(user.id, completedRentalId);
+  if (!rental) {
+    throw new Error(ERROR_MESSAGES.ONLY_COMPLETED_RENTAL);
+  }
+  const product = await findProductByIdRepo(productId);
+  if (!product || product.deletedAt) {
+    throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+  }
+  return await createReviewRepo({
+    rating: ratingInt,
+    comment,
+    imageUrls: imageUrls || [],
+    userId: user.id,
+    completedRentalId,
+    productId,
+  });
+};
+
+export const getReviewsByProduct = async (productId) => {
+  const reviews = await getReviewsByProductIdRepo(productId);
+  // rating, comment(15글자), 마스킹 유저명만 반환 ex) 유승엽 -> 유**
+  return reviews.map(review => ({
+    rating: review.rating,
+    comment: review.comment ? review.comment.slice(0, 15) : "",
+    user: { name: maskName(review.user?.name) },
+  }));
+};
+
+export const getReviewById = async (id) => {
+  return await getReviewByIdRepo(id);
+};
+
+export const updateReview = async (user, id, { rating, comment, imageUrls }) => {
+  const review = await getReviewByIdRepo(id);
+  if (!review || review.deletedAt) {
+    throw new Error(ERROR_MESSAGES.REVIEW_NOT_FOUND);
+  }
+  if (review.userId !== user.id && user.role !== "ADMIN") {
+    throw new Error(ERROR_MESSAGES.ONLY_OWN_REVIEW);
+  }
+  let ratingInt;
+  if (rating !== undefined) {
+    ratingInt = Number(rating);
+    if (isNaN(ratingInt) || ratingInt < 1 || ratingInt > 5) {
+      throw new Error(ERROR_MESSAGES.INVALID_RATING);
+    }
+  }
+  if (imageUrls && imageUrls.length > 3) {
+    throw new Error(ERROR_MESSAGES.IMAGE_LIMIT_EXCEEDED);
+  }
+  return await updateReviewRepo(id, {
+    ...(rating !== undefined && { rating: ratingInt }),
+    ...(comment !== undefined && { comment }),
+    ...(imageUrls !== undefined && { imageUrls }),
+  });
+};
+
+export const deleteReview = async (user, id) => {
+  const review = await getReviewByIdRepo(id);
+  if (!review || review.deletedAt) {
+    throw new Error(ERROR_MESSAGES.REVIEW_NOT_FOUND);
+  }
+  if (review.userId !== user.id && user.role !== "ADMIN") {
+    throw new Error(ERROR_MESSAGES.ONLY_OWN_DELETE);
+  }
+  return await deleteReviewRepo(id);
+};
