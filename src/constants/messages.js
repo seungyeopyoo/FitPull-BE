@@ -25,4 +25,16 @@ export const SUCCESS_MESSAGES = {
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
+};
+
+export default {
+  SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
+  LOGIN_SUCCESS: "로그인 성공",
+  LOGOUT_SUCCESS: "로그아웃 되었습니다.",
+  PASSWORD_MISMATCH: "비밀번호가 일치하지 않습니다.",
+  EMAIL_EXISTS: "이미 가입된 이메일입니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  REFRESH_TOKEN_REQUIRED: "refreshToken이 필요합니다.",
+  INVALID_REFRESH_TOKEN: "유효하지 않은 refreshToken입니다.",
+  REFRESH_TOKEN_SUCCESS: "토큰 재발급 성공",
 }; 
