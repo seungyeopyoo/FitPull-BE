@@ -1,10 +1,12 @@
 import { findUserById } from "../repositories/user.repository.js";
 import { updateUserById } from "../repositories/user.repository.js";
 import { softDeleteUserById } from "../repositories/user.repository.js";
+import CustomError from "../utils/customError.js";
+import messages from "../constants/messages.js";
 
 export const getUserById = async (userId) => {
 	const user = await findUserById(userId);
-	if (!user) throw new Error("유저를 찾을 수 없습니다.");
+	if (!user) throw new CustomError(404, "USER_NOT_FOUND", messages.USER_NOT_FOUND);
 	const { id, name, phone, verifiedPhone, bankAccount, bankName, accountHolder, verifiedBankAccount } = user;
 	return { id, name, phone, verifiedPhone, bankAccount, bankName, accountHolder, verifiedBankAccount };
 };

@@ -37,4 +37,7 @@ export default {
   REFRESH_TOKEN_REQUIRED: "refreshToken이 필요합니다.",
   INVALID_REFRESH_TOKEN: "유효하지 않은 refreshToken입니다.",
   REFRESH_TOKEN_SUCCESS: "토큰 재발급 성공",
+  GET_MY_PROFILE_SUCCESS: "내 정보 조회 성공",
+  UPDATE_MY_PROFILE_SUCCESS: "내 정보가 수정되었습니다.",
+  DELETE_MY_ACCOUNT_SUCCESS: "회원 탈퇴가 완료되었습니다.",
 }; 
