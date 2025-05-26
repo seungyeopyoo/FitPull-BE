@@ -3,46 +3,65 @@ import {
 	createCategory,
 	updateCategory,
 	deleteCategory,
+	getCategoryDetail,
 } from "../services/category.service.js";
+import { success } from "../utils/responseHandler.js";
+import messages from "../constants/messages.js";
 
-export const getCategoriesController = async (req, res) => {
-	const categories = await getCategories();
-	res.json(categories);
-};
-
-export const createCategoryController = async (req, res) => {
-	const { name } = req.body;
-	if (!name)
-		return res.status(400).json({ message: "카테고리 이름이 필요합니다." });
-
-	const result = await createCategory(name);
-	res.status(201).json(result);
-};
-
-export const updateCategoryController = async (req, res) => {
-	const { id } = req.params;
-	const { name, description } = req.body;
-	if (!name)
-		return res.status(400).json({ message: "수정할 이름이 필요합니다." });
-
+export const getCategoriesController = async (req, res, next) => {
 	try {
-		const result = await updateCategory(id, name, description);
-		res.json(result);
+		const categories = await getCategories();
+		return success(res, messages.CATEGORY_LISTED, { categories });
 	} catch (error) {
-		console.error("카테고리 수정 에러:", error);
-		const status = error.status || 500;
-		res.status(status).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const deleteCategoryController = async (req, res) => {
-	const { id } = req.params;
+export const createCategoryController = async (req, res, next) => {
 	try {
+		const { name, description } = req.body;
+		if (!name)
+			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", messages.CATEGORY_NAME_REQUIRED));
+
+		const result = await createCategory(name, description);
+		return success(res, result.message, { category: result.category });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const updateCategoryController = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { name, description } = req.body;
+		if (!name)
+			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", messages.CATEGORY_NAME_REQUIRED));
+
+		const result = await updateCategory(id, name, description);
+		return success(res, result.message, { category: result.category });
+	} catch (error) {
+		console.error("카테고리 수정 에러:", error);
+		next(error);
+	}
+};
+
+export const deleteCategoryController = async (req, res, next) => {
+	try {
+		const { id } = req.params;
 		const result = await deleteCategory(id);
-		res.status(200).json(result);
+		return success(res, result.message);
 	} catch (error) {
 		console.error("카테고리 삭제 에러:", error);
-		const status = error.status || 500;
-		res.status(status).json({ message: error.message });
+		next(error);
+	}
+};
+
+export const getCategoryDetailController = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const result = await getCategoryDetail(id);
+		return success(res, result.message, { category: result.category, products: result.products });
+	} catch (error) {
+		next(error);
 	}
 };
