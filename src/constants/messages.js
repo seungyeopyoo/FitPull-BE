@@ -1,7 +1,7 @@
 export const ERROR_MESSAGES = {
   PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
   NO_PERMISSION: "권한이 없습니다.",
-  INVALID_PRICE: "가격은 0보다 커야 합니다.",
+  INVALID_PRICE: "정상적인 가격을 입력해주세요 (price: 0 ~ 2147483647)",
   AUTH_REQUIRED: "인증이 필요합니다.",
   RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
   RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
@@ -16,7 +16,7 @@ export const ERROR_MESSAGES = {
 
 export const SUCCESS_MESSAGES = {
   PRODUCT_CREATED: "상품이 등록되었습니다.",
-  PRODUCT_UPDATED: "상품이 수정되었습니다.",
+  PRODUCT_UPDATED: "상품이 수정되었습니다. 수정된상품은 승인 대기상태로 변경됩니다.",
   PRODUCT_DELETED: "상품이 삭제되었습니다.",
   PRODUCT_APPROVED: "상품이 승인되었습니다.",
   PRODUCT_REJECTED: "상품이 거절되었습니다.",
@@ -40,4 +40,9 @@ export default {
   GET_MY_PROFILE_SUCCESS: "내 정보 조회 성공",
   UPDATE_MY_PROFILE_SUCCESS: "내 정보가 수정되었습니다.",
   DELETE_MY_ACCOUNT_SUCCESS: "회원 탈퇴가 완료되었습니다.",
+  PRODUCT_LISTED: "상품 목록 조회 성공",
+  PRODUCT_DETAIL: "상품 상세 조회 성공",
+  PRODUCT_WAITING_LISTED: "대기 상품 목록 조회 성공",
+  PRODUCT_RENTAL_ACTIVE: "현재 대여중인 상품은 수정/삭제할 수 없습니다.",
+  PRODUCT_REJECTED_OR_CANCELED: "거절되었거나 취소된 상품은 수정할 수 없습니다.",
 }; 

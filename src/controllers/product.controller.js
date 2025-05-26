@@ -10,59 +10,63 @@ import {
 	rejectProduct,
 } from "../services/product.service.js";
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages.js";
+import { success } from "../utils/responseHandler.js";
 
-export const createProductController = async (req, res) => {
+export const createProductController = async (req, res, next) => {
 	try {
 		const product = await createProduct(req.body, req.user);
-		res.status(201).json({ message: SUCCESS_MESSAGES.PRODUCT_CREATED, product });
+		return success(res, SUCCESS_MESSAGES.PRODUCT_CREATED, product);
 	} catch (error) {
 		console.error("상품 등록 에러:", error);
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const getAllProductsController = async (_req, res) => {
+export const getAllProductsController = async (req, res, next) => {
 	try {
-		const products = await getAllProducts();
-		res.status(200).json(products);
+		const { skip, take, categoryId } = req.query;
+		const products = await getAllProducts({
+			skip: skip ? Number(skip) : undefined,
+			take: take ? Number(take) : undefined,
+			categoryId,
+		});
+		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, products);
 	} catch (error) {
 		console.error("상품 조회 에러:", error);
-		res.status(500).json({ message: "상품 조회 중 오류 발생" });
+		next(error);
 	}
 };
 
-export const getProductByIdController = async (req, res) => {
+export const getProductByIdController = async (req, res, next) => {
 	try {
 		const product = await getProductById(req.params.id);
-		if (!product)
-			return res.status(404).json({ message: ERROR_MESSAGES.PRODUCT_NOT_FOUND });
-		res.json(product);
+		return success(res, SUCCESS_MESSAGES.PRODUCT_DETAIL, product);
 	} catch (error) {
-		if (error.message === ERROR_MESSAGES.PRODUCT_NOT_FOUND) {
-			return res.status(404).json({ message: error.message });
+		if (error.code === "PRODUCT_NOT_FOUND") {
+			return next(error);
 		}
 		console.error("상품 상세조회 에러:", error);
-		res.status(500).json({ message: "상품 상세조회 중 오류 발생" });
+		next(error);
 	}
 };
 
-export const getProductsMeController = async (req, res) => {
+export const getProductsMeController = async (req, res, next) => {
 	try {
 		if (!req.user || !req.user.id) {
-			return res.status(401).json({ message: ERROR_MESSAGES.AUTH_REQUIRED });
+			return next(new CustomError(401, "AUTH_REQUIRED", ERROR_MESSAGES.AUTH_REQUIRED));
 		}
 		const products = await getProductsByUser(req.user.id);
 		if (!products || products.length === 0) {
-			return res.status(404).json({ message: ERROR_MESSAGES.PRODUCT_NOT_FOUND });
+			return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
 		}
-		res.json(products);
+		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, { products });
 	} catch (error) {
 		console.error("내 상품 목록 조회 에러:", error);
-		res.status(500).json({ message: "내 상품 목록 조회 중 오류 발생" });
+		next(error);
 	}
 };
 
-export const updateProductController = async (req, res) => {
+export const updateProductController = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 		const productData = req.body;
@@ -76,58 +80,57 @@ export const updateProductController = async (req, res) => {
 		if (productData.imageUrls) {
 			productData.imageUrls = productData.imageUrls.filter(Boolean);
 		}
-
 		// categoryId 빈 문자열 처리
 		if (productData.categoryId === "") {
 			productData.categoryId = undefined;
 		}
 
 		const updatedProduct = await updateProduct(id, productData, user);
-		res.json({ message: SUCCESS_MESSAGES.PRODUCT_UPDATED, product: updatedProduct });
+		return success(res, SUCCESS_MESSAGES.PRODUCT_UPDATED, { product: updatedProduct });
 	} catch (error) {
 		console.error("상품 수정 에러:", error);
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const deleteProductController = async (req, res) => {
+export const deleteProductController = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 		const user = req.user;
 
 		await deleteProduct(id, user);
-		res.json({ message: SUCCESS_MESSAGES.PRODUCT_DELETED });
+		return success(res, SUCCESS_MESSAGES.PRODUCT_DELETED);
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const getWaitingProductsController = async (_req, res) => {
+export const getWaitingProductsController = async (_req, res, next) => {
 	try {
 		const products = await getWaitingProducts();
-		res.json(products);
+		return success(res, SUCCESS_MESSAGES.PRODUCT_WAITING_LISTED, { products });
 	} catch (error) {
 		console.error("대기 상품 조회 에러:", error);
-		res.status(500).json({ message: "대기 상품 조회 중 오류 발생" });
+		next(error);
 	}
 };
 
-export const approveProductController = async (req, res) => {
+export const approveProductController = async (req, res, next) => {
 	try {
 		const result = await approveProduct(req.params.id);
-		res.json({ message: SUCCESS_MESSAGES.PRODUCT_APPROVED, result });
+		return success(res, SUCCESS_MESSAGES.PRODUCT_APPROVED, result);
 	} catch (error) {
 		console.error("상품 승인 에러:", error);
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const rejectProductController = async (req, res) => {
+export const rejectProductController = async (req, res, next) => {
 	try {
 		const result = await rejectProduct(req.params.id);
-		res.json({ message: SUCCESS_MESSAGES.PRODUCT_REJECTED, result });
+		return success(res, SUCCESS_MESSAGES.PRODUCT_REJECTED, result);
 	} catch (error) {
 		console.error("상품 거절 에러:", error);
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };

@@ -50,6 +50,7 @@ app.get("/", (_, res) => {
 
 app.use(errorHandler);
 
+
 const PORT = Number(process.env.PORT || "3000", 10);
 
 // 서버 시작
