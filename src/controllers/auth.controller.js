@@ -17,7 +17,6 @@ export const signupController = async (req, res, next) => {
 		});
 		return success(res, messages.SIGNUP_SUCCESS, { id: user.id, name: user.name, accessToken: user.accessToken });
 	} catch (error) {
-		console.error("회원가입 에러:", error);
 		next(error);
 	}
 };
@@ -35,7 +34,6 @@ export const loginController = async (req, res, next) => {
 		});
 		return success(res, result.message, { id: result.id, name: result.name, accessToken: result.accessToken });
 	} catch (error) {
-		console.error("로그인 에러:", error);
 		next(error);
 	}
 };
@@ -49,7 +47,6 @@ export const logoutController = async (req, res, next) => {
 		res.clearCookie("refreshToken", { path: "/" });
 		return success(res, messages.LOGOUT_SUCCESS);
 	} catch (error) {
-		console.error("로그아웃 에러:", error);
 		next(error);
 	}
 };
@@ -83,7 +80,6 @@ export const refreshTokenController = async (req, res, next) => {
 		await setRefreshToken(userId, newRefreshToken);
 		return success(res, messages.REFRESH_TOKEN_SUCCESS, { accessToken });
 	} catch (error) {
-		console.error("refreshToken 재발급 에러:", error);
 		next(error);
 	}
 };

@@ -1,43 +1,35 @@
 import {
-	completeRentalService,
+	completeRental,
 	getMyCompletedRentals,
 	getAllCompletedRentals,
 } from "../services/completedRental.service.js";
+import { success } from "../utils/responseHandler.js";
+import { SUCCESS_MESSAGES } from "../constants/messages.js";
 
-export const completeRental = async (req, res) => {
+export const completeRentalController = async (req, res, next) => {
 	try {
 		const rentalRequestId = req.params.id;
-		const completed = await completeRentalService(rentalRequestId);
-		res.status(201).json({ message: "대여 완료 처리됨", result: completed });
+		const completed = await completeRental(rentalRequestId);
+		return success(res, SUCCESS_MESSAGES.RENTAL_COMPLETED, { completedRental: completed });
 	} catch (err) {
-		res.status(400).json({ message: err.message });
+		next(err);
 	}
 };
 
-export const getMyCompletedRentalsController = async (req, res) => {
+export const getMyCompletedRentalsController = async (req, res, next) => {
 	try {
 		const result = await getMyCompletedRentals(req.user.id);
-
-		if (result.length === 0) {
-			return res.status(200).json({ message: "조회된 대여 내역이 없습니다." });
-		}
-
-		res.json(result);
+		return success(res, SUCCESS_MESSAGES.MY_COMPLETED_RENTALS_LISTED, { completedRentals: result });
 	} catch (err) {
-		res.status(500).json({ message: "조회 실패", error: err.message });
+		next(err);
 	}
 };
 
-export const getAllCompletedRentalsController = async (_req, res) => {
+export const getAllCompletedRentalsController = async (_req, res, next) => {
 	try {
 		const result = await getAllCompletedRentals();
-
-		if (result.length === 0) {
-			return res.status(200).json({ message: "완료된 대여가 없습니다." });
-		}
-
-		res.json(result);
+		return success(res, SUCCESS_MESSAGES.ALL_COMPLETED_RENTALS_LISTED, { completedRentals: result });
 	} catch (err) {
-		res.status(500).json({ message: "조회 실패", error: err.message });
+		next(err);
 	}
 };

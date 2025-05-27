@@ -38,7 +38,6 @@ export const createStatusLogController = async (req, res) => {
 
     res.status(201).json({ message: "상태 로그가 등록되었습니다.", log: newLog });
   } catch (error) {
-    console.error("상태 로그 생성 에러:", error);
     res.status(500).json({ message: "상태 로그 생성 중 오류가 발생했습니다." });
   }
 };
@@ -49,7 +48,6 @@ export const getStatusLogsController = async (req, res) => {
     const logs = await getLogsByProduct(productId);
     res.status(200).json({ logs });
   } catch (error) {
-    console.error("상태 로그 조회 에러:", error);
     res.status(500).json({ message: "상태 로그 조회 중 오류가 발생했습니다." });
   }
 };
@@ -79,7 +77,6 @@ export const updateStatusLogController = async (req, res) => {
     const updated = await updateStatusLog(id, data);
     res.status(200).json({ message: "상태 로그가 수정되었습니다.", log: updated });
   } catch (error) {
-    console.error("상태 로그 수정 에러:", error);
     res.status(500).json({ message: "상태 로그 수정 중 오류가 발생했습니다." });
   }
 };
@@ -90,7 +87,6 @@ export const deleteStatusLogController = async (req, res) => {
     await deleteStatusLog(id);
     res.status(200).json({ message: "상태 로그가 삭제되었습니다." });
   } catch (error) {
-    console.error("상태 로그 삭제 에러:", error);
     res.status(500).json({ message: "상태 로그 삭제 중 오류가 발생했습니다." });
   }
 };

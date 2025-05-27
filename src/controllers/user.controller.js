@@ -10,7 +10,6 @@ export const getMyProfile = async (req, res, next) => {
 		const user = await getUserById(userId);
 		return success(res, messages.GET_MY_PROFILE_SUCCESS, { user });
 	} catch (err) {
-		console.error("내 정보 조회 실패:", err);
 		next(err);
 	}
 };
@@ -29,7 +28,6 @@ export const updateMyProfile = async (req, res, next) => {
 
 		return success(res, messages.UPDATE_MY_PROFILE_SUCCESS, { user: updatedUser });
 	} catch (err) {
-		console.error("내 정보 수정 실패:", err);
 		next(err);
 	}
 };
@@ -42,7 +40,6 @@ export const deleteMyAccount = async (req, res, next) => {
 
 		return success(res, messages.DELETE_MY_ACCOUNT_SUCCESS);
 	} catch (err) {
-		console.error("회원 탈퇴 실패:", err);
 		next(err);
 	}
 };

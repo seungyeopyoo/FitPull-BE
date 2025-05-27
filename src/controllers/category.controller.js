@@ -40,7 +40,6 @@ export const updateCategoryController = async (req, res, next) => {
 		const result = await updateCategory(id, name, description);
 		return success(res, result.message, { category: result.category });
 	} catch (error) {
-		console.error("카테고리 수정 에러:", error);
 		next(error);
 	}
 };
@@ -51,7 +50,6 @@ export const deleteCategoryController = async (req, res, next) => {
 		const result = await deleteCategory(id);
 		return success(res, result.message);
 	} catch (error) {
-		console.error("카테고리 삭제 에러:", error);
 		next(error);
 	}
 };

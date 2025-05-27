@@ -30,6 +30,9 @@ export const SUCCESS_MESSAGES = {
   RENTAL_MY_LISTED: "내 대여 요청 목록 조회 성공",
   RENTAL_PENDING_LISTED: "대기중 대여 요청 목록 조회 성공",
   RENTAL_CANCELED: "대여 요청이 취소되었습니다.",
+  RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
+  MY_COMPLETED_RENTALS_LISTED: "내 완료 대여 목록 조회 성공",
+  ALL_COMPLETED_RENTALS_LISTED: "전체 완료 대여 목록 조회 성공",
 };
 
 export default {

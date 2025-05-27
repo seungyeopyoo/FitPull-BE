@@ -17,7 +17,6 @@ export const createProductController = async (req, res, next) => {
 		const product = await createProduct(req.body, req.user);
 		return success(res, SUCCESS_MESSAGES.PRODUCT_CREATED, product);
 	} catch (error) {
-		console.error("상품 등록 에러:", error);
 		next(error);
 	}
 };
@@ -32,7 +31,6 @@ export const getAllProductsController = async (req, res, next) => {
 		});
 		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, products);
 	} catch (error) {
-		console.error("상품 조회 에러:", error);
 		next(error);
 	}
 };
@@ -45,7 +43,6 @@ export const getProductByIdController = async (req, res, next) => {
 		if (error.code === "PRODUCT_NOT_FOUND") {
 			return next(error);
 		}
-		console.error("상품 상세조회 에러:", error);
 		next(error);
 	}
 };
@@ -61,7 +58,6 @@ export const getProductsMeController = async (req, res, next) => {
 		}
 		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, { products });
 	} catch (error) {
-		console.error("내 상품 목록 조회 에러:", error);
 		next(error);
 	}
 };
@@ -88,7 +84,6 @@ export const updateProductController = async (req, res, next) => {
 		const updatedProduct = await updateProduct(id, productData, user);
 		return success(res, SUCCESS_MESSAGES.PRODUCT_UPDATED, { product: updatedProduct });
 	} catch (error) {
-		console.error("상품 수정 에러:", error);
 		next(error);
 	}
 };
@@ -110,7 +105,6 @@ export const getWaitingProductsController = async (_req, res, next) => {
 		const products = await getWaitingProducts();
 		return success(res, SUCCESS_MESSAGES.PRODUCT_WAITING_LISTED, { products });
 	} catch (error) {
-		console.error("대기 상품 조회 에러:", error);
 		next(error);
 	}
 };
@@ -120,7 +114,6 @@ export const approveProductController = async (req, res, next) => {
 		const result = await approveProduct(req.params.id);
 		return success(res, SUCCESS_MESSAGES.PRODUCT_APPROVED, result);
 	} catch (error) {
-		console.error("상품 승인 에러:", error);
 		next(error);
 	}
 };
@@ -130,7 +123,6 @@ export const rejectProductController = async (req, res, next) => {
 		const result = await rejectProduct(req.params.id);
 		return success(res, SUCCESS_MESSAGES.PRODUCT_REJECTED, result);
 	} catch (error) {
-		console.error("상품 거절 에러:", error);
 		next(error);
 	}
 };
