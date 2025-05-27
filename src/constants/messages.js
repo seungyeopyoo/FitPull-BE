@@ -2,6 +2,7 @@ export const ERROR_MESSAGES = {
   PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
   NO_PERMISSION: "권한이 없습니다.",
   INVALID_PRICE: "정상적인 가격을 입력해주세요 (price: 0 ~ 2147483647)",
+  INVALID_RENTAL_DATE: "정상적인 날짜를 입력해주세요.",
   AUTH_REQUIRED: "인증이 필요합니다.",
   RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
   RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
@@ -25,6 +26,10 @@ export const SUCCESS_MESSAGES = {
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
+  RENTAL_REQUEST_CREATED: "대여 요청이 등록되었습니다.",
+  RENTAL_MY_LISTED: "내 대여 요청 목록 조회 성공",
+  RENTAL_PENDING_LISTED: "대기중 대여 요청 목록 조회 성공",
+  RENTAL_CANCELED: "대여 요청이 취소되었습니다.",
 };
 
 export default {
