@@ -26,6 +26,7 @@ export const SUCCESS_MESSAGES = {
   RENTAL_APPROVED: "대여 요청이 승인되었습니다.",
   RENTAL_REJECTED: "대여 요청이 거절되었습니다.",
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
+  REVIEW_LISTED: "리뷰 목록 조회 성공",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
   RENTAL_REQUEST_CREATED: "대여 요청이 등록되었습니다.",
