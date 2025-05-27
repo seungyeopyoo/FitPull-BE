@@ -2,8 +2,10 @@ import { signup, login } from "../services/auth.service.js";
 import { deleteRefreshToken, getRefreshToken, setRefreshToken } from "../utils/redis.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
 import { generateTokens } from "../utils/jwt.js";
+import { success } from "../utils/responseHandler.js";
+import messages from "../constants/messages.js";
 
-export const signupController = async (req, res) => {
+export const signupController = async (req, res, next) => {
 	try {
 		const user = await signup(req.body);
 		// 서비스에서 반환된 refreshToken을 쿠키로 전달
@@ -13,14 +15,13 @@ export const signupController = async (req, res) => {
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
 			path: "/",
 		});
-		res.status(201).json({ message: "회원가입이 완료되었습니다.", user: { id: user.id, name: user.name, accessToken: user.accessToken } });
+		return success(res, messages.SIGNUP_SUCCESS, { id: user.id, name: user.name, accessToken: user.accessToken });
 	} catch (error) {
-		console.error("회원가입 에러:", error);
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const loginController = async (req, res) => {
+export const loginController = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 		const result = await login({ email, password });
@@ -31,46 +32,43 @@ export const loginController = async (req, res) => {
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
 			path: "/",
 		});
-		res.json({ message: result.message, id: result.id, name: result.name, accessToken: result.accessToken });
+		return success(res, result.message, { id: result.id, name: result.name, accessToken: result.accessToken });
 	} catch (error) {
-		console.error("로그인 에러:", error);
-		res.status(401).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const logoutController = async (req, res) => {
+export const logoutController = async (req, res, next) => {
 	try {
 		const userId = req.user?.userId;
 		if (userId) {
 			await deleteRefreshToken(userId);
 		}
 		res.clearCookie("refreshToken", { path: "/" });
-		return res.status(200).json({ message: "로그아웃 되었습니다." });
+		return success(res, messages.LOGOUT_SUCCESS);
 	} catch (error) {
-		console.error("로그아웃 에러:", error);
-		return res.status(500).json({ message: "로그아웃 처리 중 오류가 발생했습니다." });
+		next(error);
 	}
 };
 
 // refreshToken 재발급
-export const refreshTokenController = async (req, res) => {
+export const refreshTokenController = async (req, res, next) => {
 	try {
 		const refreshToken = req.cookies.refreshToken;
 		if (!refreshToken) {
-			return res.status(401).json({ message: "refreshToken이 필요합니다." });
+			return next(new CustomError(401, "REFRESH_TOKEN_REQUIRED", messages.REFRESH_TOKEN_REQUIRED));
 		}
 		let decoded;
 		try {
 			decoded = verifyRefreshToken(refreshToken);
 		} catch (err) {
-			return res.status(401).json({ message: "유효하지 않은 refreshToken입니다." });
+			return next(new CustomError(401, "INVALID_REFRESH_TOKEN", messages.INVALID_REFRESH_TOKEN));
 		}
 		const userId = decoded.userId;
 		const savedToken = await getRefreshToken(userId);
 		if (!savedToken || savedToken !== refreshToken) {
-			return res.status(401).json({ message: "refreshToken이 유효하지 않습니다." });
+			return next(new CustomError(401, "INVALID_REFRESH_TOKEN", messages.INVALID_REFRESH_TOKEN));
 		}
-	
 		const { exp, iat, ...cleanedPayload } = decoded;
 		const { accessToken, refreshToken: newRefreshToken } = generateTokens(cleanedPayload);
 		res.cookie("refreshToken", newRefreshToken, {
@@ -80,9 +78,8 @@ export const refreshTokenController = async (req, res) => {
 			path: "/",
 		});
 		await setRefreshToken(userId, newRefreshToken);
-		return res.json({ accessToken });
+		return success(res, messages.REFRESH_TOKEN_SUCCESS, { accessToken });
 	} catch (error) {
-		console.error("refreshToken 재발급 에러:", error);
-		return res.status(500).json({ message: "토큰 재발급 중 오류가 발생했습니다." });
+		next(error);
 	}
 };

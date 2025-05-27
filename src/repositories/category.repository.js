@@ -11,8 +11,8 @@ export const findAll = () => {
 	});
 };
 
-export const create = (name) => {
-	return prisma.category.create({ data: { name } });
+export const create = (name, description) => {
+	return prisma.category.create({ data: { name, description } });
 };
 
 export const update = (id, name, description) => {
@@ -40,5 +40,16 @@ export const moveProductsToCategory = (fromCategoryId, toCategoryId) => {
 	return prisma.product.updateMany({
 		where: { categoryId: fromCategoryId },
 		data: { categoryId: toCategoryId }
+	});
+};
+
+export const findByIdWithProducts = (id) => {
+	return prisma.category.findUnique({
+		where: { id },
+		include: {
+			products: {
+				where: { status: "APPROVED" }
+			}
+		}
 	});
 };

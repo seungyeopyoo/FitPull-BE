@@ -1,6 +1,6 @@
 import express from "express";
 import {
-	completeRental,
+	completeRentalController,
 	getMyCompletedRentalsController,
 	getAllCompletedRentalsController,
 } from "../controllers/completedRental.controller.js";
@@ -68,6 +68,6 @@ router.get("/me", authenticate, getMyCompletedRentalsController);
 // 어드민 대여완료 전체 조회
 router.get("/", authenticate, adminOnly, getAllCompletedRentalsController);
 // 어드민 대여 완료 처리
-router.post("/:id/complete", authenticate, adminOnly, completeRental);
+router.post("/:id/complete", authenticate, adminOnly, completeRentalController);
 
 export default router;

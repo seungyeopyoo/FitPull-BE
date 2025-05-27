@@ -16,14 +16,23 @@ import { PRODUCT_STATUS } from "../constants/status.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
 import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repositories/rentalRequest.repository.js";
 import { findLogsByProductRepo } from "../repositories/productStatusLog.repository.js";
+import CustomError from "../utils/customError.js";
+import messages from "../constants/messages.js";
+import { MAX_PRODUCT_IMAGES } from "../constants/limits.js";
+
+const MAX_INT_32 = 2147483647;
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
-		throw new Error(ERROR_MESSAGES.AUTH_REQUIRED);
+		throw new CustomError(401, "AUTH_REQUIRED", ERROR_MESSAGES.AUTH_REQUIRED);
 	}
 
-	if (productData.price < 0) {
-		throw new Error(ERROR_MESSAGES.INVALID_PRICE);
+	if (productData.price < 0 || productData.price > MAX_INT_32) {
+		throw new CustomError(400, "INVALID_PRICE", ERROR_MESSAGES.INVALID_PRICE);
+	}
+
+	if (productData.imageUrls && productData.imageUrls.length > MAX_PRODUCT_IMAGES) {
+		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", messages.IMAGE_LIMIT_EXCEEDED);
 	}
 
 	let categoryId = productData.categoryId;
@@ -92,7 +101,7 @@ export const getProductById = async (id) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product || product.status !== PRODUCT_STATUS.APPROVED) {
-		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	// 상태 로그 5개 조회
@@ -135,19 +144,19 @@ export const updateProduct = async (id, productData, user) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product) {
-		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	// 본인 상품이거나 관리자만 수정 가능
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
-		throw new Error(ERROR_MESSAGES.NO_PERMISSION);
+		throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
 	}
 
 	// 대여중이면 수정 불가
 	const rentalActive = await findActiveRentalByProductId(id);
 
 	if (rentalActive) {
-		throw new Error("현재 대여중인 상품은 수정할 수 없습니다.");
+		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", messages.PRODUCT_RENTAL_ACTIVE);
 	}
 
 	// 상품 상태에 따라 수정 제한
@@ -157,7 +166,7 @@ export const updateProduct = async (id, productData, user) => {
 
 		// 거절되거나 취소된 상품은 수정 불가
 		if (["REJECTED", "CANCELED"].includes(product.status)) {
-			throw new Error("거절되었거나 취소된 상품은 수정할 수 없습니다.");
+			throw new CustomError(400, "PRODUCT_REJECTED_OR_CANCELED", messages.PRODUCT_REJECTED_OR_CANCELED);
 		}
 
 		// 승인된 상품은 다시 승인 대기로 전환
@@ -169,9 +178,13 @@ export const updateProduct = async (id, productData, user) => {
 	// price 검증
 	if (productData.price !== undefined) {
 		productData.price = Number(productData.price);
-		if (productData.price < 0) {
-			throw new Error(ERROR_MESSAGES.INVALID_PRICE);
+		if (productData.price < 0 || productData.price > MAX_INT_32) {
+			throw new CustomError(400, "INVALID_PRICE", ERROR_MESSAGES.INVALID_PRICE);
 		}
+	}
+
+	if (productData.imageUrls && productData.imageUrls.length > MAX_PRODUCT_IMAGES) {
+		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", messages.IMAGE_LIMIT_EXCEEDED);
 	}
 
 	let categoryId = productData.categoryId;
@@ -214,11 +227,11 @@ export const deleteProduct = async (id, user) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product) {
-		throw new Error(ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
-		throw new Error(ERROR_MESSAGES.NO_PERMISSION);
+		throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
 	}
 	const now = new Date();
 	const oneMonthLater = new Date();
@@ -228,7 +241,7 @@ export const deleteProduct = async (id, user) => {
 	const activeRental = await findActiveRentalForDelete(id, oneMonthLater);
 
 	if (activeRental) {
-		throw new Error("예약 중이거나 대여 중인 상품은 삭제할 수 없습니다.");
+		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", messages.PRODUCT_RENTAL_ACTIVE);
 	}
 
 	// 이미지 삭제
@@ -238,7 +251,6 @@ export const deleteProduct = async (id, user) => {
 
 	return await deleteProductRepo(id);
 };
-
 
 export const getWaitingProducts = async () => {
 	const products = await findWaitingProductsRepo();
@@ -260,41 +272,55 @@ export const getWaitingProducts = async () => {
 };
 
 export const approveProduct = async (id) => {
-	const product = await updateProductStatusRepo(id);
+	try {
+		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
 
-	return {
-		message: PRODUCT_STATUS.APPROVED,
-		id: product.id,
-		title: product.title,
-		price: product.price,
-		status: product.status,
-		imageUrl: product.imageUrls?.[0] ?? null,
-		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
-		owner: {
-			id: product.owner?.id,
-			name: product.owner?.name,
-			phone: product.owner?.phone,
-		},
-		createdAt: product.createdAt,
-	};
+		return {
+			message: PRODUCT_STATUS.APPROVED,
+			id: product.id,
+			title: product.title,
+			price: product.price,
+			status: product.status,
+			imageUrl: product.imageUrls?.[0] ?? null,
+			category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+			owner: {
+				id: product.owner?.id,
+				name: product.owner?.name,
+				phone: product.owner?.phone,
+			},
+			createdAt: product.createdAt,
+		};
+	} catch (err) {
+		if (err.code === "P2025") {
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		}
+		throw err;
+	}
 };
 
 export const rejectProduct = async (id) => {
-	const product = await updateProductStatusRepo(id);
+	try {
+		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
 
-	return {
-		message: PRODUCT_STATUS.REJECTED,
-		id: product.id,
-		title: product.title,
-		price: product.price,
-		status: product.status,
-		imageUrl: product.imageUrls?.[0] ?? null,
-		category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
-		owner: {
-			id: product.owner?.id,
-			name: product.owner?.name,
-			phone: product.owner?.phone,
-		},
-		createdAt: product.createdAt,
-	};
+		return {
+			message: PRODUCT_STATUS.REJECTED,
+			id: product.id,
+			title: product.title,
+			price: product.price,
+			status: product.status,
+			imageUrl: product.imageUrls?.[0] ?? null,
+			category: { name: product.category?.name ?? DEFAULT_CATEGORY_NAME },
+			owner: {
+				id: product.owner?.id,
+				name: product.owner?.name,
+				phone: product.owner?.phone,
+			},
+			createdAt: product.createdAt,
+		};
+	} catch (err) {
+		if (err.code === "P2025") {
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		}
+		throw err;
+	}
 };

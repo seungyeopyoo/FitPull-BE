@@ -13,6 +13,7 @@ import reviewRouter from "./routes/review.router.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
+import errorHandler from './middlewares/errorHandler.js';
 dotenv.config();
 
 const app = express();
@@ -46,6 +47,9 @@ app.use("/api/reviews", reviewRouter);
 app.get("/", (_, res) => {
 	res.send("백엔드 서버 정상 작동 중.");
 });
+
+app.use(errorHandler);
+
 
 const PORT = Number(process.env.PORT || "3000", 10);
 

@@ -6,8 +6,10 @@ import {
 	rejectRentalRequest,
 	cancelRentalRequest,
 } from "../services/rentalRequest.service.js";
+import { success } from "../utils/responseHandler.js";
+import { SUCCESS_MESSAGES } from "../constants/messages.js";
 
-export const createRentalRequestController = async (req, res) => {
+export const createRentalRequestController = async (req, res, next) => {
 	try {
 		const { productId, startDate, endDate, howToReceive, memo } = req.body;
 		const user = req.user;
@@ -19,55 +21,55 @@ export const createRentalRequestController = async (req, res) => {
 			howToReceive,
 			memo
 		);
-		res.status(201).json(rentalRequest);
+		return success(res, SUCCESS_MESSAGES.RENTAL_REQUEST_CREATED, { rentalRequest });
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const getMyRentalRequestsController = async (req, res) => {
+export const getMyRentalRequestsController = async (req, res, next) => {
 	try {
 		const myRequests = await getMyRentalRequests(req.user.id);
-		res.json(myRequests);
+		return success(res, SUCCESS_MESSAGES.RENTAL_MY_LISTED, { requests: myRequests });
 	} catch (error) {
-		res.status(500).json({ message: "예약 목록 조회 실패" });
+		next(error);
 	}
 };
 
-export const getPendingRequestsController = async (_req, res) => {
+export const getPendingRequestsController = async (_req, res, next) => {
 	try {
 		const requests = await getPendingRequests();
-		res.json(requests);
+		return success(res, SUCCESS_MESSAGES.RENTAL_PENDING_LISTED, { requests });
 	} catch (error) {
-		res.status(500).json({ message: "대기중 요청 조회 실패" });
+		next(error);
 	}
 };
 
-export const approveRentalRequestController = async (req, res) => {
+export const approveRentalRequestController = async (req, res, next) => {
 	try {
 		const request = await approveRentalRequest(req.params.id);
-		res.json({ message: "승인되었습니다.", request });
+		return success(res, SUCCESS_MESSAGES.RENTAL_APPROVED, { request });
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const rejectRentalRequestController = async (req, res) => {
+export const rejectRentalRequestController = async (req, res, next) => {
 	try {
 		const request = await rejectRentalRequest(req.params.id);
-		res.json({ message: "거절되었습니다.", request });
+		return success(res, SUCCESS_MESSAGES.RENTAL_REJECTED, { request });
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };
 
-export const cancelRentalRequestController = async (req, res) => {
+export const cancelRentalRequestController = async (req, res, next) => {
 	try {
 		const userId = req.user.id;
 		const { id } = req.params;
 		const request = await cancelRentalRequest(id, userId);
-		res.json({ message: "고객 요청으로 거절되었습니다.", request });
+		return success(res, SUCCESS_MESSAGES.RENTAL_CANCELED, { request });
 	} catch (error) {
-		res.status(400).json({ message: error.message });
+		next(error);
 	}
 };

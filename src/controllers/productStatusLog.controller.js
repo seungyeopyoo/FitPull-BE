@@ -4,94 +4,132 @@ import {
     updateStatusLog,
     deleteStatusLog,
   } from "../services/productStatusLog.service.js";
-import { getProductById as getProductByIdRepo } from "../repositories/product.repository.js";
+import { getProductById  } from "../repositories/product.repository.js";
+import { success } from "../utils/responseHandler.js";
+import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages.js";
+import CustomError from "../utils/customError.js";
 
-export const createStatusLogController = async (req, res) => {
+const PRODUCT_LOG_TYPES = [
+  "PRE_RENTAL",
+  "ON_RENTAL",
+  "DAMAGE_REPORTED",
+  "WITHDRAWN",
+  "STORAGE_FEE_NOTICE",
+  "ETC"
+];
+
+export const createStatusLogController = async (req, res, next) => {
   try {
-    const { type, notes, completedRentalId } = req.body;
+    const { type, notes, completedRentalId, imageUrls } = req.body;
     const { productId } = req.params;
     const userId = req.user.userId;
 
-    // 상품 삭제 여부 체크
-    const product = await getProductByIdRepo(productId);
-    if (!product || product.deletedAt) {
-      return res.status(400).json({ message: "삭제된 상품에는 로그를 작성할 수 없습니다." });
+    const product = await getProductById(productId);
+    if (!product) {
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
     }
 
+    if (product.deletedAt) {
+      return next(new CustomError(400, "PRODUCT_DELETED", ERROR_MESSAGES.DELETED_PRODUCT));
+    }
+
+    if (!PRODUCT_LOG_TYPES.includes(type)) {
+      return next(
+        new CustomError(400, "INVALID_LOG_TYPE", `올바른 로그타입을 입력하세요: ${PRODUCT_LOG_TYPES.join(", ")}`)
+      );
+    }
     // S3에서 업로드된 이미지 URL 추출
-    const photoUrls = req.files?.map((file) => file.location) ?? [];
-    const filteredPhotoUrls = (photoUrls ?? []).filter(url => !!url);
+    const photoUrls = Array.isArray(imageUrls) ? imageUrls : [];
+if (photoUrls.length > 5) {
+  return next(new CustomError(400, "IMAGE_LIMIT_EXCEEDED", ERROR_MESSAGES.IMAGE_LIMIT_EXCEEDED));
+}
 
-    const data = {
-      userId,
-      productId,
-      type,
-      photoUrls: filteredPhotoUrls,
-      notes,
-    };
+const data = {
+  userId,
+  productId,
+  type,
+  photoUrls,
+  notes,
+};
 
-    if (completedRentalId) {
-      data.completedRentalId = completedRentalId;
-    }
+if (completedRentalId) {
+  data.completedRentalId = completedRentalId;
+}
 
-    const newLog = await createStatusLog(data);
+const newLog = await createStatusLog(data);
 
-    res.status(201).json({ message: "상태 로그가 등록되었습니다.", log: newLog });
+return success(res, SUCCESS_MESSAGES.STATUS_LOG_CREATED, { log: newLog });
   } catch (error) {
-    console.error("상태 로그 생성 에러:", error);
-    res.status(500).json({ message: "상태 로그 생성 중 오류가 발생했습니다." });
+    next(error);
   }
 };
 
-export const getStatusLogsController = async (req, res) => {
+export const getStatusLogsController = async (req, res, next) => {
   try {
     const { productId } = req.params;
+
+    const product = await getProductById(productId);
+    if (!product) {
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+    }
+
     const logs = await getLogsByProduct(productId);
-    res.status(200).json({ logs });
+    return success(res, SUCCESS_MESSAGES.STATUS_LOG_LISTED, { logs });
   } catch (error) {
-    console.error("상태 로그 조회 에러:", error);
-    res.status(500).json({ message: "상태 로그 조회 중 오류가 발생했습니다." });
+    next(error);
   }
 };
 
-export const updateStatusLogController = async (req, res) => {
+export const updateStatusLogController = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { productId, id } = req.params;
+    const { type, notes, completedRentalId, imageUrls } = req.body;
 
-    const body = req.body || {};
-    const { type, notes, completedRentalId } = body;
+    // 상품 존재 여부 확인
+    const product = await getProductById(productId);
+    if (!product) {
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+    }
 
-    // S3에서 업로드된 이미지 URL 추출
-    const photoUrls = req.files?.map((file) => file.location) ?? [];
-    const filteredPhotoUrls = (photoUrls ?? []).filter(url => !!url);
+    if (product.deletedAt) {
+      return next(new CustomError(400, "PRODUCT_DELETED", ERROR_MESSAGES.DELETED_PRODUCT));
+    }
+
+    // 로그 타입 유효성 검사
+    if (type && !PRODUCT_LOG_TYPES.includes(type)) {
+      return next(
+        new CustomError(400, "INVALID_LOG_TYPE", `올바른 로그타입을 입력하세요: ${PRODUCT_LOG_TYPES.join(", ")}`)
+      );
+    }
+
+    // 이미지 URL 처리
+    const photoUrls = Array.isArray(imageUrls) ? imageUrls : [];
 
     // 수정할 데이터 구성
     const data = {};
     if (type !== undefined) data.type = type;
     if (notes !== undefined) data.notes = notes;
     if (completedRentalId !== undefined) data.completedRentalId = completedRentalId;
-    if (filteredPhotoUrls.length > 0) data.photoUrls = filteredPhotoUrls;
+    if (photoUrls.length > 0) data.photoUrls = photoUrls;
 
     if (Object.keys(data).length === 0) {
-      return res.status(400).json({ message: "수정할 데이터가 없습니다." });
+      return next(new CustomError(400, "NO_UPDATE_DATA", "수정할 데이터가 없습니다."));
     }
 
     const updated = await updateStatusLog(id, data);
-    res.status(200).json({ message: "상태 로그가 수정되었습니다.", log: updated });
+    return success(res, SUCCESS_MESSAGES.STATUS_LOG_UPDATED, { log: updated });
   } catch (error) {
-    console.error("상태 로그 수정 에러:", error);
-    res.status(500).json({ message: "상태 로그 수정 중 오류가 발생했습니다." });
+    next(error);
   }
 };
 
-export const deleteStatusLogController = async (req, res) => {
+export const deleteStatusLogController = async (req, res, next) => {
   try {
     const { id } = req.params;
     await deleteStatusLog(id);
-    res.status(200).json({ message: "상태 로그가 삭제되었습니다." });
+    return success(res, SUCCESS_MESSAGES.STATUS_LOG_DELETED);
   } catch (error) {
-    console.error("상태 로그 삭제 에러:", error);
-    res.status(500).json({ message: "상태 로그 삭제 중 오류가 발생했습니다." });
+    next(error);
   }
 };
   

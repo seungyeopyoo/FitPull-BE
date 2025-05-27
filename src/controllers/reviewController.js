@@ -6,70 +6,71 @@ import {
   deleteReview,
 } from "../services/review.service.js";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../constants/messages.js";
+import { success, fail } from "../utils/responseHandler.js";
+import CustomError from "../utils/customError.js";
 
-export const createReviewController = async (req, res) => {
+export const createReviewController = async (req, res, next) => {
   try {
     const review = await createReview(req.user, req.body);
-    res.status(201).json({ message: SUCCESS_MESSAGES.REVIEW_CREATED, review });
+    return success(res, SUCCESS_MESSAGES.REVIEW_CREATED, { review });
   } catch (err) {
-    // Prisma unique constraint 에러를 ALREADY_REVIEWED로 변환
     if (
       err.message &&
       err.message.includes("Unique constraint failed") &&
       err.message.includes("completed_rental_id")
     ) {
-      return res.status(400).json({ message: ERROR_MESSAGES.ALREADY_REVIEWED });
+      return next(new CustomError(400, "ALREADY_REVIEWED", ERROR_MESSAGES.ALREADY_REVIEWED));
     }
-    res.status(400).json({ message: err.message });
+    next(err);
   }
 };
 
 // 상품별 리뷰 조회
-export const getReviewsByProductController = async (req, res) => {
+export const getReviewsByProductController = async (req, res, next) => {
   try {
     const { productId } = req.params;
     const reviews = await getReviewsByProduct(productId);
-    res.json(reviews);
+    return success(res, SUCCESS_MESSAGES.REVIEW_LISTED, { reviews });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const getReviewByIdController = async (req, res) => {
+export const getReviewByIdController = async (req, res, next) => {
   try {
     const { id } = req.params;
     const review = await getReviewById(id);
     if (!review || review.deletedAt) {
-      return res.status(404).json({ message: ERROR_MESSAGES.REVIEW_NOT_FOUND });
+      return next(new CustomError(404, "REVIEW_NOT_FOUND", ERROR_MESSAGES.REVIEW_NOT_FOUND));
     }
-    res.json(review);
+    return success(res, SUCCESS_MESSAGES.REVIEW_DETAIL, { review });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const updateReviewController = async (req, res) => {
+export const updateReviewController = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updated = await updateReview(req.user, id, req.body);
-    res.json({ message: SUCCESS_MESSAGES.REVIEW_UPDATED, review: updated });
+    return success(res, SUCCESS_MESSAGES.REVIEW_UPDATED, { review: updated });
   } catch (err) {
     if (err.message === ERROR_MESSAGES.ONLY_OWN_REVIEW) {
-      return res.status(403).json({ message: err.message });
+      return next(new CustomError(403, "ONLY_OWN_REVIEW", err.message));
     }
-    res.status(400).json({ message: err.message });
+    next(err);
   }
 };
 
-export const deleteReviewController = async (req, res) => {
+export const deleteReviewController = async (req, res, next) => {
   try {
     const { id } = req.params;
     await deleteReview(req.user, id);
-    res.status(200).json({ message: SUCCESS_MESSAGES.REVIEW_DELETED });
+    return success(res, SUCCESS_MESSAGES.REVIEW_DELETED);
   } catch (err) {
     if (err.message === ERROR_MESSAGES.ONLY_OWN_DELETE) {
-      return res.status(403).json({ message: err.message });
+      return next(new CustomError(403, "ONLY_OWN_DELETE", err.message));
     }
-    res.status(400).json({ message: err.message });
+    next(err);
   }
 }; 

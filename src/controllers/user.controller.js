@@ -1,19 +1,20 @@
 import { getUserById } from "../services/user.service.js";
 import { updateUserInfo } from "../services/user.service.js";
 import { deactivateUser } from "../services/user.service.js";
+import { success } from "../utils/responseHandler.js";
+import messages from "../constants/messages.js";
 
-export const getMyProfile = async (req, res) => {
+export const getMyProfile = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const user = await getUserById(userId);
-		res.json({ message: "내 정보 조회", user });
+		return success(res, messages.GET_MY_PROFILE_SUCCESS, { user });
 	} catch (err) {
-		console.error("내 정보 조회 실패:", err);
-		res.status(404).json({ message: err.message });
+		next(err);
 	}
 };
 
-export const updateMyProfile = async (req, res) => {
+export const updateMyProfile = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const { name, bankAccount, bankName, accountHolder } = req.body;
@@ -25,22 +26,20 @@ export const updateMyProfile = async (req, res) => {
 			accountHolder,
 		});
 
-		res.json({ message: "내 정보가 수정되었습니다.", user: updatedUser });
+		return success(res, messages.UPDATE_MY_PROFILE_SUCCESS, { user: updatedUser });
 	} catch (err) {
-		console.error("내 정보 수정 실패:", err);
-		res.status(500).json({ message: "내 정보 수정 중 오류가 발생했습니다." });
+		next(err);
 	}
 };
 
-export const deleteMyAccount = async (req, res) => {
+export const deleteMyAccount = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 
 		await deactivateUser(userId);
 
-		res.status(200).json({ message: "회원 탈퇴가 완료되었습니다." });
+		return success(res, messages.DELETE_MY_ACCOUNT_SUCCESS);
 	} catch (err) {
-		console.error("회원 탈퇴 실패:", err);
-		res.status(500).json({ message: "회원 탈퇴 중 오류가 발생했습니다." });
+		next(err);
 	}
 };
