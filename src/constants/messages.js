@@ -13,6 +13,8 @@ export const ERROR_MESSAGES = {
   ONLY_COMPLETED_RENTAL: "본인이 완료한 대여에만 리뷰를 작성할 수 있습니다.",
   INVALID_RATING: "별점은 1~5 사이여야 합니다.",
   IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
+  DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
+  STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
 };
 
 export const SUCCESS_MESSAGES = {
@@ -33,6 +35,10 @@ export const SUCCESS_MESSAGES = {
   RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
   MY_COMPLETED_RENTALS_LISTED: "내 완료 대여 목록 조회 성공",
   ALL_COMPLETED_RENTALS_LISTED: "전체 완료 대여 목록 조회 성공",
+  STATUS_LOG_CREATED: "상태 로그가 등록되었습니다.",
+  STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
+  STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
+  STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
 };
 
 export default {

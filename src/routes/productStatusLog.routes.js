@@ -84,13 +84,19 @@ const router = express.Router();
 
 /**
  * @swagger
- * /products/logs/{id}:
+ * /products/{productId}/logs/{id}:
  *   patch:
  *     summary: 상품 상태 로그 수정 (관리자 전용)
  *     tags: [ProductStatusLog]
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         description: 상품 ID
+ *         schema:
+ *           type: string
  *       - in: path
  *         name: id
  *         required: true
@@ -141,7 +147,10 @@ const router = express.Router();
  *         description: 상태 로그 삭제 성공
  */
 
+// 상품로그조회
 router.get("/:productId/logs", authenticate, getStatusLogsController);
+
+// 어드민 상품로그생성
 router.post(
   "/:productId/logs",
   authenticate,
@@ -149,13 +158,10 @@ router.post(
   ...s3ImageUpload,
   createStatusLogController
 );
-router.patch(
-  "/logs/:id",
-  authenticate,
-  adminOnly,
-  ...s3ImageUpload,
-  updateStatusLogController
-);
+
+// 어드민 상품로그수정
+router.patch("/:productId/logs/:id", authenticate, adminOnly, ...s3ImageUpload, updateStatusLogController);
+// 어드민 상품로그삭제
 router.delete("/logs/:id", authenticate, adminOnly, deleteStatusLogController);
 
 export default router;
