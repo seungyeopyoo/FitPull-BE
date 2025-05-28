@@ -14,10 +14,12 @@ export const updateUserById = async (userId, updateData) => {
 };
 
 export const softDeleteUserById = async (userId) => {
-	return await prisma.user.update({
+	await prisma.account.updateMany({
+		where: { userId, deletedAt: null },
+		data: { deletedAt: new Date() },
+	  });
+	  return await prisma.user.update({
 		where: { id: userId },
-		data: {
-			deletedAt: new Date(),
-		},
-	});
+		data: { deletedAt: new Date() },
+	  });
 };
