@@ -13,6 +13,13 @@ export const findByEmail = async (email) => {
 	});
 };
 
+export const findAnyByEmail = async (email) => {
+	return await prisma.account.findFirst({
+		where: { email },
+		include: { user: true },
+	});
+};
+
 export const createUser = async ({ email, passwordHash, name, phone }) => {
 	return await prisma.account.create({
 		data: {

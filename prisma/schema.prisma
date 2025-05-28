@@ -45,18 +45,19 @@ model User {
 }
 
 model Account {
-  id           String    @id @default(uuid())
-  provider     Provider
-  providerId   String?   @map("provider_id")
-  email        String
-  passwordHash String?   @map("password_hash")
-  accessToken  String?   @map("access_token")
-  refreshToken String?   @map("refresh_token")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-  deletedAt    DateTime? @map("deleted_at")
-  userId       String    @map("user_id")
-  user         User      @relation(fields: [userId], references: [id])
+  id            String    @id @default(uuid())
+  provider      Provider
+  providerId    String?   @map("provider_id")
+  email         String
+  verifiedEmail Boolean   @default(false)
+  passwordHash  String?   @map("password_hash")
+  accessToken   String?   @map("access_token")
+  refreshToken  String?   @map("refresh_token")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
 
   @@map("accounts")
 }

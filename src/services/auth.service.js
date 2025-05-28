@@ -1,4 +1,4 @@
-import { findByEmail, createUser } from "../repositories/auth.repository.js";
+import { findByEmail, createUser, findAnyByEmail } from "../repositories/auth.repository.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
 import { setRefreshToken, deleteRefreshToken, getRefreshToken } from "../utils/redis.js";
@@ -15,8 +15,13 @@ export const signup = async ({
 	if (password !== passwordCheck) {
 		throw new CustomError(400, "PASSWORD_MISMATCH", messages.PASSWORD_MISMATCH);
 	}
-	const exists = await findByEmail(email);
-	if (exists) throw new CustomError(409, "EMAIL_EXISTS", messages.EMAIL_EXISTS);
+	const exists = await findAnyByEmail(email);
+	if (exists && exists.deletedAt === null) {
+		throw new CustomError(409, "EMAIL_EXISTS", messages.EMAIL_EXISTS);
+	}
+	if (exists && exists.deletedAt !== null) {
+		throw new CustomError(409, "DELETED_ACCOUNT", messages.DELETED_ACCOUNT);
+	}
 
 	const hash = await bcrypt.hash(password, 10);
 	const account = await createUser({ email, passwordHash: hash, name, phone });

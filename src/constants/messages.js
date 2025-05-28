@@ -48,6 +48,7 @@ export default {
   LOGOUT_SUCCESS: "로그아웃 되었습니다.",
   PASSWORD_MISMATCH: "비밀번호가 일치하지 않습니다.",
   EMAIL_EXISTS: "이미 가입된 이메일입니다.",
+  DELETED_ACCOUNT: "탈퇴한 계정입니다. 재가입하려면 인증하세요.",
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   REFRESH_TOKEN_REQUIRED: "refreshToken이 필요합니다.",
   INVALID_REFRESH_TOKEN: "유효하지 않은 refreshToken입니다.",
