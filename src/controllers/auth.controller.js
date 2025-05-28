@@ -1,9 +1,10 @@
-import { signup, login } from "../services/auth.service.js";
+import { signup, login, rejoinRequest, rejoinVerify } from "../services/auth.service.js";
 import { deleteRefreshToken, getRefreshToken, setRefreshToken } from "../utils/redis.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
 import { generateTokens } from "../utils/jwt.js";
 import { success } from "../utils/responseHandler.js";
 import messages from "../constants/messages.js";
+
 
 export const signupController = async (req, res, next) => {
 	try {
@@ -79,6 +80,40 @@ export const refreshTokenController = async (req, res, next) => {
 		});
 		await setRefreshToken(userId, newRefreshToken);
 		return success(res, messages.REFRESH_TOKEN_SUCCESS, { accessToken });
+	} catch (error) {
+		next(error);
+	}
+};
+
+// 탈퇴 계정 재가입: 인증코드 발송
+export const rejoinRequestController = async (req, res, next) => {
+	try {
+		const { email } = req.body;
+		await rejoinRequest(email);
+		return success(res, "인증 코드가 이메일로 전송되었습니다.");
+	} catch (error) {
+		next(error);
+	}
+};
+
+// 탈퇴 계정 재가입: 인증코드 검증 및 계정 복구
+export const rejoinVerifyController = async (req, res, next) => {
+	try {
+		const { email, code, password } = req.body;
+		const user = await rejoinVerify({ email, code, password });
+
+		// 토큰 발급 및 쿠키 세팅 (회원가입/로그인과 동일)
+		res.cookie("refreshToken", user.refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+			path: "/",
+		});
+		return success(res, messages.REJOIN_SUCCESS, {
+			id: user.id,
+			name: user.name,
+			accessToken: user.accessToken,
+		});
 	} catch (error) {
 		next(error);
 	}

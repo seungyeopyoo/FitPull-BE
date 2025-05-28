@@ -18,4 +18,16 @@ export const deleteRefreshToken = async (userId) => {
   await redis.del(`refresh:${userId}`);
 };
 
+export const setEmailCode = async (email, code) => {
+  await redis.set(`emailCode:${email}`, code, "EX", 180); // 3분 유효
+};
+
+export const getEmailCode = async (email) => {
+  return await redis.get(`emailCode:${email}`);
+};
+
+export const deleteEmailCode = async (email) => {
+  await redis.del(`emailCode:${email}`);
+};
+
 export default redis;
