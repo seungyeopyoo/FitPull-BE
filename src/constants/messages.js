@@ -40,6 +40,7 @@ export const SUCCESS_MESSAGES = {
   STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
   STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
+  
 };
 
 export default {
@@ -70,4 +71,8 @@ export default {
   CATEGORY_NOT_FOUND: "존재하지 않는 카테고리입니다.",
   ETC_CATEGORY_NOT_FOUND: "'기타' 카테고리가 존재하지 않습니다.",
   CATEGORY_NAME_REQUIRED: "카테고리 이름이 필요합니다.",
+  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
+  REJOIN_SUCCESS: "재가입이 완료되었습니다.",
+  INVALID_PASSWORD: "비밀번호는 6자 이상 입력해야 합니다.",
+  NO_CODE: "해당 이메일로 인증 요청이 없습니다.",
 }; 

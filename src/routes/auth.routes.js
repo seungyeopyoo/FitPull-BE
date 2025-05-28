@@ -4,6 +4,8 @@ import {
 	loginController,
 	logoutController,
 	refreshTokenController,
+	rejoinRequestController,
+	rejoinVerifyController,
 } from "../controllers/auth.controller.js";
 
 /**
@@ -59,6 +61,93 @@ import {
  *         description: refreshToken이 유효하지 않음
  */
 
+/**
+ * @swagger
+ * /auth/rejoin/request:
+ *   post:
+ *     summary: 탈퇴한 계정 재가입 인증코드 요청
+ *     description: 탈퇴한 계정의 이메일로 인증코드를 전송합니다.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: 인증 코드 전송 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: 탈퇴한 계정이 아닐 때
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
+/**
+ * @swagger
+ * /auth/rejoin/verify:
+ *   post:
+ *     summary: 탈퇴한 계정 재가입 인증코드 검증 및 계정 복구
+ *     description: 인증코드와 새 비밀번호를 입력하여 탈퇴한 계정을 복구합니다.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *               password:
+ *                 type: string
+ *                 example: "새비밀번호"
+ *     responses:
+ *       200:
+ *         description: 재가입(계정 복구) 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     accessToken:
+ *                       type: string
+ *       400:
+ *         description: 인증코드 불일치 등 잘못된 요청
+ *       404:
+ *         description: 계정 없음
+ *       500:
+ *         description: 서버 내부 오류
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
@@ -68,5 +157,9 @@ router.post("/login", loginController);
 router.post("/logout", logoutController);
 //토큰 재발급
 router.post("/refresh", refreshTokenController);
+//재가입 요청
+router.post("/rejoin/request", rejoinRequestController);
+//재가입 인증
+router.post("/rejoin/verify", rejoinVerifyController);
 
 export default router;
