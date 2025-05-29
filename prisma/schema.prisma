@@ -315,6 +315,7 @@ enum Provider {
   LOCAL
   KAKAO
   GOOGLE
+  NAVER
 }
 
 enum ProductStatus {

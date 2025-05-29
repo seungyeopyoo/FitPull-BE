@@ -198,6 +198,30 @@ import passport from "../configs/passport.js";
  *         description: 로그인 실패
  */
 
+/**
+ * @swagger
+ * /auth/naver:
+ *   get:
+ *     summary: 네이버 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 네이버 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/naver/callback:
+ *   get:
+ *     summary: 네이버 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
@@ -232,6 +256,19 @@ router.get(
 router.get(
 	"/google/callback",
 	passport.authenticate("google", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
+
+// 네이버 로그인 시작
+router.get(
+	"/naver",
+	passport.authenticate("naver")
+);
+
+// 네이버 로그인 콜백
+router.get(
+	"/naver/callback",
+	passport.authenticate("naver", { failureRedirect: "/login", session: false }),
 	socialCallbackController
 );
 

@@ -139,20 +139,12 @@ export const socialCallbackController = async (req, res, next) => {
 		});
 
 		// provider에 따라 메시지 선택
-		let msg;
-		switch (user.provider) {
-			case "KAKAO":
-				msg = messages.KAKAO_LOGIN_SUCCESS;
-				break;
-			case "GOOGLE":
-				msg = messages.GOOGLE_LOGIN_SUCCESS;
-				break;
-			case "NAVER":
-				msg = messages.NAVER_LOGIN_SUCCESS;
-				break;
-			default:
-				msg = messages.LOGIN_SUCCESS;
-		}
+		const providerMsgMap = {
+			KAKAO: messages.KAKAO_LOGIN_SUCCESS,
+			GOOGLE: messages.GOOGLE_LOGIN_SUCCESS,
+			NAVER: messages.NAVER_LOGIN_SUCCESS,
+		};
+		const msg = providerMsgMap[user.provider] || messages.LOGIN_SUCCESS;
 
 		return success(res, msg, {
 			id: user.id,
