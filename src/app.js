@@ -14,6 +14,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import errorHandler from './middlewares/errorHandler.js';
+import passport from "./configs/passport.js";
 dotenv.config();
 
 const app = express();
@@ -22,6 +23,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 
 //스웨거
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

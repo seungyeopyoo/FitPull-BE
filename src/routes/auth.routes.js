@@ -6,7 +6,9 @@ import {
 	refreshTokenController,
 	rejoinRequestController,
 	rejoinVerifyController,
+	socialCallbackController
 } from "../controllers/auth.controller.js";
+import passport from "../configs/passport.js";
 
 /**
  * @swagger
@@ -161,5 +163,15 @@ router.post("/refresh", refreshTokenController);
 router.post("/rejoin/request", rejoinRequestController);
 //재가입 인증
 router.post("/rejoin/verify", rejoinVerifyController);
+
+// 카카오 로그인 시작
+router.get("/kakao", passport.authenticate("kakao"));
+
+// 카카오 로그인 콜백
+router.get(
+	"/kakao/callback",
+	passport.authenticate("kakao", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
 
 export default router;

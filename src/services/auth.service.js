@@ -1,4 +1,4 @@
-import { findByEmail, createUser, findAnyByEmail, restoreAccountByEmail } from "../repositories/auth.repository.js";
+import { findByEmail, createUser, findAnyByEmail, restoreAccountByEmail, findAccountByProvider } from "../repositories/auth.repository.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
 import { setRefreshToken, deleteRefreshToken, getRefreshToken, getEmailCode, deleteEmailCode, setEmailCode } from "../utils/redis.js";
@@ -26,7 +26,14 @@ export const signup = async ({
 	}
 
 	const hash = await bcrypt.hash(password, 10);
-	const account = await createUser({ email, passwordHash: hash, name, phone });
+	const account = await createUser({
+		email,
+		passwordHash: hash,
+		name,
+		phone,
+		provider: "LOCAL", 
+		providerId: email,
+	  });
 
 	const payload = {
 		userId: account.user.id,
@@ -123,3 +130,23 @@ export const rejoinVerify = async ({ email, code, password }) => {
 	};
 };
 
+export const findOrCreateSocialAccount = async (profile, provider) => {
+	const kakaoId = String(profile.id);
+	const email = profile._json.kakao_account?.email ?? `kakao_${kakaoId}@social-login.com`;
+	const nickname = profile.username || profile.displayName || "카카오유저";
+
+	const existing = await findAccountByProvider(provider, kakaoId);
+	if (existing) {
+	  return existing.user;
+	}
+  
+	const user = await createUser({
+	  email,
+	  name: nickname,
+	  phone: "00000000000",
+	  provider,
+	  providerId: kakaoId,
+	});
+  
+	return user;
+  };

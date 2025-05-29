@@ -118,3 +118,32 @@ export const rejoinVerifyController = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const socialCallbackController = async (req, res, next) => {
+	try {
+	  const user = req.user; // passport에서 넘겨준 유저
+	  const { accessToken, refreshToken } = generateTokens({
+		userId: user.id,
+		accountId: user.accountId,
+		email: user.email,
+		role: user.role,
+	  });
+  
+	  await setRefreshToken(user.id, refreshToken);
+  
+	  res.cookie("refreshToken", refreshToken, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		maxAge: 7 * 24 * 60 * 60 * 1000,
+		path: "/",
+	  });
+  
+	  return success(res, "카카오 로그인 성공", {
+		id: user.id,
+		name: user.name,
+		accessToken,
+	  });
+	} catch (err) {
+	  next(err);
+	}
+  };
