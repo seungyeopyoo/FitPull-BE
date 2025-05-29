@@ -174,6 +174,30 @@ import passport from "../configs/passport.js";
  *         description: 로그인 실패
  */
 
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: 구글 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 구글 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: 구글 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
@@ -195,6 +219,19 @@ router.get("/kakao", passport.authenticate("kakao"));
 router.get(
 	"/kakao/callback",
 	passport.authenticate("kakao", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
+
+// 구글 로그인 시작
+router.get(
+	"/google",
+	passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+// 구글 로그인 콜백
+router.get(
+	"/google/callback",
+	passport.authenticate("google", { failureRedirect: "/login", session: false }),
 	socialCallbackController
 );
 

@@ -131,22 +131,38 @@ export const rejoinVerify = async ({ email, code, password }) => {
 };
 
 export const findOrCreateSocialAccount = async (profile, provider) => {
-	const kakaoId = String(profile.id);
-	const email = profile._json.kakao_account?.email ?? `kakao_${kakaoId}@social-login.com`;
-	const nickname = profile.username || profile.displayName || "카카오유저";
+	let providerId, email, nickname;
 
-	const existing = await findAccountByProvider(provider, kakaoId);
-	if (existing) {
-	  return existing.user;
+	if (provider === "KAKAO") {
+		providerId = String(profile.id);
+		email = profile._json.kakao_account?.email ?? `kakao_${providerId}@social-login.com`;
+		nickname = profile.username || profile.displayName || "카카오유저";
+	} else if (provider === "GOOGLE") {
+		providerId = String(profile.id);
+		email = profile.emails?.[0]?.value ?? `google_${providerId}@social-login.com`;
+		nickname = profile.displayName || profile.username || "구글유저";
+	} else if (provider === "NAVER") {
+		providerId = String(profile.id);
+		email = profile.emails?.[0]?.value ?? `naver_${providerId}@social-login.com`;
+		nickname = profile.displayName || profile.username || "네이버유저";
+	} else {
+		providerId = String(profile.id);
+		email = `social_${providerId}@social-login.com`;
+		nickname = profile.displayName || profile.username || "소셜유저";
 	}
-  
+
+	const existing = await findAccountByProvider(provider, providerId);
+	if (existing) {
+		return existing.user;
+	}
+
 	const user = await createUser({
-	  email,
-	  name: nickname,
-	  phone: "00000000000",
-	  provider,
-	  providerId: kakaoId,
+		email,
+		name: nickname,
+		phone: "00000000000",
+		provider,
+		providerId,
 	});
-  
+
 	return user;
-  };
+};
