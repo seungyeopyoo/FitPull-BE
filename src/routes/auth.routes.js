@@ -6,7 +6,9 @@ import {
 	refreshTokenController,
 	rejoinRequestController,
 	rejoinVerifyController,
+	socialCallbackController
 } from "../controllers/auth.controller.js";
+import passport from "../configs/passport.js";
 
 /**
  * @swagger
@@ -148,6 +150,78 @@ import {
  *         description: 서버 내부 오류
  */
 
+/**
+ * @swagger
+ * /auth/kakao:
+ *   get:
+ *     summary: 카카오 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 카카오 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/kakao/callback:
+ *   get:
+ *     summary: 카카오 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: 구글 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 구글 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: 구글 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
+/**
+ * @swagger
+ * /auth/naver:
+ *   get:
+ *     summary: 네이버 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 네이버 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/naver/callback:
+ *   get:
+ *     summary: 네이버 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
@@ -161,5 +235,41 @@ router.post("/refresh", refreshTokenController);
 router.post("/rejoin/request", rejoinRequestController);
 //재가입 인증
 router.post("/rejoin/verify", rejoinVerifyController);
+
+// 카카오 로그인 시작
+router.get("/kakao", passport.authenticate("kakao"));
+
+// 카카오 로그인 콜백
+router.get(
+	"/kakao/callback",
+	passport.authenticate("kakao", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
+
+// 구글 로그인 시작
+router.get(
+	"/google",
+	passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+// 구글 로그인 콜백
+router.get(
+	"/google/callback",
+	passport.authenticate("google", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
+
+// 네이버 로그인 시작
+router.get(
+	"/naver",
+	passport.authenticate("naver")
+);
+
+// 네이버 로그인 콜백
+router.get(
+	"/naver/callback",
+	passport.authenticate("naver", { failureRedirect: "/login", session: false }),
+	socialCallbackController
+);
 
 export default router;

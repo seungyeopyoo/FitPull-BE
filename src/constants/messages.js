@@ -75,4 +75,7 @@ export default {
   REJOIN_SUCCESS: "재가입이 완료되었습니다.",
   INVALID_PASSWORD: "비밀번호는 6자 이상 입력해야 합니다.",
   NO_CODE: "해당 이메일로 인증 요청이 없습니다.",
+  KAKAO_LOGIN_SUCCESS: "카카오 로그인 성공",
+  GOOGLE_LOGIN_SUCCESS: "구글 로그인 성공",
+  NAVER_LOGIN_SUCCESS: "네이버 로그인 성공",
 }; 

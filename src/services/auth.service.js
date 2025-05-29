@@ -1,4 +1,4 @@
-import { findByEmail, createUser, findAnyByEmail, restoreAccountByEmail } from "../repositories/auth.repository.js";
+import { findByEmail, createUser, findAnyByEmail, restoreAccountByEmail, findAccountByProvider } from "../repositories/auth.repository.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
 import { setRefreshToken, deleteRefreshToken, getRefreshToken, getEmailCode, deleteEmailCode, setEmailCode } from "../utils/redis.js";
@@ -26,7 +26,14 @@ export const signup = async ({
 	}
 
 	const hash = await bcrypt.hash(password, 10);
-	const account = await createUser({ email, passwordHash: hash, name, phone });
+	const account = await createUser({
+		email,
+		passwordHash: hash,
+		name,
+		phone,
+		provider: "LOCAL", 
+		providerId: email,
+	  });
 
 	const payload = {
 		userId: account.user.id,
@@ -123,3 +130,63 @@ export const rejoinVerify = async ({ email, code, password }) => {
 	};
 };
 
+const extractSocialProfile = (profile, provider) => {
+	const id = String(profile.id);
+  
+	const fallbackEmail = `${provider.toLowerCase()}_${id}@social-login.com`;
+	const fallbackNickname = `${provider.toUpperCase()}유저`;
+  
+	if (provider === "KAKAO") {
+	  return {
+		providerId: id,
+		email: profile._json?.kakao_account?.email ?? fallbackEmail,
+		nickname: profile.username || profile.displayName || fallbackNickname,
+	  };
+	}
+  
+	if (provider === "GOOGLE") {
+	  return {
+		providerId: id,
+		email: profile.emails?.[0]?.value ?? fallbackEmail,
+		nickname: profile.displayName || profile.username || fallbackNickname,
+	  };
+	}
+  
+	if (provider === "NAVER") {
+	  return {
+		providerId: id,
+		email: profile.emails?.[0]?.value || profile._json?.email || fallbackEmail,
+		nickname:
+		  profile._json?.nickname ||
+		  profile._json?.name ||
+		  profile.displayName ||
+		  profile.username ||
+		  fallbackEmail.split("@")[0] ||
+		  fallbackNickname,
+	  };
+	}
+  
+	return {
+	  providerId: id,
+	  email: fallbackEmail,
+	  nickname: profile.displayName || profile.username || fallbackNickname,
+	};
+  };
+  
+  export const findOrCreateSocialAccount = async (profile, provider) => {
+	const { providerId, email, nickname } = extractSocialProfile(profile, provider);
+  
+	const existing = await findAccountByProvider(provider, providerId);
+	if (existing) return existing.user;
+  
+	const user = await createUser({
+	  email,
+	  name: nickname,
+	  phone: "00000000000",
+	  provider,
+	  providerId,
+	});
+  
+	return user;
+  };
+  
