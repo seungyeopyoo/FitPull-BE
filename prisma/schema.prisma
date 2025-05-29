@@ -313,8 +313,8 @@ enum Role {
 
 enum Provider {
   LOCAL
-  kakao
-  google
+  KAKAO
+  GOOGLE
 }
 
 enum ProductStatus {
