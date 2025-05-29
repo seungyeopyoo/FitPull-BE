@@ -150,6 +150,30 @@ import passport from "../configs/passport.js";
  *         description: 서버 내부 오류
  */
 
+/**
+ * @swagger
+ * /auth/kakao:
+ *   get:
+ *     summary: 카카오 소셜 로그인 시작
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: 카카오 인증 페이지로 리다이렉트
+ */
+
+/**
+ * @swagger
+ * /auth/kakao/callback:
+ *   get:
+ *     summary: 카카오 소셜 로그인 콜백
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 토큰 등 반환)
+ *       401:
+ *         description: 로그인 실패
+ */
+
 const router = express.Router();
 //회원가입
 router.post("/signup", signupController);
