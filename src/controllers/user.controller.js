@@ -17,13 +17,14 @@ export const getMyProfile = async (req, res, next) => {
 export const updateMyProfile = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
-		const { name, bankAccount, bankName, accountHolder } = req.body;
+		const { name, bankAccount,phone, bankName, accountHolder } = req.body;
 
 		const updatedUser = await updateUserInfo(userId, {
 			name,
 			bankAccount,
 			bankName,
 			accountHolder,
+			phone
 		});
 
 		return success(res, messages.UPDATE_MY_PROFILE_SUCCESS, { user: updatedUser });
