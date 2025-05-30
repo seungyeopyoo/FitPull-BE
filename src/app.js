@@ -10,6 +10,7 @@ import rentalRequestRouter from "./routes/rentalRequest.routes.js";
 import completedRentalRouter from "./routes/completedRental.routes.js";
 import productStatusLogRouter from "./routes/productStatusLog.routes.js";
 import reviewRouter from "./routes/review.router.js";
+import messageRouter from "./routes/message.router.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -45,6 +46,7 @@ app.use("/api/rental-requests", rentalRequestRouter);
 app.use("/api/completed-rentals", completedRentalRouter);
 app.use("/api/products", productStatusLogRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/messages", messageRouter);
 // 기본 라우트
 app.get("/", (_, res) => {
 	res.send("백엔드 서버 정상 작동 중.");

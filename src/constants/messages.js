@@ -43,6 +43,13 @@ export const SUCCESS_MESSAGES = {
   
 };
 
+export const MESSAGE_RESPONSES = {
+  SEND_SUCCESS: "메시지 전송 완료",
+  FETCH_SUCCESS: "메시지 조회 성공",
+  MARK_READ: "읽음 처리 완료",
+  DELETE_SUCCESS: "메시지 삭제 완료",
+};
+
 export default {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
   LOGIN_SUCCESS: "로그인 성공",
