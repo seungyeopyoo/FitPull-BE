@@ -1,11 +1,20 @@
 import * as messageRepo from "../repositories/message.repository.js";
 import CustomError from "../utils/customError.js";
 import { MESSAGE_RESPONSES } from "../constants/messages.js";
+import { getProductById } from "../repositories/product.repository.js";
 
 //메세지 전송
 export const sendMessage = async ({ senderId, receiverId, content, productId, senderRole }) => {
   if (!content || !receiverId) {
     throw new CustomError(400, "INVALID_MESSAGE", "내용과 수신자를 입력하세요.");
+  }
+
+  // productId 유효성 체크
+  if (productId) {
+    const product = await getProductById(productId);
+    if (!product) {
+      throw new CustomError(400, "PRODUCT_NOT_FOUND", "존재하지 않는 상품입니다.");
+    }
   }
 
   let adminId;
@@ -46,13 +55,11 @@ export const getReceivedMessages = async (userId, userRole) => {
   } catch {
     throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
   }
-  let messages;
+  let messages = await messageRepo.findReceivedMessages(userId);
   if (userRole === "USER") {
-    messages = await messageRepo.findReceivedMessages(userId);
     messages = messages.filter(msg => msg.sender.id === adminId);
   } else if (userRole === "ADMIN") {
-    messages = await messageRepo.findReceivedMessages(userId);
-    messages = messages.filter(msg => msg.sender.role === "USER");
+    messages = messages.filter(msg => msg.sender.id !== adminId); // ADMIN이 보낸 메시지는 제외
   } else {
     throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
   }
@@ -70,13 +77,11 @@ export const getSentMessages = async (userId, userRole) => {
   } catch {
     throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
   }
-  let messages;
+  let messages = await messageRepo.findSentMessages(userId);
   if (userRole === "USER") {
-    messages = await messageRepo.findSentMessages(userId);
     messages = messages.filter(msg => msg.receiver.id === adminId);
   } else if (userRole === "ADMIN") {
-    messages = await messageRepo.findSentMessages(userId);
-    messages = messages.filter(msg => msg.receiver.role === "USER");
+    messages = messages.filter(msg => msg.receiver.id !== adminId); // ADMIN이 보낸 메시지는 제외
   } else {
     throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
   }

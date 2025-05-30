@@ -18,9 +18,12 @@ export const findReceivedMessages = (userId) => {
       deletedAt: null,
     },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      content: true,
+      isRead: true,
       sender: {
-        select: { id: true, name: true, profileImage: true, role: true }
+        select: { id: true, name: true }
       },
       product: {
         select: { id: true, title: true }
@@ -36,9 +39,12 @@ export const findSentMessages = (userId) => {
       deletedAt: null,
     },
     orderBy: { createdAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      content: true,
+      isRead: true,
       receiver: {
-        select: { id: true, name: true, profileImage: true, role: true }
+        select: { id: true, name: true }
       },
       product: {
         select: { id: true, title: true }
