@@ -1,7 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { DEFAULT_CATEGORY_NAME } from '../src/constants/category.js';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient();
+
+const ADMIN_EMAIL = 'admin@fitpull.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_NAME = '어드민';
+const ADMIN_PHONE = '010-2667-8832'; 
 
 async function main() {
   // 이미 "기타" 카테고리가 있으면 추가하지 않음
@@ -19,6 +27,37 @@ async function main() {
     console.log(`카테고리 "${DEFAULT_CATEGORY_NAME}"가 생성되었습니다.`);
   } else {
     console.log(`카테고리 "${DEFAULT_CATEGORY_NAME}"가 이미 존재합니다.`);
+  }
+
+  // 관리자 계정 seeding
+  const adminUser = await prisma.user.findFirst({
+    where: { role: 'ADMIN' }
+  });
+
+  if (!adminUser) {
+    // 1. User 생성
+    const newAdminUser = await prisma.user.create({
+      data: {
+        name: ADMIN_NAME,
+        phone: ADMIN_PHONE,
+        role: 'ADMIN',
+      }
+    });
+
+    // 2. Account 생성 (User와 연결)
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    await prisma.account.create({
+      data: {
+        provider: 'LOCAL',
+        email: ADMIN_EMAIL,
+        passwordHash: hashedPassword,
+        userId: newAdminUser.id,
+      }
+    });
+
+    console.log('관리자 계정(User + Account)이 생성되었습니다.');
+  } else {
+    console.log('관리자 계정이 이미 존재합니다.');
   }
 }
 
