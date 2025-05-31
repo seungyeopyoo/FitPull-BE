@@ -65,6 +65,13 @@ export const NOTIFICATION_MESSAGES = {
   REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁dream니다!",
 };
 
+export const RENTAL_REQUEST_MESSAGES = {
+  START_DATE_LIMIT: "예약 시작일은 30일 이내여야 합니다.",
+  RECEIVE_METHOD_REQUIRED: "수령 방법을 선택해주세요.",
+  CANCEL_NOT_ALLOWED: "해당 상태에서는 취소할 수 없습니다.",
+  CANCEL_TOO_LATE: "대여 시작 3일 전부터는 취소가 불가합니다.",
+};
+
 export default {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
   LOGIN_SUCCESS: "로그인 성공",
