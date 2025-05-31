@@ -1,19 +1,17 @@
 import express from "express";
-import { sendNotification } from "../utils/notify.js";
+import { sendTestNotification, getNotificationList, markNotificationRead } from "../controllers/notification.controller.js";
+import { authenticate  } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-// 테스트용 API
-router.post("/test", async (req, res) => {
-  const { userId, message } = req.body;
+// 테스트용 알림 전송
+router.post("/test", sendTestNotification);
 
-  sendNotification(userId, {
-    type: "INFO",
-    message,
-    url: "/some/path",
-  });
+// 알림 목록 조회
+router.get("/", authenticate, getNotificationList);
 
-  return res.status(200).json({ success: true });
-});
+// 알림 읽음 처리
+router.patch("/:id/read", authenticate, markNotificationRead);
+
 
 export default router;
