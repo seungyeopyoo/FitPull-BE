@@ -62,6 +62,7 @@ export const NOTIFICATION_MESSAGES = {
   PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
   REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
   ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
+  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁dream니다!",
 };
 
 export default {
