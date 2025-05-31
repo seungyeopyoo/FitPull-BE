@@ -1,4 +1,5 @@
 import express from "express";
+
 import { sendTestNotification, getNotificationList, markNotificationRead } from "../controllers/notification.controller.js";
 import { authenticate  } from "../middlewares/auth.js";
 

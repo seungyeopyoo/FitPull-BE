@@ -19,6 +19,7 @@ import { findLogsByProductRepo } from "../repositories/productStatusLog.reposito
 import CustomError from "../utils/customError.js";
 import messages from "../constants/messages.js";
 import { MAX_PRODUCT_IMAGES } from "../constants/limits.js";
+import { createNotification } from "./notification.service.js";
 
 const MAX_INT_32 = 2147483647;
 
@@ -275,6 +276,14 @@ export const approveProduct = async (id) => {
 	try {
 		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
 
+		await createNotification({
+			userId: product.owner.id,
+			type: "APPROVAL",
+			message: `등록하신 상품 '${product.title}'이 승인되어 웹사이트에 개제되었습니다.`,
+			url: `/products/${product.id}`,
+			productId: product.id,
+		});
+
 		return {
 			message: PRODUCT_STATUS.APPROVED,
 			id: product.id,
@@ -298,9 +307,17 @@ export const approveProduct = async (id) => {
 	}
 };
 
-export const rejectProduct = async (id) => {
+export const rejectProduct = async (id, rejectReason = "") => {
 	try {
 		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
+
+		await createNotification({
+			userId: product.owner.id,
+			type: "APPROVAL",
+			message: `등록하신 상품 '${product.title}'이 거절되었습니다.${rejectReason ? " 사유: " + rejectReason : ""}`,
+			url: `/products/${product.id}`,
+			productId: product.id,
+		});
 
 		return {
 			message: PRODUCT_STATUS.REJECTED,

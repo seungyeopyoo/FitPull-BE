@@ -10,7 +10,7 @@ const socket = io("http://127.0.0.1:3000", {
 
 socket.on("connect", () => {
   console.log("소켓 연결됨:", socket.id);
-  socket.emit("register", "3c283e3b-84a9-4ac5-af5a-ed5e0d6696bc");
+  socket.emit("register", "fe8e77ec-df55-481c-adb5-8b48d2dcc44e");
 });
 
 socket.on("connect_error", (err) => {
