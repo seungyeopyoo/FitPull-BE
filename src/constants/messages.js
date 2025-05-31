@@ -60,6 +60,7 @@ export const NOTIFICATION_MESSAGES = {
   PRODUCT_APPROVED: "등록하신 상품이 승인되어 웹사이트에 개제되었습니다.",
   PRODUCT_REJECTED: "등록하신 상품이 거절되었습니다.",
   PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
+  REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
 };
 
 export default {
