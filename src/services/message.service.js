@@ -4,6 +4,7 @@ import { MESSAGE_RESPONSES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
 import { createNotification } from "./notification.service.js";
 import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
+import { findUserById } from "../repositories/user.repository.js";
 
 //메세지 전송
 export const sendMessage = async ({ senderId, receiverId, content, productId, senderRole }) => {
@@ -34,7 +35,7 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
   }
   // ADMIN → USER만 허용
   else if (senderRole === "ADMIN") {
-    const user = await messageRepo.getUserById(receiverId);
+    const user = await findUserById(receiverId);
     if (!user || user.role !== "USER") {
       throw new CustomError(403, "FORBIDDEN", "유저에게만 답변할 수 있습니다.");
     }

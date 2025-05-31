@@ -9,10 +9,11 @@ import {
 	getRentalRequestById,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
-import { ERROR_MESSAGES, NOTIFICATION_MESSAGES } from "../constants/messages.js";
+import { ERROR_MESSAGES, NOTIFICATION_MESSAGES, RENTAL_REQUEST_MESSAGES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { createNotification } from "./notification.service.js";
+
 
 export const createRentalRequest = async (
 	productId,
@@ -33,14 +34,14 @@ export const createRentalRequest = async (
 	  }
 	  
 	if (new Date(startDate) > oneMonthLater) {
-		throw new CustomError(400, "RENTAL_DATE_LIMIT", "예약 시작일은 30일 이내여야 합니다.");
+		throw new CustomError(400, "RENTAL_DATE_LIMIT", RENTAL_REQUEST_MESSAGES.START_DATE_LIMIT);
 	}
 
 	// 날짜 중복 체크
 	const conflict = await checkRentalDateConflict(productId, startDate, endDate);
 	if (conflict) throw new CustomError(400, "RENTAL_DATE_CONFLICT", ERROR_MESSAGES.RENTAL_DATE_CONFLICT);
 
-	if (!howToReceive) throw new CustomError(400, "RECEIVE_METHOD_REQUIRED", "수령 방법을 선택해주세요.");
+	if (!howToReceive) throw new CustomError(400, "RECEIVE_METHOD_REQUIRED", RENTAL_REQUEST_MESSAGES.RECEIVE_METHOD_REQUIRED);
 
 	const product = await getProductById(productId);
 	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
@@ -163,14 +164,14 @@ export const cancelRentalRequest = async (id, userId) => {
 	if (!request) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
 	if (request.userId !== userId) throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
 	if (![RENTAL_STATUS.PENDING, RENTAL_STATUS.APPROVED].includes(request.status)) {
-		throw new CustomError(400, "RENTAL_CANCEL_NOT_ALLOWED", "해당 상태에서는 취소할 수 없습니다.");
+		throw new CustomError(400, "RENTAL_CANCEL_NOT_ALLOWED", RENTAL_REQUEST_MESSAGES.CANCEL_NOT_ALLOWED);
 	}
 	// 3일전 취소 불가
 	const now = new Date();
 	const startDate = new Date(request.startDate);
 	const diffDays = (startDate - now) / (1000 * 60 * 60 * 24);
 	if (diffDays < 3) {
-		throw new CustomError(400, "RENTAL_CANCEL_TOO_LATE", "대여 시작 3일 전부터는 취소가 불가합니다.");
+		throw new CustomError(400, "RENTAL_CANCEL_TOO_LATE", RENTAL_REQUEST_MESSAGES.CANCEL_TOO_LATE);
 	}
 	await updateRentalRequestStatusRepo(id, RENTAL_STATUS.REJECTED);
 	return {

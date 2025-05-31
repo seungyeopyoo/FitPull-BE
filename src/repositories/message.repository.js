@@ -102,8 +102,3 @@ export const getAdminId = async () => {
   if (!admin) throw new Error("ADMIN_NOT_FOUND");
   return admin.id;
 };
-
-// 특정유저조회
-export const getUserById = async (userId) => {
-  return prisma.user.findUnique({ where: { id: userId } });
-};

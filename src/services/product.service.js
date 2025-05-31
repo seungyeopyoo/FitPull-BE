@@ -18,10 +18,10 @@ import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repos
 import { findLogsByProductRepo } from "../repositories/productStatusLog.repository.js";
 import CustomError from "../utils/customError.js";
 import messages from "../constants/messages.js";
-import { MAX_PRODUCT_IMAGES } from "../constants/limits.js";
+import { MAX_PRODUCT_IMAGES, MAX_INT_32 } from "../constants/limits.js";
 import { createNotification } from "./notification.service.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
-const MAX_INT_32 = 2147483647;
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
@@ -276,13 +276,15 @@ export const approveProduct = async (id) => {
 	try {
 		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
 
-		await createNotification({
+		const notificationParams = {
 			userId: product.owner.id,
 			type: "APPROVAL",
 			message: `${NOTIFICATION_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
 			url: `/products/${product.id}`,
 			productId: product.id,
-		});
+		};
+
+		await createNotification(notificationParams);
 
 		return {
 			message: PRODUCT_STATUS.APPROVED,
