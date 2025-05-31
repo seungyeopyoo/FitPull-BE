@@ -279,7 +279,7 @@ export const approveProduct = async (id) => {
 		await createNotification({
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `등록하신 상품 '${product.title}'이 승인되어 웹사이트에 개제되었습니다.`,
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		});
@@ -314,7 +314,7 @@ export const rejectProduct = async (id, rejectReason = "") => {
 		await createNotification({
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `등록하신 상품 '${product.title}'이 거절되었습니다.${rejectReason ? " 사유: " + rejectReason : ""}`,
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		});

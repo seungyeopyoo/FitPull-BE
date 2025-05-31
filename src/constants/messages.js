@@ -54,6 +54,14 @@ export const MESSAGE_RESPONSES = {
   DELETE_SUCCESS: "메시지 삭제 완료",
 };
 
+export const NOTIFICATION_MESSAGES = {
+  RENTAL_APPROVED: "신청하신 대여가 승인되었습니다.",
+  RENTAL_REJECTED: "신청하신 대여가 거절되었습니다.",
+  PRODUCT_APPROVED: "등록하신 상품이 승인되어 웹사이트에 개제되었습니다.",
+  PRODUCT_REJECTED: "등록하신 상품이 거절되었습니다.",
+  PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
+};
+
 export default {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
   LOGIN_SUCCESS: "로그인 성공",

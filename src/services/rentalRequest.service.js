@@ -9,9 +9,10 @@ import {
 	getRentalRequestById,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
+import { ERROR_MESSAGES, NOTIFICATION_MESSAGES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
+import { createNotification } from "./notification.service.js";
 
 export const createRentalRequest = async (
 	productId,
@@ -107,6 +108,23 @@ export const approveRentalRequest = async (id) => {
 		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
 		const summary = await findRentalRequestSummaryById(id);
 		const request = await getRentalRequestById(id);
+
+		await createNotification({
+			userId: request.userId,
+			type: "RENTAL_STATUS",
+			message: `${NOTIFICATION_MESSAGES.RENTAL_APPROVED} [${request.product.title}]`,
+			url: `/rental-requests/${id}`,
+			rentalRequestId: id,
+		});
+
+		await createNotification({
+			userId: request.product.ownerId,
+			type: "RENTAL_STATUS",
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_RENTED} [${request.product.title}]`,
+			url: `/rental-requests/${id}`,
+			rentalRequestId: id,
+		});
+
 		return { id, ...summary, totalPrice: request.totalPrice };
 	} catch (err) {
 		if (err.code === "P2025") {
@@ -122,6 +140,15 @@ export const rejectRentalRequest = async (id) => {
 		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
 		const summary = await findRentalRequestSummaryById(id);
 		const request = await getRentalRequestById(id);
+
+		await createNotification({
+			userId: request.userId,
+			type: "RENTAL_STATUS",
+			message: `${NOTIFICATION_MESSAGES.RENTAL_REJECTED} [${request.product.title}]`,
+			url: `/rental-requests/${id}`,
+			rentalRequestId: id,
+		});
+
 		return { id, ...summary, totalPrice: request.totalPrice };
 	} catch (err) {
 		if (err.code === "P2025") {
