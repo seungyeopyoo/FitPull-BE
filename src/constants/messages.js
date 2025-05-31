@@ -15,6 +15,10 @@ export const ERROR_MESSAGES = {
   IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
   DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
   STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
+  INVALID_MESSAGE: "알림 메시지를 입력하세요.",
+  NOTIFICATION_NOT_FOUND: "알림을 찾을 수 없습니다.",
 };
 
 export const SUCCESS_MESSAGES = {
