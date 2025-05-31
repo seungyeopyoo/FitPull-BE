@@ -8,6 +8,8 @@ import { getRentalRequestById } from "../repositories/rentalRequest.repository.j
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
+import { createNotification } from "./notification.service.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 export const completeRental = async (rentalRequestId) => {
 	const rental = await getRentalRequestById(rentalRequestId);
@@ -35,6 +37,16 @@ export const completeRental = async (rentalRequestId) => {
 		startDate: rental.startDate,
 		endDate: rental.endDate,
 		totalPrice: Number(totalPrice),
+	});
+
+	// === 리뷰 작성 요청 알림 ===
+	await createNotification({
+		userId: rental.userId,
+		type: "REVIEW",
+		message: `${NOTIFICATION_MESSAGES.REVIEW_REQUEST} [${product.title}]`,
+		url: `/products/${product.id}`,
+		productId: product.id,
+		rentalRequestId: rentalRequestId,
 	});
 
 	return {

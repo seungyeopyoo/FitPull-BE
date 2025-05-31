@@ -10,6 +10,8 @@ import {
 import { ERROR_MESSAGES } from "../constants/messages.js";
 import { findProductByIdRepo } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
+import { createNotification } from "./notification.service.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 // 이름 마스킹 함수 
 export function maskName(name) {
@@ -43,7 +45,8 @@ export const createReview = async (user, { rating, comment, imageUrls, completed
   if (!product || product.deletedAt) {
     throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
   }
-  return await createReviewRepo({
+
+  const review = await createReviewRepo({
     rating: ratingInt,
     comment,
     imageUrls: imageUrls || [],
@@ -51,6 +54,20 @@ export const createReview = async (user, { rating, comment, imageUrls, completed
     completedRentalId,
     productId,
   });
+
+  // === 알림 생성 및 소켓 전송 ===
+  if (product && product.ownerId && product.ownerId !== user.id) {
+    await createNotification({
+      userId: product.ownerId,
+      type: "REVIEW",
+      message: `${NOTIFICATION_MESSAGES.REVIEW_CREATED} [${product.title}]`,
+      url: `/products/${productId}`,
+      productId,
+      reviewId: review.id,
+    });
+  }
+
+  return review;
 };
 
 export const getReviewsByProduct = async (productId) => {

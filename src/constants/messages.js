@@ -15,6 +15,10 @@ export const ERROR_MESSAGES = {
   IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
   DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
   STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
+  INVALID_MESSAGE: "알림 메시지를 입력하세요.",
+  NOTIFICATION_NOT_FOUND: "알림을 찾을 수 없습니다.",
 };
 
 export const SUCCESS_MESSAGES = {
@@ -48,6 +52,17 @@ export const MESSAGE_RESPONSES = {
   FETCH_SUCCESS: "메시지 조회 성공",
   MARK_READ: "읽음 처리 완료",
   DELETE_SUCCESS: "메시지 삭제 완료",
+};
+
+export const NOTIFICATION_MESSAGES = {
+  RENTAL_APPROVED: "신청하신 대여가 승인되었습니다.",
+  RENTAL_REJECTED: "신청하신 대여가 거절되었습니다.",
+  PRODUCT_APPROVED: "등록하신 상품이 승인되어 웹사이트에 개제되었습니다.",
+  PRODUCT_REJECTED: "등록하신 상품이 거절되었습니다.",
+  PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
+  REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
+  ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
+  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁dream니다!",
 };
 
 export default {

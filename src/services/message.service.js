@@ -2,6 +2,8 @@ import * as messageRepo from "../repositories/message.repository.js";
 import CustomError from "../utils/customError.js";
 import { MESSAGE_RESPONSES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
+import { createNotification } from "./notification.service.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 //메세지 전송
 export const sendMessage = async ({ senderId, receiverId, content, productId, senderRole }) => {
@@ -41,6 +43,19 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
   }
 
   const message = await messageRepo.createMessage({ senderId, receiverId, content, productId });
+
+  // === 운영자가 유저에게 보낼 때만 알림 생성 ===
+  if (senderRole === "ADMIN") {
+    await createNotification({
+      userId: receiverId,
+      type: "CHAT",
+      message: NOTIFICATION_MESSAGES.ADMIN_MESSAGE,
+      url: `/messages/${message.id}`,
+      messageId: message.id,
+      productId: productId || undefined,
+    });
+  }
+
   return {
     message: MESSAGE_RESPONSES.SEND_SUCCESS,
     data: { id: message.id }

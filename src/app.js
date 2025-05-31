@@ -16,6 +16,10 @@ import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
 import errorHandler from './middlewares/errorHandler.js';
 import passport from "./configs/passport.js";
+import http from "http";
+import { initSocket } from "./sockets/socket.js";
+import notificationRouter from "./routes/notification.router.js";
+
 dotenv.config();
 
 const app = express();
@@ -25,6 +29,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
+
+process.env.DEBUG = "socket.io:*";
 
 //스웨거
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -47,6 +53,8 @@ app.use("/api/completed-rentals", completedRentalRouter);
 app.use("/api/products", productStatusLogRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/notifications", notificationRouter);
+	
 // 기본 라우트
 app.get("/", (_, res) => {
 	res.send("백엔드 서버 정상 작동 중.");
@@ -56,11 +64,13 @@ app.use(errorHandler);
 
 
 const PORT = Number(process.env.PORT || "3000", 10);
+const server = http.createServer(app); // 소켓 연결 가능하도록 http 서버로 분리
+initSocket(server); // 👈 소켓 초기화
 
 // 서버 시작
-app.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "0.0.0.0", () => {
 	console.log(`서버가 ${PORT}번 포트에서 실행 중입니다.`);
-});
+  });
 
 // Prisma 연결 테스트
 prisma

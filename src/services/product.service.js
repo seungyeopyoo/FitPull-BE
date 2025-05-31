@@ -19,6 +19,7 @@ import { findLogsByProductRepo } from "../repositories/productStatusLog.reposito
 import CustomError from "../utils/customError.js";
 import messages from "../constants/messages.js";
 import { MAX_PRODUCT_IMAGES } from "../constants/limits.js";
+import { createNotification } from "./notification.service.js";
 
 const MAX_INT_32 = 2147483647;
 
@@ -275,6 +276,14 @@ export const approveProduct = async (id) => {
 	try {
 		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.APPROVED);
 
+		await createNotification({
+			userId: product.owner.id,
+			type: "APPROVAL",
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
+			url: `/products/${product.id}`,
+			productId: product.id,
+		});
+
 		return {
 			message: PRODUCT_STATUS.APPROVED,
 			id: product.id,
@@ -298,9 +307,17 @@ export const approveProduct = async (id) => {
 	}
 };
 
-export const rejectProduct = async (id) => {
+export const rejectProduct = async (id, rejectReason = "") => {
 	try {
 		const product = await updateProductStatusRepo(id, PRODUCT_STATUS.REJECTED);
+
+		await createNotification({
+			userId: product.owner.id,
+			type: "APPROVAL",
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
+			url: `/products/${product.id}`,
+			productId: product.id,
+		});
 
 		return {
 			message: PRODUCT_STATUS.REJECTED,
