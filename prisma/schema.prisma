@@ -28,20 +28,20 @@ model User {
   accountHolder       String?
   verifiedBankAccount Boolean   @default(false)
 
-  accounts          Account[]
-  products          Product[]
-  rentalRequests    RentalRequest[]
-  completedRentals  CompletedRental[]
-  paymentLogs       PaymentLog[]
-  notifications     Notification[]
-  rentalReviews     RentalReview[]
-  productStatusLogs ProductStatusLog[]
-  aiReviews         AiReview[]
-  aiRecommends      AiRecommend[]
-  sentMessages      Message[]          @relation("SentMessages")
-  receivedMessages  Message[]          @relation("ReceivedMessages")
-  packages          Package[]
-  influencerPromos  InfluencerPromo[]
+  accounts                Account[]
+  products                Product[]
+  rentalRequests          RentalRequest[]
+  completedRentals        CompletedRental[]
+  paymentLogs             PaymentLog[]
+  notifications           Notification[]
+  rentalReviews           RentalReview[]
+  productStatusLogs       ProductStatusLog[]
+  aiPriceEstimation       AiPriceEstimation[]
+  aiProductRecommendation AiProductRecommendation[]
+  sentMessages            Message[]                 @relation("SentMessages")
+  receivedMessages        Message[]                 @relation("ReceivedMessages")
+  packages                Package[]
+  influencerPromos        InfluencerPromo[]
 }
 
 model Account {
@@ -75,30 +75,31 @@ model Category {
 }
 
 model Product {
-  id               String             @id @default(uuid())
-  title            String
-  description      String?            @db.Text
-  price            Int
-  status           ProductStatus
-  imageUrls        String[]           @map("image_urls")
-  allowPurchase    Boolean            @default(false) @map("allow_purchase")
-  createdAt        DateTime           @default(now()) @map("created_at")
-  updatedAt        DateTime           @updatedAt @map("updated_at")
-  deletedAt        DateTime?          @map("deleted_at")
-  ownerId          String             @map("user_id")
-  categoryId       String             @map("category_id")
-  owner            User               @relation(fields: [ownerId], references: [id])
-  category         Category           @relation(fields: [categoryId], references: [id])
-  rentalRequests   RentalRequest[]
-  statusLogs       ProductStatusLog[]
-  completedRentals CompletedRental[]
-  aiReviews        AiReview[]
-  aiRecommends     AiRecommend[]
-  messages         Message[]
-  influencerPromos InfluencerPromo[]
-  packageItems     PackageItem[]
-  Notification     Notification[]
-  RentalReview     RentalReview[]
+  id                      String                    @id @default(uuid())
+  title                   String
+  description             String?                   @db.Text
+  price                   Int
+  status                  ProductStatus
+  imageUrls               String[]                  @map("image_urls")
+  allowPurchase           Boolean                   @default(false) @map("allow_purchase")
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+  deletedAt               DateTime?                 @map("deleted_at")
+  ownerId                 String                    @map("user_id")
+  categoryId              String                    @map("category_id")
+  owner                   User                      @relation(fields: [ownerId], references: [id])
+  category                Category                  @relation(fields: [categoryId], references: [id])
+  rentalRequests          RentalRequest[]
+  statusLogs              ProductStatusLog[]
+  completedRentals        CompletedRental[]
+  aiPriceEstimation       AiPriceEstimation[]
+  aiProductRecommendation AiProductRecommendation[]
+  aiReviewSummary         AiReviewSummary?
+  messages                Message[]
+  influencerPromos        InfluencerPromo[]
+  packageItems            PackageItem[]
+  Notification            Notification[]
+  RentalReview            RentalReview[]
 
   @@map("products")
 }
@@ -241,32 +242,43 @@ model ProductStatusLog {
   @@map("product_status_logs")
 }
 
-model AiReview {
+model AiPriceEstimation {
   id             String   @id @default(uuid())
   estimatedPrice Int      @map("estimated_price")
   isValid        Boolean  @default(false) @map("is_valid")
   sources        Json?
+  reason         String?  @db.Text
   createdAt      DateTime @default(now()) @map("created_at")
   productId      String   @map("product_id")
   userId         String   @map("user_id")
   product        Product  @relation(fields: [productId], references: [id])
   user           User     @relation(fields: [userId], references: [id])
 
-  @@map("ai_reviews")
+  @@map("ai_price_estimations")
 }
 
-model AiRecommend {
+model AiProductRecommendation {
   id                  String   @id @default(uuid())
   prompt              String   @db.Text
   recommendedProducts String[] @map("recommended_products")
   recommendReason     String   @map("recommend_reason") @db.Text
   createdAt           DateTime @default(now()) @map("created_at")
-  productId           String   @map("product_id")
-  product             Product  @relation(fields: [productId], references: [id])
+  productId           String?  @map("product_id")
+  product             Product? @relation(fields: [productId], references: [id])
   user                User?    @relation(fields: [userId], references: [id])
   userId              String?
 
-  @@map("ai_recommend")
+  @@map("ai_product_recommendations")
+}
+
+model AiReviewSummary {
+  id          String   @id @default(uuid())
+  summaryText String   @map("summary_text") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  productId   String   @unique @map("product_id")
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("ai_review_summaries")
 }
 
 model Package {

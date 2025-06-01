@@ -269,7 +269,15 @@ export const getWaitingProducts = async () => {
 			phone: product.owner?.phone,
 		},
 		createdAt: product.createdAt,
-	}));
+		aiPriceEstimation: product.aiPriceEstimation?.[0]
+		? {
+			estimatedPrice: product.aiPriceEstimation[0].estimatedPrice,
+			isValid: product.aiPriceEstimation[0].isValid,
+			reason: product.aiPriceEstimation[0].reason,
+			sources: product.aiPriceEstimation[0].sources,
+			createdAt: product.aiPriceEstimation[0].createdAt,
+		  }
+		: null,	}));
 };
 
 export const approveProduct = async (id) => {

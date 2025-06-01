@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Socket.IO 테스트 클라이언트</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+        }
+
+        #log {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Socket.IO 알림 테스트</h1>
+    <label>
+        User ID:
+        <input type="text" id="userId" value="3c283e3b-84a9-4ac5-af5a-ed5e0d6696bc" style="width: 350px;">
+    </label>
+    <button id="connectBtn">소켓 연결</button>
+    <div id="status"></div>
+    <div id="log"></div>
+
+    <script>
+        let socket;
+
+        document.getElementById('connectBtn').onclick = function () {
+            const userId = document.getElementById('userId').value.trim();
+            if (!userId) {
+                alert('User ID를 입력하세요.');
+                return;
+            }
+
+            if (socket && socket.connected) {
+                socket.disconnect();
+            }
+
+            socket = io("http://127.0.0.1:3000", {
+                transports: ["websocket", "polling"]
+            });
+
+            socket.on("connect", () => {
+                document.getElementById('status').textContent = "서버에 연결됨";
+                socket.emit("register", userId);
+                log("서버에 연결됨. userId로 register 전송: " + userId);
+            });
+
+            socket.on("disconnect", () => {
+                document.getElementById('status').textContent = "연결 끊김";
+                log("서버와 연결이 끊어졌습니다.");
+            });
+
+            socket.on("newNotification", (payload) => {
+                log("알림 도착: " + JSON.stringify(payload));
+            });
+
+            socket.on("connect_error", (err) => {
+                document.getElementById('status').textContent = "연결 오류: " + err.message;
+                log("연결 오류: " + err.message);
+            });
+        };
+
+        function log(msg) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
