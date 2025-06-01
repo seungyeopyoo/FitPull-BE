@@ -31,7 +31,7 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 ## ERD
 
-![FOF ERD 전체](./docs/erd/.FOFFOURTHERD.png)
+![FOF ERD 전체](./docs/erd/FOFFOURTHERD.png)
 [ERD 원본 보기 (ERDCloud)](https://www.erdcloud.com/d/waj7NZ2NAPBamqBPM)
 
 ## 핵심 기능
@@ -45,10 +45,9 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 ### 2. AI 기반 서비스
 
--   상품 가격 적정성 검사
--   중고나라, 당근, 쿠팡, 네이버쇼핑 등 시세 크롤링
+-   상품 가격 적정성 검사 상품명을 통해 중고나라, 당근마켓, 쿠팡에서 적절한 가격응답
 -   상황별 맞춤 상품 추천
--   패키지 상품 추천
+-   상품평 요약 기능
 
 ### 3. 대여 시스템
 
@@ -69,9 +68,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 -   Backend: Node.js, Express.js
 -   Database: PostgreSQL (AWS RDS)
 -   ORM: Prisma
--   Container: Docker
--   AI: (검토 중)
--   실시간 통신: Socket.io (상품 문의용)
+-   AI: openAI GPT
+-   실시간 알람: Socket.io
 
 ## 주요 카테고리
 
@@ -85,17 +83,15 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 ## 비즈니스 모델
 
--   대여 수수료: 대여가격의 일정 %
+-   대여 수수료: 대여가격의 일정 % 혹은 건당 가격
 -   판매 수수료: 별도 책정
--   보관료: 장기 미대여 상품
+-   보관료: 장기 미대여 상품 보관료 징수
 
 ## 향후 계획
 
 -   인플루언서 홍보관
 -   실시간 채팅 시스템
 -   전문가 시스템 (변호사, 제품평가사 등)
-
-## 시작하기
 
 ### 필수 조건
 
