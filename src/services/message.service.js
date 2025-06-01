@@ -1,4 +1,12 @@
-import * as messageRepo from "../repositories/message.repository.js";
+import {
+  createMessage,
+  findReceivedMessages,
+  findSentMessages,
+  markAsRead,
+  markAllAsRead,
+  softDeleteMessage,
+  getAdminId,
+} from "../repositories/message.repository.js";
 import CustomError from "../utils/customError.js";
 import { MESSAGE_RESPONSES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
@@ -22,7 +30,7 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
 
   let adminId;
   try {
-    adminId = await messageRepo.getAdminId();
+    adminId = await getAdminId();
   } catch {
     throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
   }
@@ -43,7 +51,7 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
     throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
   }
 
-  const message = await messageRepo.createMessage({ senderId, receiverId, content, productId });
+  const message = await createMessage({ senderId, receiverId, content, productId });
 
   // === 운영자가 유저에게 보낼 때만 알림 생성 ===
   if (senderRole === "ADMIN") {
@@ -67,11 +75,11 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
 export const getReceivedMessages = async (userId, userRole) => {
   let adminId;
   try {
-    adminId = await messageRepo.getAdminId();
+    adminId = await getAdminId();
   } catch {
     throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
   }
-  let messages = await messageRepo.findReceivedMessages(userId);
+  let messages = await findReceivedMessages(userId);
   if (userRole === "USER") {
     messages = messages.filter(msg => msg.sender.id === adminId);
   } else if (userRole === "ADMIN") {
@@ -89,11 +97,11 @@ export const getReceivedMessages = async (userId, userRole) => {
 export const getSentMessages = async (userId, userRole) => {
   let adminId;
   try {
-    adminId = await messageRepo.getAdminId();
+    adminId = await getAdminId();
   } catch {
     throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
   }
-  let messages = await messageRepo.findSentMessages(userId);
+  let messages = await findSentMessages(userId);
   if (userRole === "USER") {
     messages = messages.filter(msg => msg.receiver.id === adminId);
   } else if (userRole === "ADMIN") {
@@ -109,7 +117,7 @@ export const getSentMessages = async (userId, userRole) => {
 
 // 단건읽음하기 
 export const markMessageRead = async (messageId, userId, userRole) => {
-  const result = await messageRepo.markAsRead(messageId, userId);
+  const result = await markAsRead(messageId, userId);
   if (result.count === 0) {
     throw new CustomError(404, "MESSAGE_NOT_FOUND", "메시지를 찾을 수 없거나 권한이 없습니다.");
   }
@@ -120,14 +128,14 @@ export const markMessageRead = async (messageId, userId, userRole) => {
 
 // 전체읽음하기 
 export const markAllMessagesRead = async (userId, userRole) => {
-  await messageRepo.markAllAsRead(userId);
+  await markAllAsRead(userId);
   return {
     message: MESSAGE_RESPONSES.MARK_READ
   };
 };
 
 export const deleteMessage = async (messageId, userId, userRole) => {
-  const result = await messageRepo.softDeleteMessage(messageId, userId);
+  const result = await softDeleteMessage(messageId, userId);
   if (result.count === 0) {
     throw new CustomError(404, "MESSAGE_NOT_FOUND", "메시지를 찾을 수 없거나 권한이 없습니다.");
   }

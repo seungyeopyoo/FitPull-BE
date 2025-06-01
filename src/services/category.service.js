@@ -1,9 +1,18 @@
-import * as categoryRepo from "../repositories/category.repository.js";
+import {
+	findAll,
+	create,
+	update,
+	remove,
+	findById,
+	findByName,
+	moveProductsToCategory,
+	findByIdWithProducts,
+} from "../repositories/category.repository.js";
 import CustomError from "../utils/customError.js";
 import messages from "../constants/messages.js";
 
 export const getCategories = async () => {
-	const categories = await categoryRepo.findAll();
+	const categories = await findAll();
 	return categories.map(category => ({
 		id: category.id,
 		name: category.name,
@@ -13,11 +22,11 @@ export const getCategories = async () => {
 
 export const createCategory = async (name, description) => {
 	// 중복 체크
-	const exists = await categoryRepo.findByName(name);
+	const exists = await findByName(name);
 	if (exists) {
 		throw new CustomError(409, "CATEGORY_ALREADY_EXISTS", messages.CATEGORY_ALREADY_EXISTS.replace("{name}", name));
 	}
-	const category = await categoryRepo.create(name, description);
+	const category = await create(name, description);
 	return {
 		message: messages.CATEGORY_CREATED.replace("{name}", category.name),
 		category: {
@@ -30,7 +39,7 @@ export const createCategory = async (name, description) => {
 
 export const updateCategory = async (id, name, description) => {
 	try {
-		const category = await categoryRepo.update(id, name, description);
+		const category = await update(id, name, description);
 		const { id: categoryId, name: categoryName, description: desc } = category;
 		return {
 			message: messages.CATEGORY_UPDATED.replace("{name}", categoryName),
@@ -47,21 +56,21 @@ export const updateCategory = async (id, name, description) => {
 export const deleteCategory = async (id) => {
 	try {
 		//삭제할 카테고리 정보 조회
-		const category = await categoryRepo.findById(id);
+		const category = await findById(id);
 		if (!category) {
 			throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
 		}
 
 		//'기타' 카테고리 id 조회
-		const etcCategory = await categoryRepo.findByName("기타");
+		const etcCategory = await findByName("기타");
 		if (!etcCategory) {
 			throw new CustomError(404, "ETC_CATEGORY_NOT_FOUND", messages.ETC_CATEGORY_NOT_FOUND);
 		}
 
 		//해당 카테고리에 속한 상품들 모두 '기타'로 이동
-		await categoryRepo.moveProductsToCategory(id, etcCategory.id);
+		await moveProductsToCategory(id, etcCategory.id);
 
-		await categoryRepo.remove(id);
+		await remove(id);
 
 		return {
 			message: messages.CATEGORY_DELETED.replace("{name}", category.name)
@@ -75,7 +84,7 @@ export const deleteCategory = async (id) => {
 };
 
 export const getCategoryDetail = async (id) => {
-	const category = await categoryRepo.findByIdWithProducts(id);
+	const category = await findByIdWithProducts(id);
 	if (!category) {
 		throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
 	}
