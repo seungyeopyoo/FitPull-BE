@@ -1,5 +1,6 @@
 import { findProductByIdRepo } from "../repositories/product.repository.js";
 import { saveAiPriceEstimation } from "../repositories/ai.repository.js";
+import { getReviewsByProductIdRepo } from "../repositories/review.repository.js";
 import CustomError from "../utils/customError.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
 import OpenAI from "openai";
@@ -89,3 +90,33 @@ export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
 
   return result;
 };
+
+export const summarizeReviews = async (productId) => {
+    const product = await findProductByIdRepo(productId);
+    if (!product) {
+      throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+    }
+    const reviews = await getReviewsByProductIdRepo(productId);
+    const contents = reviews.map((review) => review.comment).join("\n");
+  
+    if (!contents) {
+      throw new CustomError(404, "REVIEW_NOT_FOUND", ERROR_MESSAGES.REVIEW_NOT_FOUND);
+    }
+  
+    const prompt = `
+  다음은 어떤 상품에 대한 리뷰들입니다. 전체적인 내용을 한국어로 간결히 요약해주세요.
+  ---
+  
+  ${contents}
+  
+  요약결과:
+  `;
+  
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.5,
+    });
+  
+    return { summary: completion.choices[0].message.content };
+  };
