@@ -19,6 +19,7 @@ export const ERROR_MESSAGES = {
   INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
   INVALID_MESSAGE: "알림 메시지를 입력하세요.",
   NOTIFICATION_NOT_FOUND: "알림을 찾을 수 없습니다.",
+  INVALID_PRODUCT_STATUS: "AI 분석은 대기 중(PENDING) 상품만 가능합니다.",
 };
 
 export const SUCCESS_MESSAGES = {

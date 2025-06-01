@@ -11,6 +11,8 @@ import completedRentalRouter from "./routes/completedRental.routes.js";
 import productStatusLogRouter from "./routes/productStatusLog.routes.js";
 import reviewRouter from "./routes/review.router.js";
 import messageRouter from "./routes/message.router.js";
+import notificationRouter from "./routes/notification.router.js";
+import aiRouter from "./routes/ai.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -18,7 +20,6 @@ import errorHandler from './middlewares/errorHandler.js';
 import passport from "./configs/passport.js";
 import http from "http";
 import { initSocket } from "./sockets/socket.js";
-import notificationRouter from "./routes/notification.router.js";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use("/api/products", productStatusLogRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/ai", aiRouter);
 	
 // 기본 라우트
 app.get("/", (_, res) => {

@@ -110,23 +110,27 @@ export const deleteProduct = async (id, user) => {
 
 export const findWaitingProducts = async () => {
 	return await prisma.product.findMany({
-		where: {
-			status: PRODUCT_STATUS.PENDING,
-			deletedAt: null,
+	  where: {
+		status: PRODUCT_STATUS.PENDING,
+		deletedAt: null,
+	  },
+	  include: {
+		category: true,
+		owner: {
+		  select: {
+			id: true,
+			name: true,
+			phone: true,
+		  },
 		},
-		include: {
-			category: true,
-			owner: {
-				select: {
-					id: true,
-					name: true,
-					phone: true,
-				},
-			},
+		aiPriceEstimation: {
+		  take: 1, 
+		  orderBy: { createdAt: "desc" },
 		},
-		orderBy: { createdAt: "desc" },
+	  },
+	  orderBy: { createdAt: "desc" },
 	});
-};
+  };
 
 export const updateProductStatus = async (id, status) => {
 	return await prisma.product.update({
