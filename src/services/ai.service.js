@@ -1,5 +1,5 @@
-import { findProductByIdRepo } from "../repositories/product.repository.js";
-import { saveAiPriceEstimation } from "../repositories/ai.repository.js";
+import { findProductByIdRepo , getAllProducts} from "../repositories/product.repository.js";
+import { saveAiPriceEstimation, saveAiProductRecommendation } from "../repositories/ai.repository.js";
 import { getReviewsByProductIdRepo } from "../repositories/review.repository.js";
 import CustomError from "../utils/customError.js";
 import { ERROR_MESSAGES } from "../constants/messages.js";
@@ -119,4 +119,75 @@ export const summarizeReviews = async (productId) => {
     });
   
     return { summary: completion.choices[0].message.content };
+  };
+
+  export const recommendProducts = async ({ prompt, userId }) => {
+    if (!prompt) {
+      throw new CustomError(400, "PROMPT_REQUIRED", ERROR_MESSAGES.PROMPT_REQUIRED);
+    }
+    const { products } = await getAllProducts({ take: 20 });
+  
+    if (products.length === 0) {
+      throw new CustomError(404, "NO_PRODUCTS", ERROR_MESSAGES.NO_PRODUCTS);
+    }
+  
+    const itemsText = products.map((p, idx) => {
+      return `${idx + 1}. [ID: ${p.id}] ${p.title} - ${p.description ?? "설명 없음"}`;
+    }).join("\n");
+  
+    const gptPrompt = `
+당신은 상품 추천 도우미입니다.
+
+아래는 대여 가능한 상품 목록입니다.
+각 상품은 ID, 제목, 설명으로 구성되어 있습니다.
+
+--- 상품 목록 ---
+${itemsText}
+
+--- 사용자 요청 ---
+"${prompt}"
+
+위 요청에 맞게 적절한 상품 3개를 추천해 주세요.
+단, 정말로 적합한 상품이 없다면 빈 배열([])로만 응답하세요.
+
+추천할 때는 상품의 ID를 기준으로 출력하고, 간단한 추천 이유도 함께 작성하세요.
+
+출력 형식 (JSON만 반환):
+[
+  { "id": "상품ID", "reason": "추천 이유" },
+  ...
+]
+적합한 상품이 없으면 [] 만 반환
+`;
+  
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: gptPrompt }],
+      temperature: 0.5,
+    });
+  
+    const content = completion.choices[0].message.content;
+  
+    let parsed;
+    try {
+      parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
+    } catch (err) {
+      throw new CustomError(500, "AI_PARSE_ERROR", ERROR_MESSAGES.AI_PARSE_ERROR);
+    }
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return { recommendedProductIds: [], reason: "추천할 만한 상품이 없습니다." };
+    }
+  
+    const recommendedProductIds = parsed.map((item) => item.id);
+    const reason = parsed.map((item) => `- ${item.reason}`).join("\n");
+  
+    await saveAiProductRecommendation({
+      prompt,
+      recommendedProducts: recommendedProductIds,
+      recommendReason: reason,
+      userId: userId ?? null,
+    });
+  
+    return { recommendedProductIds, reason };
   };

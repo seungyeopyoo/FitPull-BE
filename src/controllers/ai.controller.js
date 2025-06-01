@@ -1,5 +1,6 @@
-import { requestAiPriceEstimation, summarizeReviews } from "../services/ai.service.js";
+import { requestAiPriceEstimation, summarizeReviews, recommendProducts } from "../services/ai.service.js";
 import { success } from "../utils/responseHandler.js";
+
 
 export const requestAiPriceEstimationController = async (req, res, next) => {
     try {
@@ -25,3 +26,15 @@ export const requestAiPriceEstimationController = async (req, res, next) => {
       next(err);
     }
   };
+
+export const recommendProductsController = async (req, res, next) => {
+  try {
+    const { prompt } = req.body;
+    const userId = req.user?.id ?? null;
+    const result = await recommendProducts({ prompt, userId });
+    return success(res, "상품 추천 완료", result);
+  } catch (err) {
+    console.error("❗ 상품 추천 실패:", err);
+    next(err);
+  }
+};
