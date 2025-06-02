@@ -31,4 +31,8 @@ tasks/
 .taskmasterconfig
 .cursor/
 .cursor/mcp.json
-    
+
+Dockerfile
+docker-compose.yml
+.env.docker
+
