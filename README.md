@@ -34,6 +34,106 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 ![FOF ERD 전체](./docs/erd/FOFFOURTHERD.png)
 [ERD 원본 보기 (ERDCloud)](https://www.erdcloud.com/d/waj7NZ2NAPBamqBPM)
 
+## 파일구조
+```
+📦 FitPull-BE
+ ┣ 📂docs                  
+ ┣ 📂prisma         
+ ┣ 📂scripts             
+ ┣ 📂tasks                
+📦src
+ ┣ 📂configs
+ ┃ ┗ 📜passport.js
+ ┣ 📂constants
+ ┃ ┣ 📜category.js
+ ┃ ┣ 📜index.js
+ ┃ ┣ 📜limits.js
+ ┃ ┣ 📜messages.js
+ ┃ ┣ 📜s3.js
+ ┃ ┗ 📜status.js
+ ┣ 📂controllers
+ ┃ ┣ 📜ai.controller.js
+ ┃ ┣ 📜auth.controller.js
+ ┃ ┣ 📜category.controller.js
+ ┃ ┣ 📜completedRental.controller.js
+ ┃ ┣ 📜message.controller.js
+ ┃ ┣ 📜notification.controller.js
+ ┃ ┣ 📜product.controller.js
+ ┃ ┣ 📜productStatusLog.controller.js
+ ┃ ┣ 📜rentalRequest.controller.js
+ ┃ ┣ 📜reviewController.js
+ ┃ ┗ 📜user.controller.js
+ ┣ 📂docs
+ ┃ ┗ 📜swagger.js
+ ┣ 📂middlewares
+ ┃ ┣ 📜adminOnly.js
+ ┃ ┣ 📜auth.js
+ ┃ ┣ 📜errorHandler.js
+ ┃ ┣ 📜s3ImageUpload.js
+ ┃ ┗ 📜upload.js
+ ┣ 📂repositories
+ ┃ ┣ 📜ai.repository.js
+ ┃ ┣ 📜auth.repository.js
+ ┃ ┣ 📜category.repository.js
+ ┃ ┣ 📜completedRental.repository.js
+ ┃ ┣ 📜message.repository.js
+ ┃ ┣ 📜notification.repository.js
+ ┃ ┣ 📜product.repository.js
+ ┃ ┣ 📜productStatusLog.repository.js
+ ┃ ┣ 📜rentalRequest.repository.js
+ ┃ ┣ 📜review.repository.js
+ ┃ ┗ 📜user.repository.js
+ ┣ 📂routes
+ ┃ ┣ 📜ai.routes.js
+ ┃ ┣ 📜auth.routes.js
+ ┃ ┣ 📜category.router.js
+ ┃ ┣ 📜completedRental.routes.js
+ ┃ ┣ 📜message.router.js
+ ┃ ┣ 📜notification.router.js
+ ┃ ┣ 📜product.routes.js
+ ┃ ┣ 📜productStatusLog.routes.js
+ ┃ ┣ 📜rentalRequest.routes.js
+ ┃ ┣ 📜review.router.js
+ ┃ ┗ 📜user.router.js
+ ┣ 📂services
+ ┃ ┣ 📜ai.service.js
+ ┃ ┣ 📜auth.service.js
+ ┃ ┣ 📜category.service.js
+ ┃ ┣ 📜completedRental.service.js
+ ┃ ┣ 📜message.service.js
+ ┃ ┣ 📜notification.service.js
+ ┃ ┣ 📜product.service.js
+ ┃ ┣ 📜productStatusLog.service.js
+ ┃ ┣ 📜rentalRequest.service.js
+ ┃ ┣ 📜review.service.js
+ ┃ ┗ 📜user.service.js
+ ┣ 📂sockets
+ ┃ ┗ 📜socket.js
+ ┣ 📂utils
+ ┃ ┣ 📜customError.js
+ ┃ ┣ 📜jwt.js
+ ┃ ┣ 📜nodemailer.js
+ ┃ ┣ 📜notify.js
+ ┃ ┣ 📜redis.js
+ ┃ ┣ 📜responseHandler.js
+ ┃ ┗ 📜s3.js
+ ┣ 📜app.js
+ ┗ 📜data-source.js              
+ ┣ 📜.biome.json          
+ ┣ 📜.dockerignore       
+ ┣ 📜.env.example         
+ ┣ 📜.env.docker          
+ ┣ 📜.gitignore          
+ ┣ 📜docker-compose.yml  
+ ┣ 📜Dockerfile           
+ ┣ 📜package.json        
+ ┣ 📜README.md            
+ ┣ 📜socketClient.js      
+ ┣ 📜socketTest.html     
+ ┣ 📜todo.md             
+ ┣ 📜yarn.lock           
+```
+
 ## 핵심 기능
 
 ### 1. 상품 등록 및 관리
