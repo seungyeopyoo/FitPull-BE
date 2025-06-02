@@ -12,7 +12,7 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 ### 기획 배경
 
-이 프로젝트는 저와 같은 **극도의 I성향 + 귀차니즘**을 가진 유저들을 위해 만들었습니다.
+이 프로젝트는 **바쁜현대인 , 그중 에서도 저와 같은 .. I성향 + 반복 작업을 최소화하고 싶은 사람들을** 위해 만들어졌어요.
 
 -   직접 만나는 것은 부담스럽고 어려운데 방에 이제는 사용하지 않는 물건이 놀고있는건 불편하고...
 -   수익은 내고 싶지만, 사진 찍기/배송/관리 같은 건 직접하려니 너무 귀찮고...
@@ -133,6 +133,43 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┣ 📜todo.md             
  ┣ 📜yarn.lock           
 ```
+## 기술 스택
+
+<h3>Programming Languages & Frameworks</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" height="32"/>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black" height="32"/>
+  <img src="https://img.shields.io/badge/Express-000000?logo=express&logoColor=white" height="32"/>
+  <img src="https://img.shields.io/badge/Yarn-2C8EBB?logo=yarn&logoColor=white" height="32"/>
+  <img src="https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white" height="32"/>
+</div>
+
+<h3>Infrastructure / Database / AI</h3>  
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/PM2-2B037A?logo=pm2&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Amazon%20S3-569A31?logo=amazonaws&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Socket.IO-010101?logo=socket.io&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/OpenAI-412991?logo=openai&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Anthropic-000000?logo=Anthropic&logoColor=white" height="32"/>
+</div>
+
+<h3>인증 / 문서화</h3>  
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+<img src="https://img.shields.io/badge/Passport-34E27A?logo=passport&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=black" height="32"/>
+</div>
+
+<h3>Dev Tools</h3>  
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+<img src="https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/VSCode-007ACC?logo=visualstudiocode&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/Insomnia-4000BF?logo=insomnia&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white" height="32"/>
+</div>
 
 ## 핵심 기능
 
@@ -160,14 +197,6 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 -   전화번호 인증
 -   상품 상태 로그 관리 
-
-## 기술 스택
-
--   Backend: Node.js, Express.js
--   Database: PostgreSQL (AWS RDS)
--   ORM: Prisma
--   AI: openAI GPT
--   실시간 알람: Socket.io
 
 ## 주요 카테고리
 
@@ -201,5 +230,5 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 -  프로젝트 클론
 git clone https://github.com/P-FitPull/FitPull-BE.git
--  도커 컨테이너 빌드 및 실행
+-  docker 컨테이너 빌드 및 실행
 docker-compose up --build
