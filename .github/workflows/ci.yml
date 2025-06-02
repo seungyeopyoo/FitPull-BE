@@ -25,5 +25,13 @@ jobs:
             - name: Lint
               run: yarn lint
 
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Set up Docker Compose
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install docker-compose -y
+
             - name: Docker Compose Build
               run: docker-compose build
