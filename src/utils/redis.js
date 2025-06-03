@@ -30,4 +30,17 @@ export const deleteEmailCode = async (email) => {
   await redis.del(`emailCode:${email}`);
 };
 
+// 전화번호 인증 코드 저장 (3분 유효)
+export const setPhoneCode = async (phone, code) => {
+  await redis.set(`phoneCode:${phone}`, code, "EX", 180);
+};
+
+export const getPhoneCode = async (phone) => {
+  return await redis.get(`phoneCode:${phone}`);
+};
+
+export const deletePhoneCode = async (phone) => {
+  await redis.del(`phoneCode:${phone}`);
+};
+
 export default redis;

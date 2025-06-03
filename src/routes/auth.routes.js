@@ -6,7 +6,9 @@ import {
 	refreshTokenController,
 	rejoinRequestController,
 	rejoinVerifyController,
-	socialCallbackController
+	socialCallbackController,
+	requestPhoneCodeController,
+	verifyPhoneCodeController,
 } from "../controllers/auth.controller.js";
 import passport from "../configs/passport.js";
 
@@ -271,5 +273,10 @@ router.get(
 	passport.authenticate("naver", { failureRedirect: "/login", session: false }),
 	socialCallbackController
 );
+
+// 인증번호 요청
+router.post("/phone/request", requestPhoneCodeController);
+// 인증번호 검증
+router.post("/phone/verify", verifyPhoneCodeController);
 
 export default router;

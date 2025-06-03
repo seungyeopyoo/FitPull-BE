@@ -4,6 +4,8 @@ import { verifyRefreshToken } from "../utils/jwt.js";
 import { generateTokens } from "../utils/jwt.js";
 import { success } from "../utils/responseHandler.js";
 import messages from "../constants/messages.js";
+import { sendVerificationCode, verifyCode } from "../utils/phoneVerification.js";	
+import  CustomError  from "../utils/customError.js";
 
 
 export const signupController = async (req, res, next) => {
@@ -155,3 +157,31 @@ export const socialCallbackController = async (req, res, next) => {
 		next(err);
 	}
 };
+
+// 인증번호 요청
+export const requestPhoneCodeController = async (req, res, next) => {
+	try {
+	  const { phone } = req.body;
+	  if (!phone) throw new CustomError(400, "PHONE_REQUIRED", "전화번호를 입력해주세요.");
+  
+	  await sendVerificationCode(phone);
+	  res.status(200).json({ message: "인증번호가 전송되었습니다." });
+	} catch (err) {
+	  next(err);
+	}
+  };
+// 인증번호 검증
+  export const verifyPhoneCodeController = async (req, res, next) => {
+	try {
+	  const { phone, code } = req.body;
+	  if (!phone || !code) {
+		throw new CustomError(400, "INVALID_INPUT", "전화번호와 인증번호를 입력해주세요.");
+	  }
+  
+	  await verifyCode(phone, code);
+	  res.status(200).json({ message: "인증이 완료되었습니다." });
+  
+	} catch (err) {
+	  next(err);
+	}
+  };
