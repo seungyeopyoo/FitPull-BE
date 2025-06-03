@@ -1,4 +1,4 @@
-import { signup, login, rejoinRequest, rejoinVerify } from "../services/auth.service.js";
+import { signup, login, rejoinRequest, rejoinVerify, verifyPhoneAndUpdateUser, ensurePhoneExistsForVerification } from "../services/auth.service.js";
 import { deleteRefreshToken, getRefreshToken, setRefreshToken } from "../utils/redis.js";
 import { verifyRefreshToken } from "../utils/jwt.js";
 import { generateTokens } from "../utils/jwt.js";
@@ -162,26 +162,35 @@ export const socialCallbackController = async (req, res, next) => {
 export const requestPhoneCodeController = async (req, res, next) => {
 	try {
 	  const { phone } = req.body;
-	  if (!phone) throw new CustomError(400, "PHONE_REQUIRED", "전화번호를 입력해주세요.");
   
+	  if (!phone) {
+		throw new CustomError(400, "PHONE_REQUIRED", messages.PHONE_REQUIRED);
+	  }
+  
+	  await ensurePhoneExistsForVerification(phone);
 	  await sendVerificationCode(phone);
+  
 	  res.status(200).json({ message: "인증번호가 전송되었습니다." });
 	} catch (err) {
 	  next(err);
 	}
   };
+
 // 인증번호 검증
-  export const verifyPhoneCodeController = async (req, res, next) => {
+export const verifyPhoneCodeController = async (req, res, next) => {
 	try {
 	  const { phone, code } = req.body;
 	  if (!phone || !code) {
-		throw new CustomError(400, "INVALID_INPUT", "전화번호와 인증번호를 입력해주세요.");
+		throw new CustomError(400, "INVALID_INPUT", messages.INVALID_INPUT);
 	  }
   
 	  await verifyCode(phone, code);
-	  res.status(200).json({ message: "인증이 완료되었습니다." });
   
+	  await verifyPhoneAndUpdateUser(phone);
+  
+	  res.status(200).json({ message: "인증이 완료되었습니다." });
 	} catch (err) {
+	  console.error("🚨 인증 처리 중 오류:", err);
 	  next(err);
 	}
   };

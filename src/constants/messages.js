@@ -111,4 +111,11 @@ export default {
   KAKAO_LOGIN_SUCCESS: "카카오 로그인 성공",
   GOOGLE_LOGIN_SUCCESS: "구글 로그인 성공",
   NAVER_LOGIN_SUCCESS: "네이버 로그인 성공",
+  PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
+  PHONE_REQUIRED: "전화번호를 입력해주세요.",
+  INVALID_INPUT: "전화번호와 인증번호를 입력해주세요.",
+  EXPIRED_CODE: "인증번호가 만료되었습니다.",
+  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
+  INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
+  ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
 }; 

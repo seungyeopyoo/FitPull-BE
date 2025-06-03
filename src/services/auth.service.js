@@ -1,4 +1,5 @@
 import { findByEmail, createUser, findAnyByEmail, restoreAccountByEmail, findAccountByProvider } from "../repositories/auth.repository.js";
+import { findUserByPhone, updateUserVerifiedPhone, findValidUserByPhone } from "../repositories/user.repository.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
 import { setRefreshToken, deleteRefreshToken, getRefreshToken, getEmailCode, deleteEmailCode, setEmailCode } from "../utils/redis.js";
@@ -23,6 +24,11 @@ export const signup = async ({
 	}
 	if (exists && exists.deletedAt !== null) {
 		throw new CustomError(409, "DELETED_ACCOUNT", messages.DELETED_ACCOUNT);
+	}
+
+	const duplicatePhone = await findValidUserByPhone(phone);
+	if (duplicatePhone) {
+	  throw new CustomError(409, "PHONE_EXISTS", messages.PHONE_EXISTS);
 	}
 
 	const hash = await bcrypt.hash(password, 10);
@@ -190,3 +196,24 @@ const extractSocialProfile = (profile, provider) => {
 	return user;
   };
   
+  export const verifyPhoneAndUpdateUser = async (phone) => {
+	const user = await findUserByPhone(phone);
+	if (user && !user.verifiedPhone) {
+	  await updateUserVerifiedPhone(user.id);
+	}
+  };
+
+  export const ensurePhoneExistsForVerification = async (phone) => {
+	if (phone === "00000000000") {
+	  throw new CustomError(400, "INVALID_PHONE", messages.INVALID_PHONE);
+	}
+  
+	const user = await findUserByPhone(phone);
+	if (!user) {
+	  throw new CustomError(404, "USER_NOT_FOUND", messages.USER_NOT_FOUND);
+	}
+
+	if (user.verifiedPhone) {
+		throw new CustomError(400, "ALREADY_VERIFIED", messages.ALREADY_VERIFIED);
+	  }
+  };
