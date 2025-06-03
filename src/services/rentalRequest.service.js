@@ -13,6 +13,7 @@ import { ERROR_MESSAGES, NOTIFICATION_MESSAGES, RENTAL_REQUEST_MESSAGES } from "
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { createNotification } from "./notification.service.js";
+import { RENTAL_DISCOUNT } from "../constants/rentalDiscount.js";
 
 
 export const createRentalRequest = async (
@@ -49,7 +50,14 @@ export const createRentalRequest = async (
 	const dayCount = Math.ceil(
 		(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
 	);
-	const totalPrice = product.price * dayCount;
+	let totalPrice = product.price * dayCount;
+	
+	// 할인 정책 적용
+	const discountPolicy = RENTAL_DISCOUNT.find(policy => dayCount >= policy.minDays);
+	if (discountPolicy) {
+		totalPrice *= discountPolicy.rate;
+	}
+	totalPrice = Math.round(totalPrice); 
 
 	const rentalRequest = await createRentalRequestRepo(
 		productId,
