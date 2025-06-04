@@ -32,6 +32,6 @@ jobs:
                   key: ${{ secrets.EC2_SSH_KEY }}
                   script: |
                       cd /home/ubuntu/FitPull-BE
-                      git pull origin dev
+                      git pull --no-rebase origin dev
                       echo "${{ secrets.ENV_DOCKER }}" > .env.docker
                       sudo docker-compose --env-file .env.docker up -d --build
