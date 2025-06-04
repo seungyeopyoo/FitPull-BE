@@ -23,6 +23,7 @@ export const ERROR_MESSAGES = {
   AI_PARSE_ERROR: "AI 응답 파싱 오류",
   PROMPT_REQUIRED: "추천 키워드를 입력해 주세요.",
   NO_PRODUCTS: "추천할 상품이 없습니다.",
+  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
 };
 
 export const SUCCESS_MESSAGES = {
@@ -118,4 +119,5 @@ export default {
   INVALID_CODE: "인증 코드가 올바르지 않습니다.",
   INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
   ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
+  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
 }; 
