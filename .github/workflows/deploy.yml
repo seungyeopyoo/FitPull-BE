@@ -34,4 +34,4 @@ jobs:
                       cd /home/ubuntu/FitPull-BE
                       git pull --no-rebase origin dev
                       echo "${{ secrets.ENV_DOCKER }}" > .env.docker
-                      sudo docker-compose --env-file .env.docker up -d --build
+                      sudo docker compose --env-file .env.docker up -d --build
