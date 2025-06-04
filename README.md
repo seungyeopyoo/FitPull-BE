@@ -12,7 +12,7 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 
 ### 기획 배경
 
-이 프로젝트는 **바쁜현대인 , 그중 에서도 저와 같은 .. I성향 + 반복 작업을 최소화하고 싶은 사람들을** 위해 만들어졌어요.
+이 프로젝트는 **바쁜 현대인 , 그 중 에서도 저와 같은 .. I성향 + 반복 작업을 최소화하고 싶은 사람들을** 위해 만들어졌어요.
 
 -   직접 만나는 것은 부담스럽고 어려운데 방에 이제는 사용하지 않는 물건이 놀고있는건 불편하고...
 -   수익은 내고 싶지만, 사진 찍기/배송/관리 같은 건 직접하려니 너무 귀찮고...
@@ -159,6 +159,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
 <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
 <img src="https://img.shields.io/badge/Passport-34E27A?logo=passport&logoColor=white" height="32"/>
 <img src="https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=black" height="32"/>
+<img src="https://img.shields.io/badge/JWT-000000?logo=jsonwebtokens&logoColor=white" height="32"/>
+<img src="https://img.shields.io/badge/CoolSMS-0096FF?logo=messagebird&logoColor=white" height="32"/>
 </div>
 
 <h3>Dev Tools</h3>  
