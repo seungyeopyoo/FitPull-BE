@@ -223,6 +223,76 @@ import passport from "../configs/passport.js";
  *       401:
  *         description: 로그인 실패
  */
+/**
+ * @swagger
+ * /auth/phone/request:
+ *   post:
+ *     summary: 휴대폰 인증번호 요청
+ *     description: 입력한 휴대폰 번호로 인증번호를 전송합니다.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "01012345678"
+ *     responses:
+ *       200:
+ *         description: 인증번호 전송 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: 잘못된 요청(휴대폰 번호 누락 등)
+ *       429:
+ *         description: 인증번호 요청이 너무 많음
+ */
+
+/**
+ * @swagger
+ * /auth/phone/verify:
+ *   post:
+ *     summary: 휴대폰 인증번호 검증
+ *     description: 입력한 인증번호가 맞는지 검증합니다.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "01012345678"
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: 인증 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: 인증 실패(만료, 불일치 등)
+ */
 
 const router = express.Router();
 //회원가입
@@ -276,6 +346,7 @@ router.get(
 
 // 인증번호 요청
 router.post("/phone/request", requestPhoneCodeController);
+
 // 인증번호 검증
 router.post("/phone/verify", verifyPhoneCodeController);
 

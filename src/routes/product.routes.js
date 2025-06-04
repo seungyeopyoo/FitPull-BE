@@ -26,8 +26,11 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  * @swagger
  * /products:
  *   post:
- *     summary: 상품 등록 (이미지 업로드 지원)
+ *     summary: 상품 등록 (이미지 업로드 지원, 휴대폰 인증 필요)
  *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
+ *     description: 휴대폰 인증이 완료된 사용자만 상품을 등록할 수 있습니다.
  *     consumes:
  *       - multipart/form-data
  *     requestBody:
@@ -58,8 +61,9 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *     responses:
  *       201:
  *         description: 상품 등록 성공
+ *       401:
+ *         description: 인증 실패 또는 휴대폰 미인증
  */
-
 /**
  * @swagger
  * /products:
