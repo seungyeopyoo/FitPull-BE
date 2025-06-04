@@ -23,6 +23,7 @@ export const ERROR_MESSAGES = {
   AI_PARSE_ERROR: "AI 응답 파싱 오류",
   PROMPT_REQUIRED: "추천 키워드를 입력해 주세요.",
   NO_PRODUCTS: "추천할 상품이 없습니다.",
+  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
 };
 
 export const SUCCESS_MESSAGES = {
@@ -111,4 +112,13 @@ export default {
   KAKAO_LOGIN_SUCCESS: "카카오 로그인 성공",
   GOOGLE_LOGIN_SUCCESS: "구글 로그인 성공",
   NAVER_LOGIN_SUCCESS: "네이버 로그인 성공",
+  PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
+  PHONE_REQUIRED: "전화번호를 입력해주세요.",
+  INVALID_INPUT: "전화번호와 인증번호를 입력해주세요.",
+  EXPIRED_CODE: "인증번호가 만료되었습니다.",
+  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
+  INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
+  ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
+  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
+  PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
 }; 
