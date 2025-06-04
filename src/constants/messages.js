@@ -120,4 +120,5 @@ export default {
   INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
   ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
   TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
+  PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
 }; 

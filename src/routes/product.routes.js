@@ -13,6 +13,7 @@ import {
 import { authenticate } from "../middlewares/auth.js";
 import { adminOnly } from "../middlewares/adminOnly.js";
 import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
+import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
 
 /**
  * @swagger
@@ -220,6 +221,7 @@ const router = express.Router();
 router.post(
 	"/",
 	authenticate,
+	requireVerifiedPhone,
 	...s3ImageUpload,
 	createProductController
 );

@@ -9,6 +9,7 @@ import {
 } from "../controllers/rentalRequest.controller.js";
 import { authenticate } from "../middlewares/auth.js";
 import { adminOnly } from "../middlewares/adminOnly.js";
+import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
 
 /**
  * @swagger
@@ -113,7 +114,7 @@ import { adminOnly } from "../middlewares/adminOnly.js";
 const router = express.Router();
 
 // 대여 요청
-router.post("/", authenticate, createRentalRequestController);
+router.post("/", authenticate, requireVerifiedPhone, createRentalRequestController);
 
 // 본인 대여요청 목록 조회
 router.get("/me", authenticate, getMyRentalRequestsController);
