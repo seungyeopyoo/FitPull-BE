@@ -2,11 +2,11 @@ import { findUserById, findValidUserByPhone } from "../repositories/user.reposit
 import { updateUserById } from "../repositories/user.repository.js";
 import { softDeleteUserById } from "../repositories/user.repository.js";
 import CustomError from "../utils/customError.js";
-import messages from "../constants/messages.js";
+import {USER_MESSAGES} from "../constants/messages.js";
 
 export const getUserById = async (userId) => {
 	const user = await findUserById(userId);
-	if (!user) throw new CustomError(404, "USER_NOT_FOUND", messages.USER_NOT_FOUND);
+	if (!user) throw new CustomError(404, "USER_NOT_FOUND", USER_MESSAGES.USER_NOT_FOUND);
 	const { id, name, phone, verifiedPhone, bankAccount, bankName, accountHolder, verifiedBankAccount } = user;
 	return { id, name, phone, verifiedPhone, bankAccount, bankName, accountHolder, verifiedBankAccount };
 };
@@ -17,7 +17,7 @@ export const updateUserInfo = async (userId, { name, phone, bankAccount, bankNam
 	if (phone && phone !== "00000000000") {
 	  const duplicate = await findValidUserByPhone(phone);
 	  if (duplicate && duplicate.id !== userId) {
-		throw new CustomError(409, "PHONE_EXISTS", messages.PHONE_EXISTS);
+		throw new CustomError(409, "PHONE_EXISTS", USER_MESSAGES.PHONE_EXISTS);
 	  }
 	  updateData.phone = phone;
 	  updateData.verifiedPhone = false; 

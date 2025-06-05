@@ -2,13 +2,13 @@ import { getUserById } from "../services/user.service.js";
 import { updateUserInfo } from "../services/user.service.js";
 import { deactivateUser } from "../services/user.service.js";
 import { success } from "../utils/responseHandler.js";
-import messages from "../constants/messages.js";
+import {USER_MESSAGES} from "../constants/messages.js";
 
 export const getMyProfile = async (req, res, next) => {
 	try {
 		const userId = req.user.userId;
 		const user = await getUserById(userId);
-		return success(res, messages.GET_MY_PROFILE_SUCCESS, { user });
+		return success(res, USER_MESSAGES.GET_MY_PROFILE_SUCCESS, { user });
 	} catch (err) {
 		next(err);
 	}
@@ -27,7 +27,7 @@ export const updateMyProfile = async (req, res, next) => {
 			phone
 		});
 
-		return success(res, messages.UPDATE_MY_PROFILE_SUCCESS, { user: updatedUser });
+		return success(res, USER_MESSAGES.UPDATE_MY_PROFILE_SUCCESS, { user: updatedUser });
 	} catch (err) {
 		next(err);
 	}
@@ -39,7 +39,7 @@ export const deleteMyAccount = async (req, res, next) => {
 
 		await deactivateUser(userId);
 
-		return success(res, messages.DELETE_MY_ACCOUNT_SUCCESS);
+		return success(res, USER_MESSAGES.DELETE_MY_ACCOUNT_SUCCESS);
 	} catch (err) {
 		next(err);
 	}

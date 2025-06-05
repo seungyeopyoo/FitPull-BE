@@ -104,10 +104,16 @@ export const AUTH_MESSAGES = {
   PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
 }
 
-export default {
+export const USER_MESSAGES = {
   GET_MY_PROFILE_SUCCESS: "내 정보 조회 성공",
   UPDATE_MY_PROFILE_SUCCESS: "내 정보가 수정되었습니다.",
   DELETE_MY_ACCOUNT_SUCCESS: "회원 탈퇴가 완료되었습니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
+}
+
+
+export default {
   PRODUCT_LISTED: "상품 목록 조회 성공",
   PRODUCT_DETAIL: "상품 상세 조회 성공",
   PRODUCT_WAITING_LISTED: "대기 상품 목록 조회 성공",
