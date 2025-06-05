@@ -9,7 +9,7 @@ import {
 	findByIdWithProducts,
 } from "../repositories/category.repository.js";
 import CustomError from "../utils/customError.js";
-import messages from "../constants/messages.js";
+import {CATEGORY_MESSAGES} from "../constants/messages.js";
 
 export const getCategories = async () => {
 	const categories = await findAll();
@@ -24,11 +24,11 @@ export const createCategory = async (name, description) => {
 	// 중복 체크
 	const exists = await findByName(name);
 	if (exists) {
-		throw new CustomError(409, "CATEGORY_ALREADY_EXISTS", messages.CATEGORY_ALREADY_EXISTS.replace("{name}", name));
+		throw new CustomError(409, "CATEGORY_ALREADY_EXISTS", CATEGORY_MESSAGES.CATEGORY_ALREADY_EXISTS.replace("{name}", name));
 	}
 	const category = await create(name, description);
 	return {
-		message: messages.CATEGORY_CREATED.replace("{name}", category.name),
+		message: CATEGORY_MESSAGES.CATEGORY_CREATED.replace("{name}", category.name),
 		category: {
 			id: category.id,
 			name: category.name,
@@ -42,12 +42,12 @@ export const updateCategory = async (id, name, description) => {
 		const category = await update(id, name, description);
 		const { id: categoryId, name: categoryName, description: desc } = category;
 		return {
-			message: messages.CATEGORY_UPDATED.replace("{name}", categoryName),
+			message: CATEGORY_MESSAGES.CATEGORY_UPDATED.replace("{name}", categoryName),
 			category: { id: categoryId, name: categoryName, description: desc }
 		};
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
+			throw new CustomError(404, "CATEGORY_NOT_FOUND", CATEGORY_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 		throw err;
 	}
@@ -58,13 +58,13 @@ export const deleteCategory = async (id) => {
 		//삭제할 카테고리 정보 조회
 		const category = await findById(id);
 		if (!category) {
-			throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
+			throw new CustomError(404, "CATEGORY_NOT_FOUND", CATEGORY_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 
 		//'기타' 카테고리 id 조회
 		const etcCategory = await findByName("기타");
 		if (!etcCategory) {
-			throw new CustomError(404, "ETC_CATEGORY_NOT_FOUND", messages.ETC_CATEGORY_NOT_FOUND);
+			throw new CustomError(404, "ETC_CATEGORY_NOT_FOUND", CATEGORY_MESSAGES.ETC_CATEGORY_NOT_FOUND);
 		}
 
 		//해당 카테고리에 속한 상품들 모두 '기타'로 이동
@@ -73,11 +73,11 @@ export const deleteCategory = async (id) => {
 		await remove(id);
 
 		return {
-			message: messages.CATEGORY_DELETED.replace("{name}", category.name)
+			message: CATEGORY_MESSAGES.CATEGORY_DELETED.replace("{name}", category.name)
 		};
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
+			throw new CustomError(404, "CATEGORY_NOT_FOUND", CATEGORY_MESSAGES.CATEGORY_NOT_FOUND);
 		}
 		throw err;
 	}
@@ -86,12 +86,12 @@ export const deleteCategory = async (id) => {
 export const getCategoryDetail = async (id) => {
 	const category = await findByIdWithProducts(id);
 	if (!category) {
-		throw new CustomError(404, "CATEGORY_NOT_FOUND", messages.CATEGORY_NOT_FOUND);
+		throw new CustomError(404, "CATEGORY_NOT_FOUND", CATEGORY_MESSAGES.CATEGORY_NOT_FOUND);
 	}
 	// products 필드만 따로 분리
 	const { products, ...categoryInfo } = category;
 	return {
-		message: messages.CATEGORY_DETAIL_LISTED.replace("{name}", category.name),
+		message: CATEGORY_MESSAGES.CATEGORY_DETAIL_LISTED.replace("{name}", category.name),
 		category: {
 			id: category.id,
 			name: category.name,

@@ -123,23 +123,14 @@ export const PRODUCT_MESSAGES = {
   PRODUCT_REJECTED_OR_CANCELED: "거절되었거나 취소된 상품은 수정할 수 없습니다.",
 }
 
-
-export default {
-  
-  
-  
-  
-  
-  CATEGORY_LISTED: "카테고리 목록 조회 성공",
-  CATEGORY_CREATED: '카테고리 "{name}" 가 등록되었습니다.',
-  CATEGORY_UPDATED: '카테고리 "{name}" 가 수정되었습니다.',
-  CATEGORY_DELETED: '카테고리 "{name}" 가 삭제되었습니다.',
-  CATEGORY_DETAIL_LISTED: '카테고리 "{name}" 상세 조회 성공',
-  CATEGORY_ALREADY_EXISTS: "'{name}' 카테고리는 이미 존재합니다.",
-  CATEGORY_NOT_FOUND: "존재하지 않는 카테고리입니다.",
-  ETC_CATEGORY_NOT_FOUND: "'기타' 카테고리가 존재하지 않습니다.",
-  CATEGORY_NAME_REQUIRED: "카테고리 이름이 필요합니다.",
-  
-  
- 
-}; 
+export const CATEGORY_MESSAGES = {
+ CATEGORY_ALREADY_EXISTS: "'{name}' 카테고리는 이미 존재합니다.",
+ CATEGORY_LISTED: "카테고리 목록 조회 성공",
+ CATEGORY_CREATED: '카테고리 "{name}" 가 등록되었습니다.',
+ CATEGORY_UPDATED: '카테고리 "{name}" 가 수정되었습니다.',
+ CATEGORY_DELETED: '카테고리 "{name}" 가 삭제되었습니다.',
+ CATEGORY_DETAIL_LISTED: '카테고리 "{name}" 상세 조회 성공',
+ CATEGORY_NOT_FOUND: "존재하지 않는 카테고리입니다.",
+ ETC_CATEGORY_NOT_FOUND: "'기타' 카테고리가 존재하지 않습니다.",
+ CATEGORY_NAME_REQUIRED: "카테고리 이름이 필요합니다.",
+}
