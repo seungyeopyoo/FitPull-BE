@@ -2,12 +2,12 @@ import { sendSMS } from "./sms.js";
 import redis from "./redis.js";
 import { setPhoneCode, getPhoneCode, deletePhoneCode,  } from "./redis.js";
 import CustomError from "../utils/customError.js"; 
-import messages from "../constants/messages.js";    
+import {AUTH_MESSAGES} from "../constants/messages.js";    
 
 export const sendVerificationCode = async (phone) => {
   const existingCode = await redis.get(`phoneCode:${phone}`);
   if (existingCode) {
-    throw new CustomError(429, "TOO_MANY_REQUESTS", messages.TOO_MANY_REQUESTS);
+    throw new CustomError(429, "TOO_MANY_REQUESTS", AUTH_MESSAGES.TOO_MANY_REQUESTS);
   }
 
   const code = String(Math.floor(100000 + Math.random() * 900000));
@@ -19,11 +19,11 @@ export const verifyCode = async (phone, inputCode) => {
   const savedCode = await getPhoneCode(phone);
 
   if (!savedCode) {
-    throw new CustomError(400, "EXPIRED_CODE", messages.EXPIRED_CODE);
+    throw new CustomError(400, "EXPIRED_CODE", AUTH_MESSAGES.EXPIRED_CODE);
   }
 
   if (savedCode !== inputCode) {
-    throw new CustomError(400, "INVALID_CODE", messages.INVALID_CODE);
+    throw new CustomError(400, "INVALID_CODE", AUTH_MESSAGES.INVALID_CODE);
   }
 
   await deletePhoneCode(phone);

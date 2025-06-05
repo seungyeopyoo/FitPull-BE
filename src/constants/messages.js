@@ -49,7 +49,6 @@ export const SUCCESS_MESSAGES = {
   STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
   STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
-  
 };
 
 export const MESSAGE_RESPONSES = {
@@ -77,17 +76,35 @@ export const RENTAL_REQUEST_MESSAGES = {
   CANCEL_TOO_LATE: "대여 시작 3일 전부터는 취소가 불가합니다.",
 };
 
-export default {
+export const AUTH_MESSAGES = {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",
-  LOGIN_SUCCESS: "로그인 성공",
   LOGOUT_SUCCESS: "로그아웃 되었습니다.",
-  PASSWORD_MISMATCH: "비밀번호가 일치하지 않습니다.",
-  EMAIL_EXISTS: "이미 가입된 이메일입니다.",
-  DELETED_ACCOUNT: "탈퇴한 계정입니다. 재가입하려면 인증하세요.",
-  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   REFRESH_TOKEN_REQUIRED: "refreshToken이 필요합니다.",
   INVALID_REFRESH_TOKEN: "유효하지 않은 refreshToken입니다.",
   REFRESH_TOKEN_SUCCESS: "토큰 재발급 성공",
+  REJOIN_SUCCESS: "재가입이 완료되었습니다.",
+  KAKAO_LOGIN_SUCCESS: "카카오 로그인 성공",
+  GOOGLE_LOGIN_SUCCESS: "구글 로그인 성공",
+  NAVER_LOGIN_SUCCESS: "네이버 로그인 성공",
+  LOGIN_SUCCESS: "로그인 성공",
+  PHONE_REQUIRED: "전화번호를 입력해주세요.",
+  INVALID_INPUT: "전화번호와 인증번호를 입력해주세요.",
+  PASSWORD_MISMATCH: "비밀번호가 일치하지 않습니다.",
+  EMAIL_EXISTS: "이미 가입된 이메일입니다.",
+  DELETED_ACCOUNT: "탈퇴한 계정입니다. 재가입하려면 인증하세요.",
+  PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  INVALID_PASSWORD: "비밀번호는 6자 이상 입력해야 합니다.",
+  NO_CODE: "해당 이메일로 인증 요청이 없습니다.",
+  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
+  INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
+  ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
+  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
+  EXPIRED_CODE: "인증번호가 만료되었습니다.",
+  PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
+}
+
+export default {
   GET_MY_PROFILE_SUCCESS: "내 정보 조회 성공",
   UPDATE_MY_PROFILE_SUCCESS: "내 정보가 수정되었습니다.",
   DELETE_MY_ACCOUNT_SUCCESS: "회원 탈퇴가 완료되었습니다.",
@@ -105,20 +122,7 @@ export default {
   CATEGORY_NOT_FOUND: "존재하지 않는 카테고리입니다.",
   ETC_CATEGORY_NOT_FOUND: "'기타' 카테고리가 존재하지 않습니다.",
   CATEGORY_NAME_REQUIRED: "카테고리 이름이 필요합니다.",
-  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
-  REJOIN_SUCCESS: "재가입이 완료되었습니다.",
-  INVALID_PASSWORD: "비밀번호는 6자 이상 입력해야 합니다.",
-  NO_CODE: "해당 이메일로 인증 요청이 없습니다.",
-  KAKAO_LOGIN_SUCCESS: "카카오 로그인 성공",
-  GOOGLE_LOGIN_SUCCESS: "구글 로그인 성공",
-  NAVER_LOGIN_SUCCESS: "네이버 로그인 성공",
-  PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
-  PHONE_REQUIRED: "전화번호를 입력해주세요.",
-  INVALID_INPUT: "전화번호와 인증번호를 입력해주세요.",
-  EXPIRED_CODE: "인증번호가 만료되었습니다.",
-  INVALID_CODE: "인증 코드가 올바르지 않습니다.",
-  INVALID_PHONE: "해당 전화번호는 인증할 수 없습니다.",
-  ALREADY_VERIFIED: "이미 인증된 전화번호입니다.",
-  TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
-  PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
+  
+  
+ 
 }; 
