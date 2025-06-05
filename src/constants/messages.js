@@ -1,9 +1,8 @@
 export const ERROR_MESSAGES = {
-  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
-  NO_PERMISSION: "권한이 없습니다.",
-  INVALID_PRICE: "정상적인 가격을 입력해주세요 (price: 0 ~ 2147483647)",
+  
+  
   INVALID_RENTAL_DATE: "정상적인 날짜를 입력해주세요.",
-  AUTH_REQUIRED: "인증이 필요합니다.",
+  
   RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
   RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
   REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
@@ -12,7 +11,6 @@ export const ERROR_MESSAGES = {
   ALREADY_REVIEWED: "이미 해당 대여에 리뷰를 작성하셨습니다.",
   ONLY_COMPLETED_RENTAL: "본인이 완료한 대여에만 리뷰를 작성할 수 있습니다.",
   INVALID_RATING: "별점은 1~5 사이여야 합니다.",
-  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
   DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
   STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
@@ -27,11 +25,6 @@ export const ERROR_MESSAGES = {
 };
 
 export const SUCCESS_MESSAGES = {
-  PRODUCT_CREATED: "상품이 등록되었습니다.",
-  PRODUCT_UPDATED: "상품이 수정되었습니다. 수정된상품은 승인 대기상태로 변경됩니다.",
-  PRODUCT_DELETED: "상품이 삭제되었습니다.",
-  PRODUCT_APPROVED: "상품이 승인되었습니다.",
-  PRODUCT_REJECTED: "상품이 거절되었습니다.",
   RENTAL_APPROVED: "대여 요청이 승인되었습니다.",
   RENTAL_REJECTED: "대여 요청이 거절되었습니다.",
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
@@ -112,13 +105,31 @@ export const USER_MESSAGES = {
   PHONE_EXISTS: "이미 사용 중인 전화번호입니다.",
 }
 
-
-export default {
+export const PRODUCT_MESSAGES = {
+  PRODUCT_CREATED: "상품이 등록되었습니다.",
+  PRODUCT_UPDATED: "상품이 수정되었습니다. 수정된상품은 승인 대기상태로 변경됩니다.",
+  PRODUCT_DELETED: "상품이 삭제되었습니다.",
+  PRODUCT_APPROVED: "상품이 승인되었습니다.",
+  PRODUCT_REJECTED: "상품이 거절되었습니다.",
   PRODUCT_LISTED: "상품 목록 조회 성공",
   PRODUCT_DETAIL: "상품 상세 조회 성공",
+  AUTH_REQUIRED: "인증이 필요합니다.",
+  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
   PRODUCT_WAITING_LISTED: "대기 상품 목록 조회 성공",
+  INVALID_PRICE: "정상적인 가격을 입력해주세요 (price: 0 ~ 2147483647)",
+  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
+  NO_PERMISSION: "권한이 없습니다.",
   PRODUCT_RENTAL_ACTIVE: "현재 대여중인 상품은 수정/삭제할 수 없습니다.",
   PRODUCT_REJECTED_OR_CANCELED: "거절되었거나 취소된 상품은 수정할 수 없습니다.",
+}
+
+
+export default {
+  
+  
+  
+  
+  
   CATEGORY_LISTED: "카테고리 목록 조회 성공",
   CATEGORY_CREATED: '카테고리 "{name}" 가 등록되었습니다.',
   CATEGORY_UPDATED: '카테고리 "{name}" 가 수정되었습니다.',

@@ -4,7 +4,7 @@ import {
 	getProductById as getProductByIdRepo,
 	getProductsByUser as getProductsByUserRepo,
 	updateProduct as updateProductRepo,
-	deleteProduct as deleteProductRepo,
+	deleteProduct as deleteProductRepo,	
 	findWaitingProducts as findWaitingProductsRepo,
 	updateProductStatus as updateProductStatusRepo,
 	findEtcCategoryId,
@@ -13,32 +13,30 @@ import {
 import { deleteFromS3 } from "../utils/s3.js";
 import { DEFAULT_CATEGORY_NAME } from "../constants/category.js";
 import { PRODUCT_STATUS } from "../constants/status.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
+import { PRODUCT_MESSAGES } from "../constants/messages.js";
 import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repositories/rentalRequest.repository.js";
 import { findLogsByProductRepo } from "../repositories/productStatusLog.repository.js";
 import CustomError from "../utils/customError.js";
-import messages from "../constants/messages.js";
 import { MAX_PRODUCT_IMAGES, MAX_INT_32 } from "../constants/limits.js";
 import { createNotification } from "./notification.service.js";
-import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 
 export const createProduct = async (productData, user) => {
 	if (!user || !user.id) {
-		throw new CustomError(401, "AUTH_REQUIRED", ERROR_MESSAGES.AUTH_REQUIRED);
+		throw new CustomError(401, "AUTH_REQUIRED", PRODUCT_MESSAGES.AUTH_REQUIRED);
 	}
 
 	if (productData.price < 0 || productData.price > MAX_INT_32) {
-		throw new CustomError(400, "INVALID_PRICE", ERROR_MESSAGES.INVALID_PRICE);
+		throw new CustomError(400, "INVALID_PRICE", PRODUCT_MESSAGES.INVALID_PRICE);
 	}
 
 	if (productData.imageUrls && productData.imageUrls.length > MAX_PRODUCT_IMAGES) {
-		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", messages.IMAGE_LIMIT_EXCEEDED);
+		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", PRODUCT_MESSAGES.IMAGE_LIMIT_EXCEEDED);
 	}
 
 	let categoryId = productData.categoryId;
 
-	// categoryId가 없거나 잘못된 경우 → '기타' 카테고리 id로 대체
+	// categoryId가 없거나 잘못된 경우 → '기타' 카테고리 id로 대체	
 	if (!categoryId) {
 		categoryId = await findEtcCategoryId();
 	} else {
@@ -102,11 +100,11 @@ export const getProductById = async (id) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product || product.status !== PRODUCT_STATUS.APPROVED) {
-		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	// 상태 로그 5개 조회
-	const statusLogsRaw = await findLogsByProductRepo(id, 5);
+	const statusLogsRaw = await findLogsByProductRepo(id, 5);	
 	const statusLogs = statusLogsRaw.map(log => ({
 		id: log.id,
 		type: log.type,
@@ -145,19 +143,19 @@ export const updateProduct = async (id, productData, user) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product) {
-		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	// 본인 상품이거나 관리자만 수정 가능
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
-		throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
+		throw new CustomError(403, "NO_PERMISSION", PRODUCT_MESSAGES.NO_PERMISSION);
 	}
 
 	// 대여중이면 수정 불가
 	const rentalActive = await findActiveRentalByProductId(id);
 
 	if (rentalActive) {
-		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", messages.PRODUCT_RENTAL_ACTIVE);
+		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", PRODUCT_MESSAGES.PRODUCT_RENTAL_ACTIVE);
 	}
 
 	// 상품 상태에 따라 수정 제한
@@ -167,7 +165,7 @@ export const updateProduct = async (id, productData, user) => {
 
 		// 거절되거나 취소된 상품은 수정 불가
 		if (["REJECTED", "CANCELED"].includes(product.status)) {
-			throw new CustomError(400, "PRODUCT_REJECTED_OR_CANCELED", messages.PRODUCT_REJECTED_OR_CANCELED);
+			throw new CustomError(400, "PRODUCT_REJECTED_OR_CANCELED", PRODUCT_MESSAGES.PRODUCT_REJECTED_OR_CANCELED);
 		}
 
 		// 승인된 상품은 다시 승인 대기로 전환
@@ -180,12 +178,12 @@ export const updateProduct = async (id, productData, user) => {
 	if (productData.price !== undefined) {
 		productData.price = Number(productData.price);
 		if (productData.price < 0 || productData.price > MAX_INT_32) {
-			throw new CustomError(400, "INVALID_PRICE", ERROR_MESSAGES.INVALID_PRICE);
+			throw new CustomError(400, "INVALID_PRICE", PRODUCT_MESSAGES.INVALID_PRICE);
 		}
 	}
 
 	if (productData.imageUrls && productData.imageUrls.length > MAX_PRODUCT_IMAGES) {
-		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", messages.IMAGE_LIMIT_EXCEEDED);
+		throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", PRODUCT_MESSAGES.IMAGE_LIMIT_EXCEEDED);
 	}
 
 	let categoryId = productData.categoryId;
@@ -228,11 +226,11 @@ export const deleteProduct = async (id, user) => {
 	const product = await getProductByIdRepo(id);
 
 	if (!product) {
-		throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+		throw new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND);
 	}
 
 	if (product.ownerId !== user.id && user.role !== "ADMIN") {
-		throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
+		throw new CustomError(403, "NO_PERMISSION", PRODUCT_MESSAGES.NO_PERMISSION);
 	}
 	const now = new Date();
 	const oneMonthLater = new Date();
@@ -242,7 +240,7 @@ export const deleteProduct = async (id, user) => {
 	const activeRental = await findActiveRentalForDelete(id, oneMonthLater);
 
 	if (activeRental) {
-		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", messages.PRODUCT_RENTAL_ACTIVE);
+		throw new CustomError(400, "PRODUCT_RENTAL_ACTIVE", PRODUCT_MESSAGES.PRODUCT_RENTAL_ACTIVE);
 	}
 
 	// 이미지 삭제
@@ -287,7 +285,7 @@ export const approveProduct = async (id) => {
 		const notificationParams = {
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `${NOTIFICATION_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
+			message: `${PRODUCT_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		};
@@ -311,7 +309,7 @@ export const approveProduct = async (id) => {
 		};
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND);
 		}
 		throw err;
 	}
@@ -324,7 +322,7 @@ export const rejectProduct = async (id, rejectReason = "") => {
 		await createNotification({
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `${NOTIFICATION_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
+			message: `${PRODUCT_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		});
@@ -346,7 +344,7 @@ export const rejectProduct = async (id, rejectReason = "") => {
 		};
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+			throw new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND);
 		}
 		throw err;
 	}
