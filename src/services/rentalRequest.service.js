@@ -9,7 +9,7 @@ import {
 	getRentalRequestById,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
-import { ERROR_MESSAGES, NOTIFICATION_MESSAGES, RENTAL_REQUEST_MESSAGES } from "../constants/messages.js";
+import { RENTAL_REQUEST_MESSAGES, NOTIFICATION_MESSAGES } from "../constants/messages.js";
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { createNotification } from "./notification.service.js";
@@ -31,7 +31,7 @@ export const createRentalRequest = async (
 
 	  // 날짜 유효성 체크
 	  if (new Date(endDate) <= new Date(startDate)) {
-		throw new CustomError(400, "INVALID_RENTAL_DATE", ERROR_MESSAGES.INVALID_RENTAL_DATE);
+		throw new CustomError(400, "INVALID_RENTAL_DATE", RENTAL_REQUEST_MESSAGES.INVALID_RENTAL_DATE);
 	  }
 	  
 	if (new Date(startDate) > oneMonthLater) {
@@ -40,12 +40,12 @@ export const createRentalRequest = async (
 
 	// 날짜 중복 체크
 	const conflict = await checkRentalDateConflict(productId, startDate, endDate);
-	if (conflict) throw new CustomError(400, "RENTAL_DATE_CONFLICT", ERROR_MESSAGES.RENTAL_DATE_CONFLICT);
+	if (conflict) throw new CustomError(400, "RENTAL_DATE_CONFLICT", RENTAL_REQUEST_MESSAGES.RENTAL_DATE_CONFLICT);
 
 	if (!howToReceive) throw new CustomError(400, "RECEIVE_METHOD_REQUIRED", RENTAL_REQUEST_MESSAGES.RECEIVE_METHOD_REQUIRED);
 
 	const product = await getProductById(productId);
-	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", RENTAL_REQUEST_MESSAGES.PRODUCT_NOT_FOUND);
 
 	const dayCount = Math.ceil(
 		(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
@@ -114,8 +114,9 @@ export const getPendingRequests = async () => {
 export const approveRentalRequest = async (id) => {
 	try {
 		const updated = await updateRentalRequestStatusRepo(id, RENTAL_STATUS.APPROVED);
-		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
+		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 		const summary = await findRentalRequestSummaryById(id);
+		if (!summary) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 		const request = await getRentalRequestById(id);
 
 		await createNotification({
@@ -161,7 +162,7 @@ export const rejectRentalRequest = async (id) => {
 		return { id, ...summary, totalPrice: request.totalPrice };
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
+			throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 		}
 		throw err;
 	}
@@ -169,8 +170,8 @@ export const rejectRentalRequest = async (id) => {
 
 export const cancelRentalRequest = async (id, userId) => {
 	const request = await getRentalRequestById(id);
-	if (!request) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
-	if (request.userId !== userId) throw new CustomError(403, "NO_PERMISSION", ERROR_MESSAGES.NO_PERMISSION);
+	if (!request) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
+	if (request.userId !== userId) throw new CustomError(403, "NO_PERMISSION", RENTAL_REQUEST_MESSAGES.NO_PERMISSION);
 	if (![RENTAL_STATUS.PENDING, RENTAL_STATUS.APPROVED].includes(request.status)) {
 		throw new CustomError(400, "RENTAL_CANCEL_NOT_ALLOWED", RENTAL_REQUEST_MESSAGES.CANCEL_NOT_ALLOWED);
 	}

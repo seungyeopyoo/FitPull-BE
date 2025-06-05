@@ -7,7 +7,7 @@ import {
 	cancelRentalRequest,
 } from "../services/rentalRequest.service.js";
 import { success } from "../utils/responseHandler.js";
-import { SUCCESS_MESSAGES } from "../constants/messages.js";
+import {RENTAL_REQUEST_MESSAGES} from "../constants/messages.js";
 
 export const createRentalRequestController = async (req, res, next) => {
 	try {
@@ -21,7 +21,7 @@ export const createRentalRequestController = async (req, res, next) => {
 			howToReceive,
 			memo
 		);
-		return success(res, SUCCESS_MESSAGES.RENTAL_REQUEST_CREATED, { rentalRequest });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_REQUEST_CREATED, { rentalRequest });
 	} catch (error) {
 		next(error);
 	}
@@ -30,7 +30,7 @@ export const createRentalRequestController = async (req, res, next) => {
 export const getMyRentalRequestsController = async (req, res, next) => {
 	try {
 		const myRequests = await getMyRentalRequests(req.user.id);
-		return success(res, SUCCESS_MESSAGES.RENTAL_MY_LISTED, { requests: myRequests });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_MY_LISTED, { requests: myRequests });
 	} catch (error) {
 		next(error);
 	}
@@ -39,7 +39,7 @@ export const getMyRentalRequestsController = async (req, res, next) => {
 export const getPendingRequestsController = async (_req, res, next) => {
 	try {
 		const requests = await getPendingRequests();
-		return success(res, SUCCESS_MESSAGES.RENTAL_PENDING_LISTED, { requests });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_PENDING_LISTED, { requests });
 	} catch (error) {
 		next(error);
 	}
@@ -48,7 +48,7 @@ export const getPendingRequestsController = async (_req, res, next) => {
 export const approveRentalRequestController = async (req, res, next) => {
 	try {
 		const request = await approveRentalRequest(req.params.id);
-		return success(res, SUCCESS_MESSAGES.RENTAL_APPROVED, { request });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_APPROVED, { request });
 	} catch (error) {
 		next(error);
 	}
@@ -57,7 +57,7 @@ export const approveRentalRequestController = async (req, res, next) => {
 export const rejectRentalRequestController = async (req, res, next) => {
 	try {
 		const request = await rejectRentalRequest(req.params.id);
-		return success(res, SUCCESS_MESSAGES.RENTAL_REJECTED, { request });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_REJECTED, { request });
 	} catch (error) {
 		next(error);
 	}
@@ -68,7 +68,7 @@ export const cancelRentalRequestController = async (req, res, next) => {
 		const userId = req.user.id;
 		const { id } = req.params;
 		const request = await cancelRentalRequest(id, userId);
-		return success(res, SUCCESS_MESSAGES.RENTAL_CANCELED, { request });
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_CANCELED, { request });
 	} catch (error) {
 		next(error);
 	}

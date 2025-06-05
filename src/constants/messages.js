@@ -1,10 +1,5 @@
 export const ERROR_MESSAGES = {
   
-  
-  INVALID_RENTAL_DATE: "정상적인 날짜를 입력해주세요.",
-  
-  RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
-  RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
   REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
   ONLY_OWN_REVIEW: "본인 리뷰만 수정할 수 있습니다.",
   ONLY_OWN_DELETE: "본인 리뷰만 삭제할 수 있습니다.",
@@ -25,16 +20,14 @@ export const ERROR_MESSAGES = {
 };
 
 export const SUCCESS_MESSAGES = {
-  RENTAL_APPROVED: "대여 요청이 승인되었습니다.",
-  RENTAL_REJECTED: "대여 요청이 거절되었습니다.",
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
   REVIEW_LISTED: "리뷰 목록 조회 성공",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
-  RENTAL_REQUEST_CREATED: "대여 요청이 등록되었습니다.",
-  RENTAL_MY_LISTED: "내 대여 요청 목록 조회 성공",
-  RENTAL_PENDING_LISTED: "대기중 대여 요청 목록 조회 성공",
-  RENTAL_CANCELED: "대여 요청이 취소되었습니다.",
+  
+  
+  
+  
   RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
   MY_COMPLETED_RENTALS_LISTED: "내 완료 대여 목록 조회 성공",
   ALL_COMPLETED_RENTALS_LISTED: "전체 완료 대여 목록 조회 성공",
@@ -42,6 +35,24 @@ export const SUCCESS_MESSAGES = {
   STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
   STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
+};
+
+export const RENTAL_REQUEST_MESSAGES = {
+  RENTAL_REQUEST_CREATED: "대여 요청이 등록되었습니다.",
+  RENTAL_MY_LISTED: "내 대여 요청 목록 조회 성공",
+  RENTAL_APPROVED: "대여 요청이 승인되었습니다.",
+  RENTAL_REJECTED: "대여 요청이 거절되었습니다.",
+  RENTAL_CANCELED: "대여 요청이 취소되었습니다.",
+  RENTAL_PENDING_LISTED: "대기중 대여 요청 목록 조회 성공",
+  START_DATE_LIMIT: "예약 시작일은 30일 이내여야 합니다.",
+  RECEIVE_METHOD_REQUIRED: "수령 방법을 선택해주세요.",
+  CANCEL_NOT_ALLOWED: "해당 상태에서는 취소할 수 없습니다.",
+  CANCEL_TOO_LATE: "대여 시작 3일 전부터는 취소가 불가합니다.",
+  RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
+  INVALID_RENTAL_DATE: "정상적인 날짜를 입력해주세요.",
+  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
+  RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
+  NO_PERMISSION: "권한이 없습니다.",
 };
 
 export const MESSAGE_RESPONSES = {
@@ -62,12 +73,7 @@ export const NOTIFICATION_MESSAGES = {
   REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁dream니다!",
 };
 
-export const RENTAL_REQUEST_MESSAGES = {
-  START_DATE_LIMIT: "예약 시작일은 30일 이내여야 합니다.",
-  RECEIVE_METHOD_REQUIRED: "수령 방법을 선택해주세요.",
-  CANCEL_NOT_ALLOWED: "해당 상태에서는 취소할 수 없습니다.",
-  CANCEL_TOO_LATE: "대여 시작 3일 전부터는 취소가 불가합니다.",
-};
+
 
 export const AUTH_MESSAGES = {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",

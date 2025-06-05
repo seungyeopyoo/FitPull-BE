@@ -1,6 +1,5 @@
 import prisma from "../data-source.js";
 import { RENTAL_STATUS } from "../constants/status.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
 
 export const createRentalRequestRepo = async (
 	productId,
@@ -93,7 +92,7 @@ export const findRentalRequestSummaryById = async (id) => {
 		},
 	});
 
-	if (!request) throw new Error(ERROR_MESSAGES.RENTAL_NOT_FOUND);
+	if (!request) return null;
 
 	return {
 		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
