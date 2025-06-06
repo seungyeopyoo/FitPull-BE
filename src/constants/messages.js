@@ -71,6 +71,14 @@ export const MESSAGE_RESPONSES = {
   FETCH_SUCCESS: "메시지 조회 성공",
   MARK_READ: "읽음 처리 완료",
   DELETE_SUCCESS: "메시지 삭제 완료",
+  INVALID_MESSAGE: "내용과 수신자를 입력하세요.",
+  PRODUCT_NOT_FOUND: "존재하지 않는 상품입니다.",
+  ADMIN_NOT_FOUND: "운영자 계정이 존재하지 않습니다.",
+  FORBIDDEN: "운영자에게만 문의할 수 있습니다.",
+  FORBIDDEN_USER: "유저에게만 답변할 수 있습니다.",
+  FORBIDDEN_ADMIN: "권한이 없습니다.",
+  MESSAGE_NOT_FOUND: "메시지를 찾을 수 없거나 권한이 없습니다.",
+  
 };
 
 export const NOTIFICATION_MESSAGES = {
@@ -83,8 +91,6 @@ export const NOTIFICATION_MESSAGES = {
   ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
   REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁드립니다!",
 };
-
-
 
 export const AUTH_MESSAGES = {
   SIGNUP_SUCCESS: "회원가입이 완료되었습니다.",

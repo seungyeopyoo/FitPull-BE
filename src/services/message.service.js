@@ -17,14 +17,14 @@ import { findUserById } from "../repositories/user.repository.js";
 //메세지 전송
 export const sendMessage = async ({ senderId, receiverId, content, productId, senderRole }) => {
   if (!content || !receiverId) {
-    throw new CustomError(400, "INVALID_MESSAGE", "내용과 수신자를 입력하세요.");
+    throw new CustomError(400, "INVALID_MESSAGE", MESSAGE_RESPONSES.INVALID_MESSAGE);
   }
 
   // productId 유효성 체크
   if (productId) {
     const product = await getProductById(productId);
     if (!product) {
-      throw new CustomError(400, "PRODUCT_NOT_FOUND", "존재하지 않는 상품입니다.");
+      throw new CustomError(400, "PRODUCT_NOT_FOUND", MESSAGE_RESPONSES.PRODUCT_NOT_FOUND);
     }
   }
 
@@ -32,23 +32,23 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
   try {
     adminId = await getAdminId();
   } catch {
-    throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
+    throw new CustomError(500, "ADMIN_NOT_FOUND", MESSAGE_RESPONSES.ADMIN_NOT_FOUND);
   }
 
   // USER → ADMIN만 허용
   if (senderRole === "USER") {
     if (receiverId !== adminId) {
-      throw new CustomError(403, "FORBIDDEN", "운영자에게만 문의할 수 있습니다.");
+      throw new CustomError(403, "FORBIDDEN", MESSAGE_RESPONSES.FORBIDDEN);
     }
   }
   // ADMIN → USER만 허용
   else if (senderRole === "ADMIN") {
     const user = await findUserById(receiverId);
     if (!user || user.role !== "USER") {
-      throw new CustomError(403, "FORBIDDEN", "유저에게만 답변할 수 있습니다.");
+      throw new CustomError(403, "FORBIDDEN", MESSAGE_RESPONSES.FORBIDDEN_USER);
     }
   } else {
-    throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
+    throw new CustomError(403, "FORBIDDEN", MESSAGE_RESPONSES.FORBIDDEN_ADMIN);
   }
 
   const message = await createMessage({ senderId, receiverId, content, productId });
@@ -65,10 +65,7 @@ export const sendMessage = async ({ senderId, receiverId, content, productId, se
     });
   }
 
-  return {
-    message: MESSAGE_RESPONSES.SEND_SUCCESS,
-    data: { id: message.id }
-  };
+  return { id: message.id };
 };
 
 //받은 목록조회
@@ -77,7 +74,7 @@ export const getReceivedMessages = async (userId, userRole) => {
   try {
     adminId = await getAdminId();
   } catch {
-    throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
+    throw new CustomError(500, "ADMIN_NOT_FOUND", MESSAGE_RESPONSES.ADMIN_NOT_FOUND);
   }
   let messages = await findReceivedMessages(userId);
   if (userRole === "USER") {
@@ -85,12 +82,9 @@ export const getReceivedMessages = async (userId, userRole) => {
   } else if (userRole === "ADMIN") {
     messages = messages.filter(msg => msg.sender.id !== adminId); // ADMIN이 보낸 메시지는 제외
   } else {
-    throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
+    throw new CustomError(403, "FORBIDDEN", MESSAGE_RESPONSES.FORBIDDEN_ADMIN);
   }
-  return {
-    message: MESSAGE_RESPONSES.FETCH_SUCCESS,
-    data: messages
-  };
+  return messages;
 };
 
 // 보낸목록조회
@@ -99,7 +93,7 @@ export const getSentMessages = async (userId, userRole) => {
   try {
     adminId = await getAdminId();
   } catch {
-    throw new CustomError(500, "ADMIN_NOT_FOUND", "운영자 계정이 존재하지 않습니다.");
+    throw new CustomError(500, "ADMIN_NOT_FOUND", MESSAGE_RESPONSES.ADMIN_NOT_FOUND);
   }
   let messages = await findSentMessages(userId);
   if (userRole === "USER") {
@@ -107,39 +101,30 @@ export const getSentMessages = async (userId, userRole) => {
   } else if (userRole === "ADMIN") {
     messages = messages.filter(msg => msg.receiver.id !== adminId); // ADMIN이 보낸 메시지는 제외
   } else {
-    throw new CustomError(403, "FORBIDDEN", "권한이 없습니다.");
+    throw new CustomError(403, "FORBIDDEN", MESSAGE_RESPONSES.FORBIDDEN_ADMIN);
   }
-  return {
-    message: MESSAGE_RESPONSES.FETCH_SUCCESS,
-    data: messages
-  };
+  return messages;
 };
 
 // 단건읽음하기 
 export const markMessageRead = async (messageId, userId, userRole) => {
   const result = await markAsRead(messageId, userId);
   if (result.count === 0) {
-    throw new CustomError(404, "MESSAGE_NOT_FOUND", "메시지를 찾을 수 없거나 권한이 없습니다.");
+    throw new CustomError(404, "MESSAGE_NOT_FOUND", MESSAGE_RESPONSES.MESSAGE_NOT_FOUND);
   }
-  return {
-    message: MESSAGE_RESPONSES.MARK_READ
-  };
+  return;
 };
 
 // 전체읽음하기 
 export const markAllMessagesRead = async (userId, userRole) => {
   await markAllAsRead(userId);
-  return {
-    message: MESSAGE_RESPONSES.MARK_READ
-  };
+  return;
 };
 
 export const deleteMessage = async (messageId, userId, userRole) => {
   const result = await softDeleteMessage(messageId, userId);
   if (result.count === 0) {
-    throw new CustomError(404, "MESSAGE_NOT_FOUND", "메시지를 찾을 수 없거나 권한이 없습니다.");
+    throw new CustomError(404, "MESSAGE_NOT_FOUND", MESSAGE_RESPONSES.MESSAGE_NOT_FOUND);
   }
-  return {
-    message: MESSAGE_RESPONSES.DELETE_SUCCESS
-  };
+  return;
 };
