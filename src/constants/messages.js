@@ -1,12 +1,4 @@
 export const ERROR_MESSAGES = {
-  REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
-  ONLY_OWN_REVIEW: "본인 리뷰만 수정할 수 있습니다.",
-  ONLY_OWN_DELETE: "본인 리뷰만 삭제할 수 있습니다.",
-  ALREADY_REVIEWED: "이미 해당 대여에 리뷰를 작성하셨습니다.",
-  ONLY_COMPLETED_RENTAL: "본인이 완료한 대여에만 리뷰를 작성할 수 있습니다.",
-  INVALID_RATING: "별점은 1~5 사이여야 합니다.",
-  
-  
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
   INVALID_MESSAGE: "알림 메시지를 입력하세요.",
@@ -18,12 +10,22 @@ export const ERROR_MESSAGES = {
   TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
 };
 
-export const SUCCESS_MESSAGES = {
+export const REVIEW_MESSAGES = {
   REVIEW_CREATED: "리뷰가 등록되었습니다.",
   REVIEW_LISTED: "리뷰 목록 조회 성공",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
-};
+  REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
+  ONLY_OWN_REVIEW: "본인 리뷰만 수정할 수 있습니다.",
+  ONLY_OWN_DELETE: "본인 리뷰만 삭제할 수 있습니다.",
+  ALREADY_REVIEWED: "이미 해당 대여에 리뷰를 작성하셨습니다.",
+  ONLY_COMPLETED_RENTAL: "본인이 완료한 대여에만 리뷰를 작성할 수 있습니다.",
+  INVALID_RATING: "별점은 1~5 사이여야 합니다.",
+  REVIEW_DETAIL: "리뷰 상세 조회 성공",
+  RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
+  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
+  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
+}
 
 export const PRODUCT_STATUS_LOG_MESSAGES = {
   PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
