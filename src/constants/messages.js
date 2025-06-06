@@ -1,5 +1,4 @@
 export const ERROR_MESSAGES = {
-  
   REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
   ONLY_OWN_REVIEW: "본인 리뷰만 수정할 수 있습니다.",
   ONLY_OWN_DELETE: "본인 리뷰만 삭제할 수 있습니다.",
@@ -27,15 +26,20 @@ export const SUCCESS_MESSAGES = {
   
   
   
-  
-  RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
-  MY_COMPLETED_RENTALS_LISTED: "내 완료 대여 목록 조회 성공",
-  ALL_COMPLETED_RENTALS_LISTED: "전체 완료 대여 목록 조회 성공",
   STATUS_LOG_CREATED: "상태 로그가 등록되었습니다.",
   STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
   STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
 };
+
+export const COMPLETED_RENTAL_MESSAGES = {
+  RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
+  MY_COMPLETED_RENTALS_LISTED: "나의 완료된 대여 목록 조회 성공",
+  ALL_COMPLETED_RENTALS_LISTED: "전체 완료 대여 목록 조회 성공",
+  RENTAL_NOT_FOUND: "요청 정보를 찾을 수 없습니다.",
+  RENTAL_NOT_APPROVED: "승인된 대여요청만 완료할 수 있습니다.",
+  ALREADY_COMPLETED: "이미 완료된 대여입니다.",
+}
 
 export const RENTAL_REQUEST_MESSAGES = {
   RENTAL_REQUEST_CREATED: "대여 요청이 등록되었습니다.",
@@ -70,7 +74,7 @@ export const NOTIFICATION_MESSAGES = {
   PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
   REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
   ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
-  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁dream니다!",
+  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁드립니다!",
 };
 
 

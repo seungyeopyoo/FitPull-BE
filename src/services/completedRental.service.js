@@ -7,15 +7,15 @@ import {
 import { getRentalRequestById } from "../repositories/rentalRequest.repository.js";
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
+import { COMPLETED_RENTAL_MESSAGES } from "../constants/messages.js";
 import { createNotification } from "./notification.service.js";
 import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 export const completeRental = async (rentalRequestId) => {
 	const rental = await getRentalRequestById(rentalRequestId);
-	if (!rental) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
+	if (!rental) throw new CustomError(404, "RENTAL_NOT_FOUND", COMPLETED_RENTAL_MESSAGES.RENTAL_NOT_FOUND);
 	if (rental.status !== "APPROVED")
-		throw new CustomError(400, "RENTAL_NOT_APPROVED", "승인된 요청만 완료할 수 있습니다.");
+		throw new CustomError(400, "RENTAL_NOT_APPROVED", COMPLETED_RENTAL_MESSAGES.RENTAL_NOT_APPROVED);
 
 	const product = await getProductById(rental.productId);
 	const pricePerDay = Number(product.price);
@@ -27,7 +27,7 @@ export const completeRental = async (rentalRequestId) => {
 
 	const alreadyCompleted = await findCompletedRentalByRequestId(rentalRequestId);
 	if (alreadyCompleted) {
-		return { message: "이미 완료된 대여입니다." };
+		return { message: COMPLETED_RENTAL_MESSAGES.ALREADY_COMPLETED };
 	}
 
 	const completedRental = await createCompletedRentalRepo({

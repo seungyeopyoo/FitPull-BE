@@ -13,7 +13,7 @@ import {
 import { deleteFromS3 } from "../utils/s3.js";
 import { DEFAULT_CATEGORY_NAME } from "../constants/category.js";
 import { PRODUCT_STATUS } from "../constants/status.js";
-import { PRODUCT_MESSAGES } from "../constants/messages.js";
+import { PRODUCT_MESSAGES , NOTIFICATION_MESSAGES} from "../constants/messages.js";
 import { findActiveRentalByProductId, findActiveRentalForDelete } from "../repositories/rentalRequest.repository.js";
 import { findLogsByProductRepo } from "../repositories/productStatusLog.repository.js";
 import CustomError from "../utils/customError.js";
@@ -285,7 +285,7 @@ export const approveProduct = async (id) => {
 		const notificationParams = {
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `${PRODUCT_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_APPROVED} [${product.title}]`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		};
@@ -322,7 +322,7 @@ export const rejectProduct = async (id, rejectReason = "") => {
 		await createNotification({
 			userId: product.owner.id,
 			type: "APPROVAL",
-			message: `${PRODUCT_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
+			message: `${NOTIFICATION_MESSAGES.PRODUCT_REJECTED} [${product.title}]${rejectReason ? " 사유: " + rejectReason : ""}`,
 			url: `/products/${product.id}`,
 			productId: product.id,
 		});
