@@ -21,3 +21,13 @@ export const markNotificationAsReadRepo = async (id) => {
     },
   });
 };
+
+export const deleteReadNotificationsRepo = async (date) => {
+  return await prisma.notification.deleteMany({
+    where: {
+      isRead: true,
+      readAt: { lte: date },
+    },
+  });
+};
+

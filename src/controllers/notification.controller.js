@@ -30,7 +30,11 @@ export const markNotificationRead = async (req, res, next) => {
   try {
     const { id } = req.params;
     const updated = await markAsRead(id);
-    return res.status(200).json({ success: true, message: NOTIFICATION_MESSAGES.MARK_READ, notification: updated });
+    return res.status(200).json({
+      success: true,
+      message: NOTIFICATION_MESSAGES.MARK_READ_SUCCESS,
+      notification: updated,
+    });
   } catch (err) {
     next(err);
   }
