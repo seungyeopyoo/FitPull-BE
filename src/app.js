@@ -20,6 +20,7 @@ import errorHandler from './middlewares/errorHandler.js';
 import passport from "./configs/passport.js";
 import http from "http";
 import { initSocket } from "./sockets/socket.js";
+import "./utils/notificationCleaner.js";
 
 dotenv.config();
 
