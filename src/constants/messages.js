@@ -1,9 +1,14 @@
-export const ERROR_MESSAGES = {
+export const AI_MESSAGES = {
   INVALID_PRODUCT_STATUS: "AI 분석은 대기 중(PENDING) 상품만 가능합니다.",
   AI_PARSE_ERROR: "AI 응답 파싱 오류",
   PROMPT_REQUIRED: "추천 키워드를 입력해 주세요.",
   NO_PRODUCTS: "추천할 상품이 없습니다.",
   TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
+  PRICE_ESTIMATION_SUCCESS: "AI 적정가 분석 완료",
+  REVIEW_SUMMARY_SUCCESS: "리뷰 요약 완료",
+  PRODUCT_RECOMMENDATION_SUCCESS: "상품 추천 완료",
+  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
+  REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
 };
 
 export const NOTIFICATION_MESSAGES = {
