@@ -27,6 +27,7 @@ export const NOTIFICATION_MESSAGES = {
   SEND_SUCCESS: "알림이 전송되었습니다.",
   FETCH_SUCCESS: "알림 목록 조회 성공",
   MARK_READ: "읽음 처리 완료",
+  MARK_READ_SUCCESS: "읽음 처리 완료. 읽음 처리된 알림은 3일 후 자동 삭제됩니다.",
 };
 
 export const REVIEW_MESSAGES = {
