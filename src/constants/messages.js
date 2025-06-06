@@ -5,8 +5,8 @@ export const ERROR_MESSAGES = {
   ALREADY_REVIEWED: "이미 해당 대여에 리뷰를 작성하셨습니다.",
   ONLY_COMPLETED_RENTAL: "본인이 완료한 대여에만 리뷰를 작성할 수 있습니다.",
   INVALID_RATING: "별점은 1~5 사이여야 합니다.",
-  DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
-  STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
+  
+  
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
   INVALID_MESSAGE: "알림 메시지를 입력하세요.",
@@ -23,14 +23,19 @@ export const SUCCESS_MESSAGES = {
   REVIEW_LISTED: "리뷰 목록 조회 성공",
   REVIEW_UPDATED: "리뷰가 수정되었습니다.",
   REVIEW_DELETED: "리뷰가 삭제되었습니다.",
-  
-  
-  
+};
+
+export const PRODUCT_STATUS_LOG_MESSAGES = {
+  PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
+  DELETED_PRODUCT: "삭제된 상품에는 로그를 작성할 수 없습니다.",
+  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 5개까지 첨부할 수 있습니다.",
   STATUS_LOG_CREATED: "상태 로그가 등록되었습니다.",
   STATUS_LOG_LISTED: "상태 로그 목록 조회 성공",
   STATUS_LOG_UPDATED: "상태 로그가 수정되었습니다.",
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
-};
+  STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
+  NO_UPDATE_DATA: "수정할 데이터가 없습니다.",
+}
 
 export const COMPLETED_RENTAL_MESSAGES = {
   RENTAL_COMPLETED: "대여가 완료 처리되었습니다.",
@@ -127,7 +132,7 @@ export const PRODUCT_MESSAGES = {
   PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
   PRODUCT_WAITING_LISTED: "대기 상품 목록 조회 성공",
   INVALID_PRICE: "정상적인 가격을 입력해주세요 (price: 0 ~ 2147483647)",
-  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 3개까지 첨부할 수 있습니다.",
+  IMAGE_LIMIT_EXCEEDED: "이미지는 최대 5개까지 첨부할 수 있습니다.",
   NO_PERMISSION: "권한이 없습니다.",
   PRODUCT_RENTAL_ACTIVE: "현재 대여중인 상품은 수정/삭제할 수 없습니다.",
   PRODUCT_REJECTED_OR_CANCELED: "거절되었거나 취소된 상품은 수정할 수 없습니다.",
