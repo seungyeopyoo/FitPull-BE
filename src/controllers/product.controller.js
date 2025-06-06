@@ -9,13 +9,13 @@ import {
 	approveProduct,
 	rejectProduct,
 } from "../services/product.service.js";
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages.js";
+import { PRODUCT_MESSAGES } from "../constants/messages.js";
 import { success } from "../utils/responseHandler.js";
 
 export const createProductController = async (req, res, next) => {
 	try {
 		const product = await createProduct(req.body, req.user);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_CREATED, product);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_CREATED, product);
 	} catch (error) {
 		next(error);
 	}
@@ -29,7 +29,7 @@ export const getAllProductsController = async (req, res, next) => {
 			take: take ? Number(take) : undefined,
 			categoryId,
 		});
-		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, products);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_LISTED, products);
 	} catch (error) {
 		next(error);
 	}
@@ -38,7 +38,7 @@ export const getAllProductsController = async (req, res, next) => {
 export const getProductByIdController = async (req, res, next) => {
 	try {
 		const product = await getProductById(req.params.id);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_DETAIL, product);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_DETAIL, product);
 	} catch (error) {
 		if (error.code === "PRODUCT_NOT_FOUND") {
 			return next(error);
@@ -50,13 +50,13 @@ export const getProductByIdController = async (req, res, next) => {
 export const getProductsMeController = async (req, res, next) => {
 	try {
 		if (!req.user || !req.user.id) {
-			return next(new CustomError(401, "AUTH_REQUIRED", ERROR_MESSAGES.AUTH_REQUIRED));
+			return next(new CustomError(401, "AUTH_REQUIRED", PRODUCT_MESSAGES.AUTH_REQUIRED));
 		}
 		const products = await getProductsByUser(req.user.id);
 		if (!products || products.length === 0) {
-			return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+			return next(new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_MESSAGES.PRODUCT_NOT_FOUND));
 		}
-		return success(res, SUCCESS_MESSAGES.PRODUCT_LISTED, { products });
+		return success(res, PRODUCT_MESSAGES.PRODUCT_LISTED, { products });
 	} catch (error) {
 		next(error);
 	}
@@ -82,7 +82,7 @@ export const updateProductController = async (req, res, next) => {
 		}
 
 		const updatedProduct = await updateProduct(id, productData, user);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_UPDATED, { product: updatedProduct });
+		return success(res, PRODUCT_MESSAGES.PRODUCT_UPDATED, { product: updatedProduct });
 	} catch (error) {
 		next(error);
 	}
@@ -94,7 +94,7 @@ export const deleteProductController = async (req, res, next) => {
 		const user = req.user;
 
 		await deleteProduct(id, user);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_DELETED);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_DELETED);
 	} catch (error) {
 		next(error);
 	}
@@ -103,7 +103,7 @@ export const deleteProductController = async (req, res, next) => {
 export const getWaitingProductsController = async (_req, res, next) => {
 	try {
 		const products = await getWaitingProducts();
-		return success(res, SUCCESS_MESSAGES.PRODUCT_WAITING_LISTED, { products });
+		return success(res, PRODUCT_MESSAGES.PRODUCT_WAITING_LISTED, { products });
 	} catch (error) {
 		next(error);
 	}
@@ -112,7 +112,7 @@ export const getWaitingProductsController = async (_req, res, next) => {
 export const approveProductController = async (req, res, next) => {
 	try {
 		const result = await approveProduct(req.params.id);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_APPROVED, result);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_APPROVED, result);
 	} catch (error) {
 		next(error);
 	}
@@ -121,7 +121,7 @@ export const approveProductController = async (req, res, next) => {
 export const rejectProductController = async (req, res, next) => {
 	try {
 		const result = await rejectProduct(req.params.id);
-		return success(res, SUCCESS_MESSAGES.PRODUCT_REJECTED, result);
+		return success(res, PRODUCT_MESSAGES.PRODUCT_REJECTED, result);
 	} catch (error) {
 		next(error);
 	}

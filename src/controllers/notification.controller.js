@@ -1,4 +1,5 @@
 import { createNotification, getMyNotifications, markAsRead } from "../services/notification.service.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 export const sendTestNotification = async (req, res, next) => {
   try {
@@ -9,29 +10,28 @@ export const sendTestNotification = async (req, res, next) => {
     }
 
     const result = await createNotification({ userId, type, message, url });
-    return res.status(200).json({ success: true, notification: result });
+    return res.status(200).json({ success: true, message: NOTIFICATION_MESSAGES.SEND_SUCCESS, notification: result });
   } catch (err) {
     next(err);
   }
 };
 
 export const getNotificationList = async (req, res, next) => {
-    try {
-      const userId = req.user.id; 
-  
-      const notifications = await getMyNotifications(userId);
-      return res.status(200).json({ success: true, notifications });
-    } catch (err) {
-      next(err);
-    }
-  };
+  try {
+    const userId = req.user.id;
+    const notifications = await getMyNotifications(userId);
+    return res.status(200).json({ success: true, message: NOTIFICATION_MESSAGES.FETCH_SUCCESS, notifications });
+  } catch (err) {
+    next(err);
+  }
+};
 
-  export const markNotificationRead = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const updated = await markAsRead(id);
-      return res.status(200).json({ success: true, notification: updated });
-    } catch (err) {
-      next(err);
-    }
-  };
+export const markNotificationRead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updated = await markAsRead(id);
+    return res.status(200).json({ success: true, message: NOTIFICATION_MESSAGES.MARK_READ, notification: updated });
+  } catch (err) {
+    next(err);
+  }
+};

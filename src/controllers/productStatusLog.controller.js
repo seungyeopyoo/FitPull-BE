@@ -6,7 +6,7 @@ import {
   } from "../services/productStatusLog.service.js";
 import { getProductById  } from "../repositories/product.repository.js";
 import { success } from "../utils/responseHandler.js";
-import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../constants/messages.js";
+import { PRODUCT_STATUS_LOG_MESSAGES } from "../constants/messages.js";
 import CustomError from "../utils/customError.js";
 
 const PRODUCT_LOG_TYPES = [
@@ -26,11 +26,11 @@ export const createStatusLogController = async (req, res, next) => {
 
     const product = await getProductById(productId);
     if (!product) {
-      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_STATUS_LOG_MESSAGES.PRODUCT_NOT_FOUND));
     }
 
     if (product.deletedAt) {
-      return next(new CustomError(400, "PRODUCT_DELETED", ERROR_MESSAGES.DELETED_PRODUCT));
+      return next(new CustomError(400, "PRODUCT_DELETED", PRODUCT_STATUS_LOG_MESSAGES.DELETED_PRODUCT));
     }
 
     if (!PRODUCT_LOG_TYPES.includes(type)) {
@@ -41,7 +41,7 @@ export const createStatusLogController = async (req, res, next) => {
     // S3에서 업로드된 이미지 URL 추출
     const photoUrls = Array.isArray(imageUrls) ? imageUrls : [];
 if (photoUrls.length > 5) {
-  return next(new CustomError(400, "IMAGE_LIMIT_EXCEEDED", ERROR_MESSAGES.IMAGE_LIMIT_EXCEEDED));
+  return next(new CustomError(400, "IMAGE_LIMIT_EXCEEDED", PRODUCT_STATUS_LOG_MESSAGES.IMAGE_LIMIT_EXCEEDED));
 }
 
 const data = {
@@ -58,7 +58,7 @@ if (completedRentalId) {
 
 const newLog = await createStatusLog(data);
 
-return success(res, SUCCESS_MESSAGES.STATUS_LOG_CREATED, { log: newLog });
+return success(res, PRODUCT_STATUS_LOG_MESSAGES.STATUS_LOG_CREATED, { log: newLog });
   } catch (error) {
     next(error);
   }
@@ -70,11 +70,11 @@ export const getStatusLogsController = async (req, res, next) => {
 
     const product = await getProductById(productId);
     if (!product) {
-      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_STATUS_LOG_MESSAGES.PRODUCT_NOT_FOUND));
     }
 
     const logs = await getLogsByProduct(productId);
-    return success(res, SUCCESS_MESSAGES.STATUS_LOG_LISTED, { logs });
+    return success(res, PRODUCT_STATUS_LOG_MESSAGES.STATUS_LOG_LISTED, { logs });
   } catch (error) {
     next(error);
   }
@@ -88,11 +88,11 @@ export const updateStatusLogController = async (req, res, next) => {
     // 상품 존재 여부 확인
     const product = await getProductById(productId);
     if (!product) {
-      return next(new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND));
+      return next(new CustomError(404, "PRODUCT_NOT_FOUND", PRODUCT_STATUS_LOG_MESSAGES.PRODUCT_NOT_FOUND));
     }
 
     if (product.deletedAt) {
-      return next(new CustomError(400, "PRODUCT_DELETED", ERROR_MESSAGES.DELETED_PRODUCT));
+      return next(new CustomError(400, "PRODUCT_DELETED", PRODUCT_STATUS_LOG_MESSAGES.DELETED_PRODUCT));
     }
 
     // 로그 타입 유효성 검사
@@ -117,7 +117,7 @@ export const updateStatusLogController = async (req, res, next) => {
     }
 
     const updated = await updateStatusLog(id, data);
-    return success(res, SUCCESS_MESSAGES.STATUS_LOG_UPDATED, { log: updated });
+    return success(res, PRODUCT_STATUS_LOG_MESSAGES.STATUS_LOG_UPDATED, { log: updated });
   } catch (error) {
     next(error);
   }
@@ -127,7 +127,7 @@ export const deleteStatusLogController = async (req, res, next) => {
   try {
     const { id } = req.params;
     await deleteStatusLog(id);
-    return success(res, SUCCESS_MESSAGES.STATUS_LOG_DELETED);
+    return success(res, PRODUCT_STATUS_LOG_MESSAGES.STATUS_LOG_DELETED);
   } catch (error) {
     next(error);
   }

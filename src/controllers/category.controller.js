@@ -6,12 +6,12 @@ import {
 	getCategoryDetail,
 } from "../services/category.service.js";
 import { success } from "../utils/responseHandler.js";
-import messages from "../constants/messages.js";
+import {CATEGORY_MESSAGES} from "../constants/messages.js";
 
 export const getCategoriesController = async (req, res, next) => {
 	try {
 		const categories = await getCategories();
-		return success(res, messages.CATEGORY_LISTED, { categories });
+		return success(res, CATEGORY_MESSAGES.CATEGORY_LISTED, { categories });
 	} catch (error) {
 		next(error);
 	}
@@ -21,7 +21,7 @@ export const createCategoryController = async (req, res, next) => {
 	try {
 		const { name, description } = req.body;
 		if (!name)
-			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", messages.CATEGORY_NAME_REQUIRED));
+			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", CATEGORY_MESSAGES.CATEGORY_NAME_REQUIRED));
 
 		const result = await createCategory(name, description);
 		return success(res, result.message, { category: result.category });
@@ -35,7 +35,7 @@ export const updateCategoryController = async (req, res, next) => {
 		const { id } = req.params;
 		const { name, description } = req.body;
 		if (!name)
-			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", messages.CATEGORY_NAME_REQUIRED));
+			return next(new CustomError(400, "CATEGORY_NAME_REQUIRED", CATEGORY_MESSAGES.CATEGORY_NAME_REQUIRED));
 
 		const result = await updateCategory(id, name, description);
 		return success(res, result.message, { category: result.category });

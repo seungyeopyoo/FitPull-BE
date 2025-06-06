@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { generateTokens } from "../utils/jwt.js";
 import { setRefreshToken, deleteRefreshToken, getRefreshToken, getEmailCode, deleteEmailCode, setEmailCode } from "../utils/redis.js";
 import CustomError from "../utils/customError.js";
-import messages from "../constants/messages.js";
+import {AUTH_MESSAGES} from "../constants/messages.js";
 import { sendRecoveryEmail } from "../utils/nodemailer.js"
 
 
@@ -16,19 +16,19 @@ export const signup = async ({
 	phone,
 }) => {
 	if (password !== passwordCheck) {
-		throw new CustomError(400, "PASSWORD_MISMATCH", messages.PASSWORD_MISMATCH);
+		throw new CustomError(400, "PASSWORD_MISMATCH", AUTH_MESSAGES.PASSWORD_MISMATCH);
 	}
 	const exists = await findAnyByEmail(email);
 	if (exists && exists.deletedAt === null) {
-		throw new CustomError(409, "EMAIL_EXISTS", messages.EMAIL_EXISTS);
+		throw new CustomError(409, "EMAIL_EXISTS", AUTH_MESSAGES.EMAIL_EXISTS);
 	}
 	if (exists && exists.deletedAt !== null) {
-		throw new CustomError(409, "DELETED_ACCOUNT", messages.DELETED_ACCOUNT);
+		throw new CustomError(409, "DELETED_ACCOUNT", AUTH_MESSAGES.DELETED_ACCOUNT);
 	}
 
 	const duplicatePhone = await findValidUserByPhone(phone);
 	if (duplicatePhone) {
-	  throw new CustomError(409, "PHONE_EXISTS", messages.PHONE_EXISTS);
+	  throw new CustomError(409, "PHONE_EXISTS", AUTH_MESSAGES.PHONE_EXISTS);
 	}
 
 	const hash = await bcrypt.hash(password, 10);
@@ -63,10 +63,10 @@ export const signup = async ({
 
 export const login = async ({ email, password }) => {
 	const account = await findByEmail(email);
-	if (!account) throw new CustomError(404, "USER_NOT_FOUND", messages.USER_NOT_FOUND);
+	if (!account) throw new CustomError(404, "USER_NOT_FOUND", AUTH_MESSAGES.USER_NOT_FOUND);
 
 	const isMatch = await bcrypt.compare(password, account.passwordHash);
-	if (!isMatch) throw new CustomError(401, "PASSWORD_MISMATCH", messages.PASSWORD_MISMATCH);
+	if (!isMatch) throw new CustomError(401, "PASSWORD_MISMATCH", AUTH_MESSAGES.PASSWORD_MISMATCH);
 
 	const payload = {
 		userId: account.user.id,
@@ -81,7 +81,7 @@ export const login = async ({ email, password }) => {
 	await setRefreshToken(account.user.id, refreshToken);
 
 	return {
-		message: messages.LOGIN_SUCCESS,
+		message: AUTH_MESSAGES.LOGIN_SUCCESS,
 		id: account.user.id,
 		name: account.user.name,
 		accessToken,
@@ -99,16 +99,16 @@ export const rejoinRequest = async (email) => {
 
 export const rejoinVerify = async ({ email, code, password }) => {
 	if (!password || password.length < 6) {
-		throw new CustomError(400, "INVALID_PASSWORD", messages.INVALID_PASSWORD);
+		throw new CustomError(400, "INVALID_PASSWORD", AUTH_MESSAGES.INVALID_PASSWORD);
 	}
 
 	const savedCode = await getEmailCode(email);
 
 	if (!savedCode) {
-		throw new CustomError(400, "NO_CODE", messages.NO_CODE);
+		throw new CustomError(400, "NO_CODE", AUTH_MESSAGES.NO_CODE);
 	}
 	if (String(savedCode) !== String(code)) {
-		throw new CustomError(400, "INVALID_CODE", messages.INVALID_CODE);
+		throw new CustomError(400, "INVALID_CODE", AUTH_MESSAGES.INVALID_CODE);
 	}
 	await deleteEmailCode(email);
 	
@@ -128,7 +128,7 @@ export const rejoinVerify = async ({ email, code, password }) => {
 	await setRefreshToken(account.user.id, refreshToken);
 
 	return {
-		message: messages.LOGIN_SUCCESS,
+		message: AUTH_MESSAGES.LOGIN_SUCCESS,
 		id: account.user.id,
 		name: account.user.name,
 		accessToken,
@@ -205,15 +205,15 @@ const extractSocialProfile = (profile, provider) => {
 
   export const ensurePhoneExistsForVerification = async (phone) => {
 	if (phone === "00000000000") {
-	  throw new CustomError(400, "INVALID_PHONE", messages.INVALID_PHONE);
+	  throw new CustomError(400, "INVALID_PHONE", AUTH_MESSAGES.INVALID_PHONE);
 	}
   
 	const user = await findUserByPhone(phone);
 	if (!user) {
-	  throw new CustomError(404, "USER_NOT_FOUND", messages.USER_NOT_FOUND);
+	  throw new CustomError(404, "USER_NOT_FOUND", AUTH_MESSAGES.USER_NOT_FOUND);
 	}
 
 	if (user.verifiedPhone) {
-		throw new CustomError(400, "ALREADY_VERIFIED", messages.ALREADY_VERIFIED);
+		throw new CustomError(400, "ALREADY_VERIFIED", AUTH_MESSAGES.ALREADY_VERIFIED);
 	  }
   };

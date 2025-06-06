@@ -2,7 +2,7 @@ import { findProductByIdRepo, getAllProducts } from "../repositories/product.rep
 import { saveAiPriceEstimation, saveAiProductRecommendation } from "../repositories/ai.repository.js";
 import { getReviewsByProductIdRepo } from "../repositories/review.repository.js";
 import CustomError from "../utils/customError.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
+import { AI_MESSAGES } from "../constants/messages.js"; 
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -41,7 +41,6 @@ export const estimatePriceFromAI = async (product) => {
     temperature: 0.3,
   });
   const contentRaw = completion.choices[0].message.content;
-  console.log("📦 GPT 응답 내용:", contentRaw);
   let content = contentRaw;
   if (content.startsWith("```") ) {
     content = content.replace(/```[a-zA-Z]*\n?/, "").replace(/```/, "").trim();
@@ -50,7 +49,6 @@ export const estimatePriceFromAI = async (product) => {
   try {
     parsed = JSON.parse(content);
   } catch (err) {
-    console.error("❌ JSON 파싱 에러:", err, "실제 응답:", contentRaw);
     throw new CustomError(
       500,
       "AI_PARSE_ERROR",
@@ -63,10 +61,10 @@ export const estimatePriceFromAI = async (product) => {
 export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
   const product = await findProductByIdRepo(productId);
   if (!product) {
-    throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+    throw new CustomError(404, "PRODUCT_NOT_FOUND", AI_MESSAGES.PRODUCT_NOT_FOUND);
   }
   if (product.status !== "PENDING") {
-    throw new CustomError(400, "INVALID_PRODUCT_STATUS", ERROR_MESSAGES.INVALID_PRODUCT_STATUS);
+    throw new CustomError(400, "INVALID_PRODUCT_STATUS", AI_MESSAGES.INVALID_PRODUCT_STATUS);
   }
   const result = await estimatePriceFromAI(product);
   const { dailyRentalPrice, sources, ...rest } = result;
@@ -84,12 +82,12 @@ export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
 export const summarizeReviews = async (productId) => {
   const product = await findProductByIdRepo(productId);
   if (!product) {
-    throw new CustomError(404, "PRODUCT_NOT_FOUND", ERROR_MESSAGES.PRODUCT_NOT_FOUND);
+    throw new CustomError(404, "PRODUCT_NOT_FOUND", AI_MESSAGES.PRODUCT_NOT_FOUND);
   }
   const reviews = await getReviewsByProductIdRepo(productId);
   const contents = reviews.map((review) => review.comment).join("\n");
   if (!contents) {
-    throw new CustomError(404, "REVIEW_NOT_FOUND", ERROR_MESSAGES.REVIEW_NOT_FOUND);
+    throw new CustomError(404, "REVIEW_NOT_FOUND", AI_MESSAGES.REVIEW_NOT_FOUND);
   }
   const prompt = `
   다음은 어떤 상품에 대한 리뷰들입니다. 전체적인 내용을 한국어로 간결히 요약해주세요.
@@ -107,11 +105,11 @@ export const summarizeReviews = async (productId) => {
 
 export const recommendProducts = async ({ prompt, userId }) => {
   if (!prompt) {
-    throw new CustomError(400, "PROMPT_REQUIRED", ERROR_MESSAGES.PROMPT_REQUIRED);
+    throw new CustomError(400, "PROMPT_REQUIRED", AI_MESSAGES.PROMPT_REQUIRED);
   }
   const { products } = await getAllProducts({ take: 20 });
   if (products.length === 0) {
-    throw new CustomError(404, "NO_PRODUCTS", ERROR_MESSAGES.NO_PRODUCTS);
+    throw new CustomError(404, "NO_PRODUCTS", AI_MESSAGES.NO_PRODUCTS);
   }
   const itemsText = products.map((p, idx) => {
     return `${idx + 1}. [ID: ${p.id}] ${p.title} - ${p.description ?? "설명 없음"}`;

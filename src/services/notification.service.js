@@ -6,7 +6,7 @@ import {
 import { findUserById } from "../repositories/user.repository.js";
 import { sendNotification } from "../utils/notify.js";
 import CustomError from "../utils/customError.js";
-import { ERROR_MESSAGES } from "../constants/messages.js";
+import { NOTIFICATION_MESSAGES } from "../constants/messages.js";
 
 // 알림 생성 및 실시간 전송
 const VALID_TYPES = ["SYSTEM", "APPROVAL", "RENTAL_STATUS", "CHAT", "FEE", "REVIEW", "ETC"];
@@ -15,15 +15,15 @@ export const createNotification = async ({ userId, type, message, url, productId
   // userId 체크
   const user = await findUserById(userId);
   if (!user) {
-    throw new CustomError(404, "USER_NOT_FOUND", ERROR_MESSAGES.USER_NOT_FOUND);
+    throw new CustomError(404, "USER_NOT_FOUND", NOTIFICATION_MESSAGES.USER_NOT_FOUND);
   }
   // type 체크
   if (!VALID_TYPES.includes(type)) {
-    throw new CustomError(400, "INVALID_NOTIFICATION_TYPE", ERROR_MESSAGES.INVALID_TYPE);
+    throw new CustomError(400, "INVALID_NOTIFICATION_TYPE", NOTIFICATION_MESSAGES.INVALID_TYPE);
   }
   // message 체크
   if (!message) {
-    throw new CustomError(400, "INVALID_MESSAGE", ERROR_MESSAGES.INVALID_MESSAGE);
+    throw new CustomError(400, "INVALID_MESSAGE", NOTIFICATION_MESSAGES.INVALID_MESSAGE);
   }
 
   const notification = await createNotificationRepo({
@@ -72,7 +72,7 @@ export const markAsRead = async (id) => {
   try {
     const updated = await markNotificationAsReadRepo(id);
     if (!updated) {
-      throw new CustomError(404, "NOTIFICATION_NOT_FOUND", ERROR_MESSAGES.NOTIFICATION_NOT_FOUND);
+      throw new CustomError(404, "NOTIFICATION_NOT_FOUND", NOTIFICATION_MESSAGES.NOTIFICATION_NOT_FOUND);
     }
     const result = {
       id: updated.id,
@@ -91,6 +91,6 @@ export const markAsRead = async (id) => {
     if (updated.readAt) result.readAt = updated.readAt;
     return result;
   } catch (err) {
-    throw new CustomError(404, "NOTIFICATION_NOT_FOUND", ERROR_MESSAGES.NOTIFICATION_NOT_FOUND);
+    throw new CustomError(404, "NOTIFICATION_NOT_FOUND", NOTIFICATION_MESSAGES.NOTIFICATION_NOT_FOUND);
   }
 };
