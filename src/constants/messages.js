@@ -1,13 +1,27 @@
 export const ERROR_MESSAGES = {
-  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
-  INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
-  INVALID_MESSAGE: "알림 메시지를 입력하세요.",
-  NOTIFICATION_NOT_FOUND: "알림을 찾을 수 없습니다.",
   INVALID_PRODUCT_STATUS: "AI 분석은 대기 중(PENDING) 상품만 가능합니다.",
   AI_PARSE_ERROR: "AI 응답 파싱 오류",
   PROMPT_REQUIRED: "추천 키워드를 입력해 주세요.",
   NO_PRODUCTS: "추천할 상품이 없습니다.",
   TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
+};
+
+export const NOTIFICATION_MESSAGES = {
+  RENTAL_APPROVED: "신청하신 대여가 승인되었습니다.",
+  RENTAL_REJECTED: "신청하신 대여가 거절되었습니다.",
+  PRODUCT_APPROVED: "등록하신 상품이 승인되어 웹사이트에 개제되었습니다.",
+  PRODUCT_REJECTED: "등록하신 상품이 거절되었습니다.",
+  PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
+  REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
+  ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
+  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁드립니다!",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  INVALID_TYPE: "알림 타입이 올바르지 않습니다.",
+  INVALID_MESSAGE: "알림 메시지를 입력하세요.",
+  NOTIFICATION_NOT_FOUND: "알림을 찾을 수 없습니다.",
+  SEND_SUCCESS: "알림이 전송되었습니다.",
+  FETCH_SUCCESS: "알림 목록 조회 성공",
+  MARK_READ: "읽음 처리 완료",
 };
 
 export const REVIEW_MESSAGES = {
@@ -78,18 +92,7 @@ export const MESSAGE_RESPONSES = {
   FORBIDDEN_USER: "유저에게만 답변할 수 있습니다.",
   FORBIDDEN_ADMIN: "권한이 없습니다.",
   MESSAGE_NOT_FOUND: "메시지를 찾을 수 없거나 권한이 없습니다.",
-  
-};
 
-export const NOTIFICATION_MESSAGES = {
-  RENTAL_APPROVED: "신청하신 대여가 승인되었습니다.",
-  RENTAL_REJECTED: "신청하신 대여가 거절되었습니다.",
-  PRODUCT_APPROVED: "등록하신 상품이 승인되어 웹사이트에 개제되었습니다.",
-  PRODUCT_REJECTED: "등록하신 상품이 거절되었습니다.",
-  PRODUCT_RENTED: "등록하신 상품이 대여되었습니다.",
-  REVIEW_CREATED: "내 상품에 새로운 리뷰가 등록되었습니다.",
-  ADMIN_MESSAGE: "운영자로부터 새로운 메시지가 도착했습니다.",
-  REVIEW_REQUEST: "대여가 완료되었습니다 감사합니다(__). 리뷰도 부탁드립니다!",
 };
 
 export const AUTH_MESSAGES = {
