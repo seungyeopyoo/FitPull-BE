@@ -13,6 +13,7 @@ import reviewRouter from "./routes/review.router.js";
 import messageRouter from "./routes/message.router.js";
 import notificationRouter from "./routes/notification.router.js";
 import aiRouter from "./routes/ai.routes.js";
+import paymentRouter from "./routes/payment.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -57,6 +58,7 @@ app.use("/api/reviews", reviewRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/payments", paymentRouter);
 	
 // 기본 라우트
 app.get("/", (_, res) => {

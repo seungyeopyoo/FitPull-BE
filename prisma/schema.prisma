@@ -20,6 +20,7 @@ model User {
   verifiedPhone       Boolean   @default(false)
   profileImage        String?   @map("profile_image")
   role                Role      @default(USER)
+  balance             Int       @default(0)
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
   deletedAt           DateTime? @map("deleted_at")
@@ -161,6 +162,8 @@ model PaymentLog {
   rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
   userId          String        @map("user_id")
   user            User          @relation(fields: [userId], references: [id])
+  balanceBefore   Int?
+  balanceAfter    Int?
 
   @@map("payment_logs")
 }
@@ -342,6 +345,7 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+  CANCELED
   ON_RENTING
 }
 
