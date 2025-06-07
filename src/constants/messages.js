@@ -14,6 +14,7 @@ export const AI_MESSAGES = {
 export const PAYMENT_MESSAGES = {
   AUTH_REQUIRED: "인증이 필요합니다.",
   INVALID_INPUT: "충전 금액이 올바르지 않습니다.",
+  INVALID_USE_INPUT: "차감 금액이 올바르지 않습니다.",
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
   INSUFFICIENT_BALANCE: "잔고가 부족합니다.",

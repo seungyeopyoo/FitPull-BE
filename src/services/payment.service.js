@@ -2,12 +2,17 @@ import { findUserById } from "../repositories/user.repository.js";
 import { chargeBalanceRepo, useBalanceRepo } from "../repositories/paymentRepository.js";
 import CustomError from "../utils/customError.js";
 import { PAYMENT_MESSAGES } from "../constants/messages.js";
+import { MAX_INT_32 } from "../constants/limits.js";
 
 export const chargeBalance = async (userId, amount) => {
   if (!userId) {
     throw new CustomError(401, "AUTH_REQUIRED", PAYMENT_MESSAGES.AUTH_REQUIRED);
   }
-  if (typeof amount !== "number" || amount <= 0) {
+  if (
+    typeof amount !== "number" ||
+    amount <= 0 ||
+    amount > MAX_INT_32
+  ) {
     throw new CustomError(400, "INVALID_INPUT", PAYMENT_MESSAGES.INVALID_INPUT);
   }
 
@@ -27,8 +32,12 @@ export const useBalance = async (userId, amount) => {
   if (!userId) {
     throw new CustomError(401, "AUTH_REQUIRED", PAYMENT_MESSAGES.AUTH_REQUIRED);
   }
-  if (typeof amount !== "number" || amount <= 0) {
-    throw new CustomError(400, "INVALID_INPUT", "차감 금액이 올바르지 않습니다.");
+  if (
+    typeof amount !== "number" ||
+    amount <= 0 ||
+    amount > MAX_INT_32
+  ) {
+    throw new CustomError(400, "INVALID_USE_INPUT", PAYMENT_MESSAGES.INVALID_USE_INPUT);
   }
 
   const user = await findUserById(userId);
