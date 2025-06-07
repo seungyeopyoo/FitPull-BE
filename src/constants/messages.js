@@ -11,6 +11,18 @@ export const AI_MESSAGES = {
   REVIEW_NOT_FOUND: "리뷰를 찾을 수 없습니다.",
 };
 
+export const PAYMENT_MESSAGES = {
+  AUTH_REQUIRED: "인증이 필요합니다.",
+  INVALID_INPUT: "충전 금액이 올바르지 않습니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
+  INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
+  BALANCE_CHARGED: "잔고가 충전되었습니다.",
+  BALANCE_USED: "잔고가 사용되었습니다.",
+  CHARGE_SUCCESS: "잔고 충전 성공",
+  USE_SUCCESS: "잔고 사용 성공",
+}
+
 export const NOTIFICATION_MESSAGES = {
   RENTAL_APPROVED: "신청하신 대여가 승인되었습니다.",
   RENTAL_REJECTED: "신청하신 대여가 거절되었습니다.",
