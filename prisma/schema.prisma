@@ -162,6 +162,8 @@ model PaymentLog {
   rentalRequest   RentalRequest @relation(fields: [rentalRequestId], references: [id])
   userId          String        @map("user_id")
   user            User          @relation(fields: [userId], references: [id])
+  balanceBefore   Int?
+  balanceAfter    Int?
 
   @@map("payment_logs")
 }
