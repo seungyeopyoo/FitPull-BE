@@ -99,6 +99,7 @@ export const RENTAL_REQUEST_MESSAGES = {
   NO_PERMISSION: "권한이 없습니다.",
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
+  ALREADY_REJECTED: "이미 거절/취소된 대여요청입니다.",
 };
 
 export const MESSAGE_RESPONSES = {

@@ -1,5 +1,7 @@
 import prisma from "../data-source.js";
 import { RENTAL_STATUS } from "../constants/status.js";
+import CustomError from "../utils/customError.js";
+import { RENTAL_REQUEST_MESSAGES } from "../constants/messages.js";
 
 export const createRentalRequestRepo = async (
 	productId,
@@ -202,4 +204,57 @@ export const createRentalRequestWithPaymentRepo = async ({
 		return rentalRequest;
 	});
 };
+
+export const refundRentalRequestRepo = async ({
+	rentalRequestId,
+	refundMemo,
+	rejectByAdmin = false,
+}) => {
+	return await prisma.$transaction(async (tx) => {
+		const rentalRequest = await tx.rentalRequest.findUnique({
+			where: { id: rentalRequestId },
+			include: { user: true, product: true },
+		});
+		if (!rentalRequest) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
+
+		const updatedUser = await tx.user.update({
+			where: { id: rentalRequest.userId },
+			data: { balance: { increment: rentalRequest.totalPrice } },
+			select: { balance: true },
+		});
+
+		await tx.paymentLog.create({
+			data: {
+				userId: rentalRequest.userId,
+				rentalRequestId: rentalRequest.id,
+				amount: rentalRequest.totalPrice,
+				paymentType: "REFUND",
+				memo: refundMemo || "[자동] 대여요청 취소/거절 환불",
+				balanceBefore: rentalRequest.user.balance,
+				balanceAfter: updatedUser.balance,
+				paidAt: new Date(),
+			},
+		});
+
+		await tx.rentalRequest.update({
+			where: { id: rentalRequestId },
+			data: { status: rejectByAdmin ? "REJECTED" : "CANCELED" },
+		});
+
+		const updatedRentalRequest = await tx.rentalRequest.findUnique({
+			where: { id: rentalRequestId },
+		});
+
+		return {
+			rentalRequest: updatedRentalRequest,
+			product: rentalRequest.product,
+			user: rentalRequest.user,
+			refundedAmount: rentalRequest.totalPrice,
+			rejectByAdmin,
+		};
+	});
+};
+
+
+
 

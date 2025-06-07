@@ -8,6 +8,7 @@ import {
 	findRentalRequestSummaryById,
 	getRentalRequestById,
 	createRentalRequestWithPaymentRepo,
+	refundRentalRequestRepo,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
 import { RENTAL_REQUEST_MESSAGES, NOTIFICATION_MESSAGES } from "../constants/messages.js";
@@ -184,12 +185,12 @@ export const cancelRentalRequest = async (id, userId) => {
 	if (diffDays < 3) {
 		throw new CustomError(400, "RENTAL_CANCEL_TOO_LATE", RENTAL_REQUEST_MESSAGES.CANCEL_TOO_LATE);
 	}
-	await updateRentalRequestStatusRepo(id, RENTAL_STATUS.REJECTED);
+	await updateRentalRequestStatusRepo(id, RENTAL_STATUS.CANCELED);
 	return {
 		id,
 		rentalPeriod: `${request.startDate.toISOString().slice(0, 10)} ~ ${request.endDate.toISOString().slice(0, 10)}`,
 		productTitle: request.product.title,
-		status: RENTAL_STATUS.REJECTED,
+		status: RENTAL_STATUS.CANCELED,
 		totalPrice: request.totalPrice,
 	};
 };
@@ -229,4 +230,39 @@ export const createRentalRequestWithPayment = async (
 	});
 
 	return rentalRequest;
+};
+
+export const refundRentalRequest = async (rentalRequestId, refundMemo, rejectByAdmin = false) => {
+	try {
+		const rentalRequest = await getRentalRequestById(rentalRequestId);
+		if (!rentalRequest) {
+			throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
+		}
+		if (rentalRequest.status === "REJECTED" || rentalRequest.status === "CANCELED") {
+			throw new CustomError(400, "ALREADY_REJECTED_OR_CANCELED", "이미 거절/취소된 대여요청입니다.");
+		}
+		
+		const result = await refundRentalRequestRepo({ rentalRequestId, refundMemo, rejectByAdmin });
+
+		if (rejectByAdmin) {
+			await createNotification({
+				userId: result.user.id,
+				type: "RENTAL_STATUS",
+				message: `${NOTIFICATION_MESSAGES.RENTAL_REJECTED} [${result.product.title}]`,
+				url: `/rental-requests/${rentalRequestId}`,
+				rentalRequestId,
+			});
+		}
+
+		return {
+			rentalRequestId,
+			refundedAmount: result.refundedAmount,
+			status: result.rentalRequest.status,
+		};
+	} catch (err) {
+		if (err.code === "P2025" || err.message === "RENTAL_NOT_FOUND") {
+			throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
+		}
+		throw err;
+	}
 };

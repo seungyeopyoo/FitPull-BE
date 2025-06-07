@@ -6,6 +6,7 @@ import {
 	rejectRentalRequest,
 	cancelRentalRequest,
 	createRentalRequestWithPayment,
+	refundRentalRequest,
 } from "../services/rentalRequest.service.js";
 import { success } from "../utils/responseHandler.js";
 import {RENTAL_REQUEST_MESSAGES} from "../constants/messages.js";
@@ -57,7 +58,7 @@ export const approveRentalRequestController = async (req, res, next) => {
 
 export const rejectRentalRequestController = async (req, res, next) => {
 	try {
-		const request = await rejectRentalRequest(req.params.id);
+		const request = await refundRentalRequest(req.params.id, "[관리자거절]", true);
 		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_REJECTED, { request });
 	} catch (error) {
 		next(error);
@@ -68,7 +69,7 @@ export const cancelRentalRequestController = async (req, res, next) => {
 	try {
 		const userId = req.user.id;
 		const { id } = req.params;
-		const request = await cancelRentalRequest(id, userId);
+		const request = await refundRentalRequest(id, "[유저취소]", false);
 		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_CANCELED, { request });
 	} catch (error) {
 		next(error);

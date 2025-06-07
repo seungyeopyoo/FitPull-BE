@@ -345,6 +345,7 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+  CANCELED
   ON_RENTING
 }
 
