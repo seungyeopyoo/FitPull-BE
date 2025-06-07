@@ -148,7 +148,7 @@ ${itemsText}
   try {
     parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
   } catch (err) {
-    throw new CustomError(500, "AI_PARSE_ERROR", ERROR_MESSAGES.AI_PARSE_ERROR);
+    throw new CustomError(500, "AI_PARSE_ERROR", AI_MESSAGES.AI_PARSE_ERROR);
   }
   if (!Array.isArray(parsed) || parsed.length === 0) {
     return { recommendedProductIds: [], reason: "추천할 만한 상품이 없습니다." };

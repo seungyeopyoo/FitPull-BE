@@ -17,3 +17,27 @@ export const useBalanceRepo = async (userId, amount) => {
     select: { id: true, balance: true },
   });
 };
+
+export const createPaymentLogRepo = async ({
+  userId,
+  rentalRequestId,
+  amount,
+  paymentType,
+  memo,
+  balanceBefore,
+  balanceAfter,
+  paidAt
+}) => {
+  return await prisma.paymentLog.create({
+    data: {
+      userId,
+      rentalRequestId,
+      amount,
+      paymentType,
+      memo,
+      balanceBefore,
+      balanceAfter,
+      paidAt,
+    },
+  });
+};

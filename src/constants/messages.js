@@ -97,6 +97,8 @@ export const RENTAL_REQUEST_MESSAGES = {
   PRODUCT_NOT_FOUND: "상품을 찾을 수 없습니다.",
   RENTAL_DATE_CONFLICT: "해당 기간은 이미 예약되어 있습니다.",
   NO_PERMISSION: "권한이 없습니다.",
+  USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
+  INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
 };
 
 export const MESSAGE_RESPONSES = {

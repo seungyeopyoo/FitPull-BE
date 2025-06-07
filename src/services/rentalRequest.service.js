@@ -7,6 +7,7 @@ import {
 	findProductTitleById,
 	findRentalRequestSummaryById,
 	getRentalRequestById,
+	createRentalRequestWithPaymentRepo,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
 import { RENTAL_REQUEST_MESSAGES, NOTIFICATION_MESSAGES } from "../constants/messages.js";
@@ -14,6 +15,7 @@ import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { createNotification } from "./notification.service.js";
 import { RENTAL_DISCOUNT } from "../constants/rentalDiscount.js";
+import { findUserById } from "../repositories/user.repository.js";
 
 
 export const createRentalRequest = async (
@@ -138,7 +140,7 @@ export const approveRentalRequest = async (id) => {
 		return { id, ...summary, totalPrice: request.totalPrice };
 	} catch (err) {
 		if (err.code === "P2025") {
-			throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
+			throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 		}
 		throw err;
 	}
@@ -147,7 +149,7 @@ export const approveRentalRequest = async (id) => {
 export const rejectRentalRequest = async (id) => {
 	try {
 		const updated = await updateRentalRequestStatusRepo(id, RENTAL_STATUS.REJECTED);
-		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", ERROR_MESSAGES.RENTAL_NOT_FOUND);
+		if (!updated) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 		const summary = await findRentalRequestSummaryById(id);
 		const request = await getRentalRequestById(id);
 
@@ -190,4 +192,41 @@ export const cancelRentalRequest = async (id, userId) => {
 		status: RENTAL_STATUS.REJECTED,
 		totalPrice: request.totalPrice,
 	};
+};
+
+export const createRentalRequestWithPayment = async (
+	productId,
+	startDate,
+	endDate,
+	userId,
+	howToReceive,
+	memo
+) => {
+	const user = await findUserById(userId);
+	if (!user) throw new CustomError(404, "USER_NOT_FOUND", RENTAL_REQUEST_MESSAGES.USER_NOT_FOUND);
+
+	const product = await getProductById(productId);
+	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", RENTAL_REQUEST_MESSAGES.PRODUCT_NOT_FOUND);
+
+	const dayCount = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
+	let totalPrice = product.price * dayCount;
+
+	if (user.balance < totalPrice) {
+		throw new CustomError(400, "INSUFFICIENT_BALANCE", RENTAL_REQUEST_MESSAGES.INSUFFICIENT_BALANCE);
+	}
+
+	const rentalRequest = await createRentalRequestWithPaymentRepo({
+		userId,
+		productId,
+		startDate,
+		endDate,
+		howToReceive,
+		memo,
+		totalPrice,
+		balanceBefore: user.balance,
+		balanceAfter: user.balance - totalPrice,
+		productTitle: product.title,
+	});
+
+	return rentalRequest;
 };

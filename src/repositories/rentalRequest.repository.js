@@ -137,3 +137,69 @@ export const findActiveRentalForDelete = async (productId, oneMonthLater) => {
 	});
 };
 
+export const getRentalRequestByIdWithUserAndProduct = async (tx, id) => {
+	return await tx.rentalRequest.findUnique({
+		where: { id },
+		include: { user: true, product: true },
+	});
+};
+
+export const updateRentalRequestStatusRepoTx = async (tx, id, status) => {
+	return await tx.rentalRequest.update({
+		where: { id },
+		data: { status },
+	});
+};
+
+export const createRentalRequestWithPaymentRepo = async ({
+	userId,
+	productId,
+	startDate,
+	endDate,
+	howToReceive,
+	memo,
+	totalPrice,
+	balanceBefore,
+	balanceAfter,
+	productTitle,
+}) => {
+	return await prisma.$transaction(async (tx) => {
+		// 1. 유저 잔고 차감
+		const updatedUser = await tx.user.update({
+			where: { id: userId },
+			data: { balance: { decrement: totalPrice } },
+			select: { balance: true },
+		});
+
+		// 2. 대여요청 생성
+		const rentalRequest = await tx.rentalRequest.create({
+			data: {
+				productId,
+				userId,
+				startDate: new Date(startDate),
+				endDate: new Date(endDate),
+				howToReceive,
+				memo,
+				totalPrice,
+				status: "PENDING",
+			},
+		});
+
+		// 3. 결제로그 생성
+		await tx.paymentLog.create({
+			data: {
+				userId,
+				rentalRequestId: rentalRequest.id,
+				amount: totalPrice,
+				paymentType: "RENTAL_PAYMENT",
+				memo: `[자동] ${productTitle} 대여 신청`,
+				balanceBefore,
+				balanceAfter: updatedUser.balance,
+				paidAt: new Date(),
+			},
+		});
+
+		return rentalRequest;
+	});
+};
+

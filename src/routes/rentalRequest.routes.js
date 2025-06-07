@@ -6,6 +6,7 @@ import {
 	approveRentalRequestController,
 	rejectRentalRequestController,
 	cancelRentalRequestController,
+	createRentalRequestWithPaymentController,
 } from "../controllers/rentalRequest.controller.js";
 import { authenticate } from "../middlewares/auth.js";
 import { adminOnly } from "../middlewares/adminOnly.js";
@@ -132,7 +133,7 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
 const router = express.Router();
 
 // 대여 요청
-router.post("/", authenticate, requireVerifiedPhone, createRentalRequestController);
+router.post("/", authenticate, requireVerifiedPhone, createRentalRequestWithPaymentController);
 
 // 본인 대여요청 목록 조회
 router.get("/me", authenticate, getMyRentalRequestsController);

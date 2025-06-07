@@ -5,6 +5,7 @@ import {
 	approveRentalRequest,
 	rejectRentalRequest,
 	cancelRentalRequest,
+	createRentalRequestWithPayment,
 } from "../services/rentalRequest.service.js";
 import { success } from "../utils/responseHandler.js";
 import {RENTAL_REQUEST_MESSAGES} from "../constants/messages.js";
@@ -69,6 +70,24 @@ export const cancelRentalRequestController = async (req, res, next) => {
 		const { id } = req.params;
 		const request = await cancelRentalRequest(id, userId);
 		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_CANCELED, { request });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const createRentalRequestWithPaymentController = async (req, res, next) => {
+	try {
+		const { productId, startDate, endDate, howToReceive, memo } = req.body;
+		const userId = req.user.id;
+		const rentalRequest = await createRentalRequestWithPayment(
+			productId,
+			startDate,
+			endDate,
+			userId,
+			howToReceive,
+			memo
+		);
+		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_REQUEST_CREATED, { rentalRequest });
 	} catch (error) {
 		next(error);
 	}
