@@ -7,8 +7,8 @@ import {USER_MESSAGES} from "../constants/messages.js";
 export const getUserById = async (userId) => {
 	const user = await findUserById(userId);
 	if (!user) throw new CustomError(404, "USER_NOT_FOUND", USER_MESSAGES.USER_NOT_FOUND);
-	const { id, name, phone, verifiedPhone } = user;
-	return { id, name, phone, verifiedPhone };
+	const { id, name, phone, verifiedPhone, balance } = user;
+	return { id, name, phone, verifiedPhone, balance };
 };
 
 export const updateUserInfo = async (userId, { name, phone, bankAccount, bankName, accountHolder }) => {
