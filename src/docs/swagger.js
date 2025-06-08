@@ -13,7 +13,7 @@ const options = {
     },
     servers: [
       {
-        url: process.env.SWAGGER_SERVER_URL || 'http://localhost:3000',
+        url: 'http://localhost:3000',
       },
     ],
   },
