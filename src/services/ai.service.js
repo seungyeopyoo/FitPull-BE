@@ -9,18 +9,27 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 현재는 실제 데이터를 크롤링하지 않고, 상품명/설명 기반으로 학습된 지식에 따라 예측만 합니다.
-// 추후 정확도 개선 시 실제 플랫폼 크롤링 결과로 대체 가능
+//이미지 인식용 테스트용 프롬프트 
+// - 그리고 이미지에 보이는 특징(색상, 브랜드, 상태 등)을 한 문장으로 reason에 포함해줘
+
 export const estimatePriceFromAI = async (product) => {
-  const { title, description } = product;
+  const { title, description, price, imageUrls } = product;
   const prompt = `
 너는 대여 가격 전문가야.
 
-다음 상품의 이름과 설명을 기반으로, 1일 대여 적정가를 추정해줘.
-중고 판매가격을 쿠팡, 당근마켓, 중고나라에서 추정한 후에 그 가격들을 바탕으로, 
-실제 대여 서비스에서 하루에 받을 수 있는 적정 가격을 예측해서 반환해줘.
+다음 상품의 이름, 설명, 유저가 입력한 1일 대여 가격, 그리고 이미지를 기반으로
+1) 중고가 기준 1일 대여 적정가를 추정하고,
+2) 유저가 입력한 가격이 적정한지 true/false로 판단하고,
+3) 이유를 한 문장으로 설명해줘.
 
-다음 형식의 JSON으로만 응답해줘:
+다음 기준을 따르도록 해:
+- 쿠팡, 당근마켓, 중고나라의 중고 판매 가격을 각기 추정해줘 , 이걸 기반으로 너가 판단하는 적정가는 얼마인지도 적어줘
+- 이 세 개의 평균 가격을 기준으로 1일 대여가는 일반적으로 1~5% 수준이 적정하다고 생각해
+- 단, 제품의 파손 위험, 시장 수요, 대체재 여부 등을 고려해 적정가를 유연하게 판단해도 돼
+- 유저가 제시한 가격이 적정가 대비 20% 이상 차이 날 경우 부적절하다고 판단해
+- 최종적으로 왜 true/false 인지 이유도 간결하게 말해줘
+
+응답은 반드시 아래 형식의 JSON으로만 해줘:
 
 {
   "dailyRentalPrice": 정수,
@@ -28,16 +37,30 @@ export const estimatePriceFromAI = async (product) => {
     "쿠팡": 정수,
     "당근마켓": 정수,
     "중고나라": 정수
-  }
+  },
+  "isValid": true/false,
+  "reason": "유저 가격의 적정성에 대한 한 문장 설명"
 }
 
 상품명: ${title}
 설명: ${description ?? "설명 없음"}
+유저가 입력한 1일 대여 가격: ${price ?? "입력 없음"}
   `;
-  console.log("🔥 OpenAI 요청 시작");
+
+  // 멀티모달 메시지 구성
+  const messages = [
+    {
+      role: "user",
+      content: [
+        { type: "text", text: prompt },
+        ...(imageUrls?.length ? [{ type: "image_url", image_url: { url: imageUrls[0] } }] : [])
+      ]
+    }
+  ];
+
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
-    messages: [{ role: "user", content: prompt }],
+    messages,
     temperature: 0.3,
   });
   const contentRaw = completion.choices[0].message.content;
@@ -67,12 +90,14 @@ export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
     throw new CustomError(400, "INVALID_PRODUCT_STATUS", AI_MESSAGES.INVALID_PRODUCT_STATUS);
   }
   const result = await estimatePriceFromAI(product);
-  const { dailyRentalPrice, sources, ...rest } = result;
+  const { dailyRentalPrice, sources, isValid, reason, ...rest } = result;
   await saveAiPriceEstimation({
     ...rest,
     estimatedDailyRentalPrice: dailyRentalPrice,
     estimatedPrice: dailyRentalPrice,
     sources,
+    isValid,
+    reason,
     productId,
     userId: adminUser.id,
   });
