@@ -1,5 +1,4 @@
 import {
-	createRentalRequest,
 	getMyRentalRequests,
 	getPendingRequests,
 	approveRentalRequest,
@@ -10,24 +9,6 @@ import {
 } from "../services/rentalRequest.service.js";
 import { success } from "../utils/responseHandler.js";
 import {RENTAL_REQUEST_MESSAGES} from "../constants/messages.js";
-
-export const createRentalRequestController = async (req, res, next) => {
-	try {
-		const { productId, startDate, endDate, howToReceive, memo } = req.body;
-		const user = req.user;
-		const rentalRequest = await createRentalRequest(
-			productId,
-			startDate,
-			endDate,
-			user.id,
-			howToReceive,
-			memo
-		);
-		return success(res, RENTAL_REQUEST_MESSAGES.RENTAL_REQUEST_CREATED, { rentalRequest });
-	} catch (error) {
-		next(error);
-	}
-};
 
 export const getMyRentalRequestsController = async (req, res, next) => {
 	try {

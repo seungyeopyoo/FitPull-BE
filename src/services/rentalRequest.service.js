@@ -1,5 +1,4 @@
 import {
-	createRentalRequestRepo,
 	findMyRentalRequestsRepo,
 	findPendingRequestsRepo,
 	updateRentalRequestStatusRepo,
@@ -19,7 +18,7 @@ import { RENTAL_DISCOUNT } from "../constants/rentalDiscount.js";
 import { findUserById } from "../repositories/user.repository.js";
 
 
-export const createRentalRequest = async (
+export const createRentalRequestWithPayment = async (
 	productId,
 	startDate,
 	endDate,
@@ -32,11 +31,10 @@ export const createRentalRequest = async (
 	const oneMonthLater = new Date();
 	oneMonthLater.setDate(now.getDate() + 30);
 
-	  // 날짜 유효성 체크
-	  if (new Date(endDate) <= new Date(startDate)) {
+	// 날짜 유효성 체크
+	if (new Date(endDate) <= new Date(startDate)) {
 		throw new CustomError(400, "INVALID_RENTAL_DATE", RENTAL_REQUEST_MESSAGES.INVALID_RENTAL_DATE);
-	  }
-	  
+	}
 	if (new Date(startDate) > oneMonthLater) {
 		throw new CustomError(400, "RENTAL_DATE_LIMIT", RENTAL_REQUEST_MESSAGES.START_DATE_LIMIT);
 	}
@@ -50,38 +48,38 @@ export const createRentalRequest = async (
 	const product = await getProductById(productId);
 	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", RENTAL_REQUEST_MESSAGES.PRODUCT_NOT_FOUND);
 
-	const dayCount = Math.ceil(
-		(new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
-	);
+	const user = await findUserById(userId);
+	if (!user) throw new CustomError(404, "USER_NOT_FOUND", RENTAL_REQUEST_MESSAGES.USER_NOT_FOUND);
+
+	const dayCount = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
 	let totalPrice = product.price * dayCount;
-	
+
 	// 할인 정책 적용
 	const discountPolicy = RENTAL_DISCOUNT.find(policy => dayCount >= policy.minDays);
 	if (discountPolicy) {
 		totalPrice *= discountPolicy.rate;
 	}
-	totalPrice = Math.round(totalPrice); 
+	totalPrice = Math.round(totalPrice);
 
-	const rentalRequest = await createRentalRequestRepo(
+	if (user.balance < totalPrice) {
+		throw new CustomError(400, "INSUFFICIENT_BALANCE", RENTAL_REQUEST_MESSAGES.INSUFFICIENT_BALANCE);
+	}
+
+	// 트랜잭션: 잔고 차감, 대여요청 생성, 결제로그 생성
+	const rentalRequest = await createRentalRequestWithPaymentRepo({
+		userId,
 		productId,
 		startDate,
 		endDate,
-		userId,
-		totalPrice,
 		howToReceive,
-		memo
-	  );
+		memo,
+		totalPrice,
+		balanceBefore: user.balance,
+		balanceAfter: user.balance - totalPrice,
+		productTitle: product.title,
+	});
 
-	const title = await findProductTitleById(productId);
-
-	return {
-		id: rentalRequest.id,
-		rentalPeriod: `${startDate} ~ ${endDate}`,
-		productTitle: title,
-		howToReceive: howToReceive,
-		totalPrice: totalPrice,
-		memo: memo,
-	};
+	return rentalRequest;
 };
 
 export const getMyRentalRequests = async (userId) => {
@@ -193,43 +191,6 @@ export const cancelRentalRequest = async (id, userId) => {
 		status: RENTAL_STATUS.CANCELED,
 		totalPrice: request.totalPrice,
 	};
-};
-
-export const createRentalRequestWithPayment = async (
-	productId,
-	startDate,
-	endDate,
-	userId,
-	howToReceive,
-	memo
-) => {
-	const user = await findUserById(userId);
-	if (!user) throw new CustomError(404, "USER_NOT_FOUND", RENTAL_REQUEST_MESSAGES.USER_NOT_FOUND);
-
-	const product = await getProductById(productId);
-	if (!product) throw new CustomError(404, "PRODUCT_NOT_FOUND", RENTAL_REQUEST_MESSAGES.PRODUCT_NOT_FOUND);
-
-	const dayCount = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
-	let totalPrice = product.price * dayCount;
-
-	if (user.balance < totalPrice) {
-		throw new CustomError(400, "INSUFFICIENT_BALANCE", RENTAL_REQUEST_MESSAGES.INSUFFICIENT_BALANCE);
-	}
-
-	const rentalRequest = await createRentalRequestWithPaymentRepo({
-		userId,
-		productId,
-		startDate,
-		endDate,
-		howToReceive,
-		memo,
-		totalPrice,
-		balanceBefore: user.balance,
-		balanceAfter: user.balance - totalPrice,
-		productTitle: product.title,
-	});
-
-	return rentalRequest;
 };
 
 export const refundRentalRequest = async (rentalRequestId, refundMemo, rejectByAdmin = false) => {

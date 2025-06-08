@@ -3,28 +3,6 @@ import { RENTAL_STATUS } from "../constants/status.js";
 import CustomError from "../utils/customError.js";
 import { RENTAL_REQUEST_MESSAGES } from "../constants/messages.js";
 
-export const createRentalRequestRepo = async (
-	productId,
-	startDate,
-	endDate,
-	userId,
-	totalPrice,
-	howToReceive,
-	memo
-) => {
-	return await prisma.rentalRequest.create({
-		data: {
-			productId,
-			userId,
-			startDate: new Date(startDate),
-			endDate: new Date(endDate),
-			totalPrice,
-			howToReceive,
-			memo,
-		},
-	});
-};
-
 export const findProductTitleById = async (productId) => {
 	const product = await prisma.product.findUnique({
 		where: { id: productId },
