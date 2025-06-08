@@ -34,7 +34,6 @@ export const estimatePriceFromAI = async (product) => {
 상품명: ${title}
 설명: ${description ?? "설명 없음"}
   `;
-  console.log("🔥 OpenAI 요청 시작");
   const completion = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{ role: "user", content: prompt }],

@@ -249,7 +249,7 @@ model AiPriceEstimation {
   id                        String   @id @default(uuid())
   estimatedPrice            Int      @map("estimated_price")
   estimatedDailyRentalPrice Int?     @map("estimated_daily_rental_price")
-  isValid                   Boolean  @default(false) @map("is_valid")
+  isValid                   Boolean? @map("is_valid")
   sources                   Json?
   reason                    String?  @db.Text
   createdAt                 DateTime @default(now()) @map("created_at")
