@@ -87,15 +87,15 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┣ 📂routes
  ┃ ┣ 📜ai.routes.js
  ┃ ┣ 📜auth.routes.js
- ┃ ┣ 📜category.router.js
+ ┃ ┣ 📜category.routes.js
  ┃ ┣ 📜completedRental.routes.js
- ┃ ┣ 📜message.router.js
- ┃ ┣ 📜notification.router.js
+ ┃ ┣ 📜message.routes.js
+ ┃ ┣ 📜notification.routes.js
  ┃ ┣ 📜product.routes.js
  ┃ ┣ 📜productStatusLog.routes.js
  ┃ ┣ 📜rentalRequest.routes.js
- ┃ ┣ 📜review.router.js
- ┃ ┗ 📜user.router.js
+ ┃ ┣ 📜review.routes.js
+ ┃ ┗ 📜user.routes.js
  ┣ 📂services
  ┃ ┣ 📜ai.service.js
  ┃ ┣ 📜auth.service.js

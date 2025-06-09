@@ -18,7 +18,7 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
 
 /**
  * @swagger
- * /reviews/product/{productId}:
+ * /api/reviews/product/{productId}:
  *   get:
  *     summary: 상품별 리뷰 목록 조회
  *     tags: [Review]
@@ -27,32 +27,68 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *         name: productId
  *         required: true
  *         description: 상품 ID
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 리뷰 목록 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     reviews:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           rating:
+ *                             type: integer
+ *                           comment:
+ *                             type: string
+ *                           user:
+ *                             type: object
+ *                             properties:
+ *                               name:
+ *                                 type: string
+ *       404:
+ *         description: 상품 없음
  */
 
 /**
  * @swagger
- * /reviews:
+ * /api/reviews:
  *   post:
  *     summary: 리뷰 작성 (이미지 업로드 지원, 대여 완료 유저만 가능)
  *     tags: [Review]
- *     consumes:
- *       - multipart/form-data
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - rating
+ *               - completedRentalId
+ *               - productId
  *             properties:
  *               rating:
  *                 type: integer
  *                 description: 별점(1~5)
+ *                 example: 5
  *               comment:
  *                 type: string
  *                 description: 리뷰 텍스트
+ *                 example: "아주 만족합니다."
  *               completedRentalId:
  *                 type: string
  *                 description: 대여완료 ID
@@ -68,11 +104,31 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *     responses:
  *       201:
  *         description: 리뷰 작성 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     review:
+ *                       type: object
+ *       400:
+ *         description: 잘못된 입력(별점, 중복리뷰, 이미지 등)
+ *       403:
+ *         description: 본인 대여건이 아님
+ *       404:
+ *         description: 상품 없음
  */
 
 /**
  * @swagger
- * /reviews/{id}:
+ * /api/reviews/{id}:
  *   get:
  *     summary: 리뷰 상세 조회
  *     tags: [Review]
@@ -81,24 +137,44 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *         name: id
  *         required: true
  *         description: 리뷰 ID
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: 리뷰 상세 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     review:
+ *                       type: object
+ *       404:
+ *         description: 리뷰 없음
  */
 
 /**
  * @swagger
- * /reviews/{id}:
+ * /api/reviews/{id}:
  *   patch:
  *     summary: 리뷰 수정 (이미지 업로드 지원, 본인만 가능, 관리자 예외)
  *     tags: [Review]
- *     consumes:
- *       - multipart/form-data
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: 리뷰 ID
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -109,9 +185,11 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *               rating:
  *                 type: integer
  *                 description: 별점(1~5)
+ *                 example: 4
  *               comment:
  *                 type: string
  *                 description: 리뷰 텍스트
+ *                 example: "수정된 리뷰"
  *               images:
  *                 type: array
  *                 items:
@@ -121,22 +199,50 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  *     responses:
  *       200:
  *         description: 리뷰 수정 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     review:
+ *                       type: object
+ *       400:
+ *         description: 잘못된 입력(별점, 이미지 등)
+ *       403:
+ *         description: 본인만 수정 가능
+ *       404:
+ *         description: 리뷰 없음
  */
 
 /**
  * @swagger
- * /reviews/{id}:
+ * /api/reviews/{id}:
  *   delete:
  *     summary: 리뷰 삭제 (본인 또는 관리자)
  *     tags: [Review]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         description: 리뷰 ID
+ *         schema:
+ *           type: string
  *     responses:
  *       204:
  *         description: 리뷰 삭제 완료
+ *       403:
+ *         description: 본인만 삭제 가능
+ *       404:
+ *         description: 리뷰 없음
  */
 
 const router = express.Router();
