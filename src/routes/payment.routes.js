@@ -12,7 +12,7 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
 
 /**
  * @swagger
- * /payments/charge:
+ * /api/payments/charge:
  *   post:
  *     summary: 가상 잔고 충전
  *     tags: [Payment]
@@ -24,10 +24,13 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - amount
  *             properties:
  *               amount:
  *                 type: number
  *                 example: 10000
+ *                 description: 충전할 금액
  *     responses:
  *       200:
  *         description: 충전 성공
@@ -38,18 +41,29 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *               properties:
  *                 success:
  *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
+ *                   example: "잔고 충전에 성공했습니다."
  *                 data:
  *                   type: object
  *                   properties:
  *                     balance:
  *                       type: number
+ *                       example: 15000
+ *       400:
+ *         description: 잘못된 입력(음수, 0, 초과값 등)
+ *       401:
+ *         description: 인증 필요(JWT 토큰 누락/만료)
+ *       403:
+ *         description: 휴대폰 미인증
+ *       404:
+ *         description: 유저 없음
  */
 
 /**
  * @swagger
- * /payments/use:
+ * /api/payments/use:
  *   post:
  *     summary: 가상 잔고 차감
  *     tags: [Payment]
@@ -61,10 +75,13 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - amount
  *             properties:
  *               amount:
  *                 type: number
  *                 example: 5000
+ *                 description: 차감할 금액
  *     responses:
  *       200:
  *         description: 차감 성공
@@ -75,13 +92,24 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *               properties:
  *                 success:
  *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
+ *                   example: "잔고 차감에 성공했습니다."
  *                 data:
  *                   type: object
  *                   properties:
  *                     balance:
  *                       type: number
+ *                       example: 10000
+ *       400:
+ *         description: 잘못된 입력(음수, 0, 초과값 등) 또는 잔고 부족
+ *       401:
+ *         description: 인증 필요(JWT 토큰 누락/만료)
+ *       403:
+ *         description: 휴대폰 미인증
+ *       404:
+ *         description: 유저 없음
  */
 
 const router = express.Router();
