@@ -15,6 +15,21 @@ export const signup = async ({
 	name,
 	phone,
 }) => {
+	if (!email || !password || !passwordCheck || !name || !phone) {
+		throw new CustomError(400, "MISSING_FIELDS", AUTH_MESSAGES.MISSING_FIELDS);
+	}
+	if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+		throw new CustomError(400, "INVALID_EMAIL", AUTH_MESSAGES.INVALID_EMAIL);
+	}
+	if (password.length < 6) {
+		throw new CustomError(400, "INVALID_PASSWORD", AUTH_MESSAGES.INVALID_PASSWORD);
+	}
+	if (!/^[a-zA-Z가-힣]+$/.test(name)) {
+		throw new CustomError(400, "INVALID_NAME", AUTH_MESSAGES.INVALID_NAME);
+	}
+	if (phone !== "00000000000" && !/^\d+$/.test(phone)) {
+		throw new CustomError(400, "INVALID_PHONE", AUTH_MESSAGES.INVALID_PHONE_ONLY_NUMBER);
+	}
 	if (password !== passwordCheck) {
 		throw new CustomError(400, "PASSWORD_MISMATCH", AUTH_MESSAGES.PASSWORD_MISMATCH);
 	}
@@ -62,8 +77,18 @@ export const signup = async ({
 };
 
 export const login = async ({ email, password }) => {
+	if (!email || !password) {
+		throw new CustomError(400, "MISSING_FIELDS", AUTH_MESSAGES.MISSING_FIELDS);
+	}
+	if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+		throw new CustomError(400, "INVALID_EMAIL", AUTH_MESSAGES.INVALID_EMAIL);
+	}
 	const account = await findByEmail(email);
 	if (!account) throw new CustomError(404, "USER_NOT_FOUND", AUTH_MESSAGES.USER_NOT_FOUND);
+
+	if (account.provider !== "LOCAL") {
+		throw new CustomError(400, "SOCIAL_ONLY", AUTH_MESSAGES.SOCIAL_ONLY);
+	}
 
 	const isMatch = await bcrypt.compare(password, account.passwordHash);
 	if (!isMatch) throw new CustomError(401, "PASSWORD_MISMATCH", AUTH_MESSAGES.PASSWORD_MISMATCH);
@@ -91,7 +116,7 @@ export const login = async ({ email, password }) => {
 
 export const rejoinRequest = async (email) => {
 	const account = await findAnyByEmail(email);
-	if (!account || !account.deletedAt) throw new CustomError(404, "USER_NOT_FOUND", "탈퇴한 계정만 재가입 가능합니다.");
+	if (!account || !account.deletedAt) throw new CustomError(404, "REJOIN_ONLY_DELETED_ACCOUNT", AUTH_MESSAGES.REJOIN_ONLY_DELETED_ACCOUNT);
 	const code = Math.floor(100000 + Math.random() * 900000).toString();
 	await setEmailCode(email, code);
 	await sendRecoveryEmail(email, code);
@@ -182,9 +207,16 @@ const extractSocialProfile = (profile, provider) => {
   export const findOrCreateSocialAccount = async (profile, provider) => {
 	const { providerId, email, nickname } = extractSocialProfile(profile, provider);
   
+	const localAccount = await findByEmail(email);
+	if (localAccount && localAccount.provider === "LOCAL") {
+	  throw new CustomError(400, "LOCAL_ONLY", AUTH_MESSAGES.LOCAL_ONLY);
+	}
+  
+	// 기존 소셜 계정이 있으면 반환
 	const existing = await findAccountByProvider(provider, providerId);
 	if (existing) return existing.user;
   
+	// 새 소셜 계정 생성
 	const user = await createUser({
 	  email,
 	  name: nickname,

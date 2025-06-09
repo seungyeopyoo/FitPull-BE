@@ -144,6 +144,13 @@ export const AUTH_MESSAGES = {
   TOO_MANY_REQUESTS: "인증번호 요청은 잠시 후 다시 시도해주세요.",
   EXPIRED_CODE: "인증번호가 만료되었습니다.",
   PHONE_NOT_VERIFIED: "전화번호 인증이 필요한 기능입니다.",
+  MISSING_FIELDS: "필수 입력값이 누락되었습니다.",
+  INVALID_EMAIL : "이메일 형식이 올바르지 않습니다.",
+  INVALID_NAME: "이름은 한글과 영어만 입력 가능합니다.",
+  INVALID_PHONE_ONLY_NUMBER: "전화번호는 숫자만 입력 가능합니다.",
+  REJOIN_ONLY_DELETED_ACCOUNT: "탈퇴한 계정만 재가입 가능합니다.",
+  SOCIAL_ONLY: "소셜 로그인 계정은 해당 소셜 로그인을 이용해주세요.",
+  LOCAL_ONLY: "일반 계정이 존재합니다. 일반 로그인을 이용해 주세요.",
 }
 
 export const USER_MESSAGES = {
