@@ -15,6 +15,21 @@ export const signup = async ({
 	name,
 	phone,
 }) => {
+	if (!email || !password || !passwordCheck || !name || !phone) {
+		throw new CustomError(400, "MISSING_FIELDS", AUTH_MESSAGES.MISSING_FIELDS);
+	}
+	if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+		throw new CustomError(400, "INVALID_EMAIL", AUTH_MESSAGES.INVALID_EMAIL);
+	}
+	if (password.length < 6) {
+		throw new CustomError(400, "INVALID_PASSWORD", AUTH_MESSAGES.INVALID_PASSWORD);
+	}
+	if (!/^[a-zA-Z가-힣]+$/.test(name)) {
+		throw new CustomError(400, "INVALID_NAME", AUTH_MESSAGES.INVALID_NAME);
+	}
+	if (phone !== "00000000000" && !/^\d+$/.test(phone)) {
+		throw new CustomError(400, "INVALID_PHONE", AUTH_MESSAGES.INVALID_PHONE_ONLY_NUMBER);
+	}
 	if (password !== passwordCheck) {
 		throw new CustomError(400, "PASSWORD_MISMATCH", AUTH_MESSAGES.PASSWORD_MISMATCH);
 	}
