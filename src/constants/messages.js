@@ -148,6 +148,9 @@ export const AUTH_MESSAGES = {
   INVALID_EMAIL : "이메일 형식이 올바르지 않습니다.",
   INVALID_NAME: "이름은 한글과 영어만 입력 가능합니다.",
   INVALID_PHONE_ONLY_NUMBER: "전화번호는 숫자만 입력 가능합니다.",
+  REJOIN_ONLY_DELETED_ACCOUNT: "탈퇴한 계정만 재가입 가능합니다.",
+  SOCIAL_ONLY: "소셜 로그인 계정은 해당 소셜 로그인을 이용해주세요.",
+  LOCAL_ONLY: "일반 계정이 존재합니다. 일반 로그인을 이용해 주세요.",
 }
 
 export const USER_MESSAGES = {
