@@ -9,11 +9,11 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: AI
- *   description: AI 기반 기능 (적정가 분석, 리뷰 요약, 상품 추천)
+ *   description: AI 기능 관련 API
  */
 /**
  * @swagger
- * /ai/price-estimation/{productId}:
+ * /api/ai/price-estimation/{productId}:
  *   post:
  *     summary: 상품 AI 적정가 분석 (관리자 전용)
  *     tags: [AI]
@@ -29,10 +29,41 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: AI 적정가 분석 결과 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     dailyRentalPrice:
+ *                       type: integer
+ *                     sources:
+ *                       type: object
+ *                       properties:
+ *                         쿠팡:
+ *                           type: integer
+ *                         당근마켓:
+ *                           type: integer
+ *                         중고나라:
+ *                           type: integer
+ *                     isValid:
+ *                       type: boolean
+ *                     reason:
+ *                       type: string
+ *       400:
+ *         description: 잘못된 요청(상품 상태 등)
+ *       404:
+ *         description: 상품 없음
  */
 /**
  * @swagger
- * /ai/summary/{productId}:
+ * /api/ai/summary/{productId}:
  *   post:
  *     summary: 상품 리뷰 요약
  *     tags: [AI]
@@ -46,12 +77,28 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 리뷰 요약 결과 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     summary:
+ *                       type: string
+ *       404:
+ *         description: 상품 또는 리뷰 없음
  */
 
 
 /**
  * @swagger
- * /ai/recommend:
+ * /api/ai/recommend:
  *   post:
  *     summary: 상품 추천
  *     tags: [AI]
@@ -70,6 +117,28 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 추천 상품 목록 및 추천 사유 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     recommendedProductIds:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     reason:
+ *                       type: string
+ *       400:
+ *         description: 잘못된 입력(프롬프트 누락 등)
+ *       404:
+ *         description: 추천할 상품 없음
  */
 // 적정가 분석
 router.post("/price-estimation/:productId", authenticate, adminOnly, requestAiPriceEstimationController);

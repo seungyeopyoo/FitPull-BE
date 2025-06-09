@@ -70,6 +70,7 @@ export const PRODUCT_STATUS_LOG_MESSAGES = {
   STATUS_LOG_DELETED: "상태 로그가 삭제되었습니다.",
   STATUS_LOG_NOT_FOUND: "해당 상태 로그를 찾을 수 없습니다.",
   NO_UPDATE_DATA: "수정할 데이터가 없습니다.",
+  INVALID_COMPLETED_RENTAL_ID: "존재하지 않는 completedRentalId 입니다.",
 }
 
 export const COMPLETED_RENTAL_MESSAGES = {

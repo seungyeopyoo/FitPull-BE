@@ -15,12 +15,12 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Message
- *   description: 문의/답변(Q&A) 메시지 API (USER ↔ ADMIN)
+ *   description: 문의/답변(Q&A) 메시지 API
  */
 
 /**
  * @swagger
- * /messages/send:
+ * /api/messages/send:
  *   post:
  *     summary: 메시지 전송 (문의/답변)
  *     tags: [Message]
@@ -48,10 +48,30 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 메시지 전송 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *       400:
+ *         description: 잘못된 입력(필수값 누락 등)
+ *       403:
+ *         description: 권한 없음
+ *       404:
+ *         description: 상품 없음
  */
 /**
  * @swagger
- * /messages/received:
+ * /api/messages/received:
  *   get:
  *     summary: 받은 메시지 목록 조회
  *     tags: [Message]
@@ -60,10 +80,25 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 받은 메시지 목록 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       403:
+ *         description: 권한 없음
  */
 /**
  * @swagger
- * /messages/sent:
+ * /api/messages/sent:
  *   get:
  *     summary: 보낸 메시지 목록 조회
  *     tags: [Message]
@@ -72,10 +107,25 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 보낸 메시지 목록 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       403:
+ *         description: 권한 없음
  */
 /**
  * @swagger
- * /messages/{id}/read:
+ * /api/messages/{id}/read:
  *   patch:
  *     summary: 메시지 단건 읽음 처리
  *     tags: [Message]
@@ -91,12 +141,22 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 읽음 처리 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: 메시지 없음
  */
-
 
 /**
  * @swagger
- * /messages/read-all:
+ * /api/messages/read-all:
  *   patch:
  *     summary: 받은 메시지 전체 읽음 처리
  *     tags: [Message]
@@ -105,10 +165,19 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 전체 읽음 처리 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
  */
 /**
  * @swagger
- * /messages/{id}:
+ * /api/messages/{id}:
  *   delete:
  *     summary: 메시지 삭제 (soft delete)
  *     tags: [Message]
@@ -124,6 +193,17 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 메시지 삭제 완료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: 메시지 없음
  */
 
 //메세지 전송

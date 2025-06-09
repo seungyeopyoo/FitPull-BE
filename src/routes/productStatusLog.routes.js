@@ -20,7 +20,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /products/{productId}/logs:
+ * /api/products/{productId}/logs:
  *   get:
  *     summary: 상품 상태 로그 조회 (유저/관리자)
  *     tags: [ProductStatusLog]
@@ -36,16 +36,46 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 상품 상태 로그 목록 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     logs:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           type:
+ *                             type: string
+ *                           notes:
+ *                             type: string
+ *                           photoUrls:
+ *                             type: array
+ *                             items:
+ *                               type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *       404:
+ *         description: 상품 없음
  */
 
 /**
  * @swagger
- * /products/{productId}/logs:
+ * /api/products/{productId}/logs:
  *   post:
  *     summary: 상품 상태 로그 생성 (관리자 전용, 이미지 업로드)
  *     tags: [ProductStatusLog]
- *     consumes:
- *       - multipart/form-data
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -63,7 +93,6 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - type
- *               - images
  *             properties:
  *               type:
  *                 type: string
@@ -80,11 +109,29 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: 상태 로그 생성 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     log:
+ *                       type: object
+ *       400:
+ *         description: 잘못된 입력(필수값 누락, 이미지 개수 초과 등)
+ *       404:
+ *         description: 상품 없음
  */
 
 /**
  * @swagger
- * /products/{productId}/logs/{id}:
+ * /api/products/{productId}/logs/{id}:
  *   patch:
  *     summary: 상품 상태 로그 수정 (관리자 전용)
  *     tags: [ProductStatusLog]
@@ -125,11 +172,29 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 상태 로그 수정 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     log:
+ *                       type: object
+ *       400:
+ *         description: 잘못된 입력(필수값 누락, 이미지 개수 초과 등)
+ *       404:
+ *         description: 상품 또는 로그 없음
  */
 
 /**
  * @swagger
- * /products/logs/{id}:
+ * /api/products/logs/{id}:
  *   delete:
  *     summary: 상품 상태 로그 삭제 (관리자 전용)
  *     tags: [ProductStatusLog]
@@ -145,6 +210,17 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: 상태 로그 삭제 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: 로그 없음
  */
 
 // 상품로그조회

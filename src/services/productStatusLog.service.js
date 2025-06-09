@@ -7,6 +7,7 @@ import {
 import { getProductById } from "../repositories/product.repository.js";
 import CustomError from "../utils/customError.js";
 import { PRODUCT_STATUS_LOG_MESSAGES } from "../constants/messages.js";
+import { getCompletedRentalById } from '../repositories/completedRental.repository.js';
   
 const PRODUCT_LOG_TYPES = [
   "PRE_RENTAL",
@@ -31,6 +32,13 @@ export const createStatusLog = async ({ userId, productId, type, photoUrls, note
   // 이미지 개수 검증
   if (!Array.isArray(photoUrls)) photoUrls = [];
   if (photoUrls.length > 5) throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", PRODUCT_STATUS_LOG_MESSAGES.IMAGE_LIMIT_EXCEEDED);
+
+  if (completedRentalId) {
+    const completedRental = await getCompletedRentalById(completedRentalId);
+    if (!completedRental) {
+      throw new CustomError(400, "INVALID_COMPLETED_RENTAL_ID", PRODUCT_STATUS_LOG_MESSAGES.INVALID_COMPLETED_RENTAL_ID);
+    }
+  }
 
   // 생성
   return await createStatusLogRepo({
@@ -65,6 +73,13 @@ export const updateStatusLog = async (id, { productId, type, notes, completedRen
   // 이미지 개수 검증
   if (photoUrls && (!Array.isArray(photoUrls) || photoUrls.length > 5)) {
     throw new CustomError(400, "IMAGE_LIMIT_EXCEEDED", PRODUCT_STATUS_LOG_MESSAGES.IMAGE_LIMIT_EXCEEDED);
+  }
+
+  if (completedRentalId) {
+    const completedRental = await getCompletedRentalById(completedRentalId);
+    if (!completedRental) {
+      throw new CustomError(400, "INVALID_COMPLETED_RENTAL_ID", PRODUCT_STATUS_LOG_MESSAGES.INVALID_COMPLETED_RENTAL_ID);
+    }
   }
 
   // 수정할 데이터 구성

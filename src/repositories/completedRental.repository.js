@@ -79,3 +79,9 @@ export const findCompletedRentalByRequestId = async (rentalRequestId) => {
 		where: { rentalRequestId }
 	});
 };
+
+export const getCompletedRentalById = async (completedRentalId) => {
+	return await prisma.completedRental.findUnique({
+		where: { id: completedRentalId, deletedAt: null }
+	});
+};
