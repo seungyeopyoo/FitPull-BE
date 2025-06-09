@@ -14,7 +14,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /notifications:
+ * /api/notifications:
  *   get:
  *     summary: 내 알림 목록 조회
  *     tags: [Notification]
@@ -30,6 +30,8 @@ const router = express.Router();
  *               properties:
  *                 success:
  *                   type: boolean
+ *                 message:
+ *                   type: string
  *                 notifications:
  *                   type: array
  *                   items:
@@ -51,11 +53,13 @@ const router = express.Router();
  *                       readAt:
  *                         type: string
  *                         format: date-time
+ *       401:
+ *         description: 인증 실패
  */
 
 /**
  * @swagger
- * /notifications/{id}/read:
+ * /api/notifications/{id}/read:
  *   patch:
  *     summary: 알림 읽음 처리
  *     tags: [Notification]
@@ -78,19 +82,17 @@ const router = express.Router();
  *               properties:
  *                 success:
  *                   type: boolean
+ *                 message:
+ *                   type: string
  *                 notification:
  *                   type: object
+ *       404:
+ *         description: 알림 없음
  */
-
-// 알림 목록 조회
-router.get("/", authenticate, getNotificationList);
-
-// 알림 읽음 처리
-router.patch("/:id/read", authenticate, markNotificationRead);
 
 /**
  * @swagger
- * /notifications/test:
+ * /api/notifications/test:
  *   post:
  *     summary: (개발용) 테스트 알림 전송
  *     tags: [Notification]
@@ -112,8 +114,27 @@ router.patch("/:id/read", authenticate, markNotificationRead);
  *     responses:
  *       200:
  *         description: 테스트 알림 전송 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 notification:
+ *                   type: object
  *     x-deprecated: true
  */
+
+// 알림 목록 조회
+router.get("/", authenticate, getNotificationList);
+
+// 알림 읽음 처리
+router.patch("/:id/read", authenticate, markNotificationRead);
+
+// 테스트 알림 전송
 router.post("/test", sendTestNotification);
 
 export default router;
