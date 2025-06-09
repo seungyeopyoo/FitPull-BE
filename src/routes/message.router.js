@@ -15,7 +15,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Message
- *   description: 문의/답변(Q&A) 메시지 API (USER ↔ ADMIN)
+ *   description: 문의/답변(Q&A) 메시지 API
  */
 
 /**

@@ -13,7 +13,7 @@ import { adminOnly } from "../middlewares/adminOnly.js";
  * @swagger
  * tags:
  *   name: Category
- *   description: 카테고리 조회/생성/수정/삭제 (admin 전용)
+ *   description: 카테고리 관련 API
  */
 
 /**

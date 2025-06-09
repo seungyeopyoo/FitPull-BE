@@ -13,7 +13,7 @@ import { s3ImageUpload } from "../middlewares/s3ImageUpload.js";
  * @swagger
  * tags:
  *   name: Review
- *   description: 리뷰 작성/조회/수정/삭제
+ *   description: 리뷰 관련 API
  */
 
 /**

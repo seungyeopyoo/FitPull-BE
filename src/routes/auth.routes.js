@@ -16,7 +16,7 @@ import passport from "../configs/passport.js";
  * @swagger
  * tags:
  *   name: Auth
- *   description: 회원가입, 로그인, 로그아웃, 토큰 재발급, 소셜 로그인, 휴대폰 인증, 탈퇴 계정 재가입 등 인증 관련 API
+ *   description: 인증 관련 API
  */
 
 /**

@@ -9,7 +9,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: AI
- *   description: AI 기반 기능 (적정가 분석, 리뷰 요약, 상품 추천)
+ *   description: AI 기능 관련 API
  */
 /**
  * @swagger

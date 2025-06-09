@@ -15,7 +15,7 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  * @swagger
  * tags:
  *   name: RentalRequest
- *   description: 상품 대여 요청 API
+ *   description: 상품 대여 요청 관련 API
  */
 
 /**
