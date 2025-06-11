@@ -43,6 +43,7 @@ model User {
   receivedMessages        Message[]                 @relation("ReceivedMessages")
   packages                Package[]
   influencerPromos        InfluencerPromo[]
+  PlatformPaymentLog      PlatformPaymentLog[]
 }
 
 model Account {
@@ -106,24 +107,25 @@ model Product {
 }
 
 model RentalRequest {
-  id              String           @id @default(uuid())
-  startDate       DateTime         @map("start_date")
-  endDate         DateTime         @map("end_date")
-  status          RequestStatus    @default(PENDING)
-  totalPrice      Int              @map("total_price")
-  howToReceive    ReceiveMethod    @map("how_to_receive")
-  memo            String?          @db.Text
-  isPaid          Boolean          @default(false) @map("isPaid")
-  createdAt       DateTime         @default(now()) @map("created_at")
-  updatedAt       DateTime         @updatedAt @map("updated_at")
-  deletedAt       DateTime?        @map("deleted_at")
-  userId          String           @map("user_id")
-  productId       String           @map("product_id")
-  user            User             @relation(fields: [userId], references: [id])
-  product         Product          @relation(fields: [productId], references: [id])
-  completedRental CompletedRental?
-  paymentLogs     PaymentLog[]
-  notifications   Notification[]
+  id                 String               @id @default(uuid())
+  startDate          DateTime             @map("start_date")
+  endDate            DateTime             @map("end_date")
+  status             RequestStatus        @default(PENDING)
+  totalPrice         Int                  @map("total_price")
+  howToReceive       ReceiveMethod        @map("how_to_receive")
+  memo               String?              @db.Text
+  isPaid             Boolean              @default(false) @map("isPaid")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  userId             String               @map("user_id")
+  productId          String               @map("product_id")
+  user               User                 @relation(fields: [userId], references: [id])
+  product            Product              @relation(fields: [productId], references: [id])
+  completedRental    CompletedRental?
+  paymentLogs        PaymentLog[]
+  notifications      Notification[]
+  PlatformPaymentLog PlatformPaymentLog[]
 
   @@map("rental_requests")
 }
@@ -322,6 +324,35 @@ model InfluencerPromo {
   @@map("influencer_promos")
 }
 
+model PlatformAccount {
+  id        String               @id @default(uuid())
+  balance   Int                  @default(0)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  logs      PlatformPaymentLog[]
+
+  @@map("platform_accounts")
+}
+
+model PlatformPaymentLog {
+  id                String          @id @default(uuid())
+  platformAccountId String          @map("platform_account_id")
+  type              PlatformLogType
+  amount            Int
+  memo              String?
+  createdAt         DateTime        @default(now())
+  rentalRequestId   String?         @map("rental_request_id")
+  rentalRequest     RentalRequest?  @relation(fields: [rentalRequestId], references: [id])
+  userId            String?         @map("user_id")
+  user              User?           @relation(fields: [userId], references: [id])
+  balanceBefore     Int?
+  balanceAfter      Int?
+
+  platformAccount PlatformAccount @relation(fields: [platformAccountId], references: [id])
+
+  @@map("platform_payment_logs")
+}
+
 enum Role {
   USER
   ADMIN
@@ -385,4 +416,12 @@ enum ProductLogType {
 enum ReturnMethod {
   DELIVERY
   VISIT
+}
+
+enum PlatformLogType {
+  INCOME
+  OUTCOME
+  OWNER_PAYOUT
+  REFUND
+  ETC
 }
