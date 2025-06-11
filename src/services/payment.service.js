@@ -1,5 +1,5 @@
 import { findUserById } from "../repositories/user.repository.js";
-import { chargeBalanceRepo, useBalanceRepo } from "../repositories/paymentRepository.js";
+import { chargeBalanceRepo, useBalanceRepo, findPaymentLogsByUserRepo } from "../repositories/paymentRepository.js";
 import CustomError from "../utils/customError.js";
 import { PAYMENT_MESSAGES } from "../constants/messages.js";
 import { MAX_INT_32 } from "../constants/limits.js";
@@ -53,4 +53,15 @@ export const useBalance = async (userId, amount) => {
 
   const updated = await useBalanceRepo(userId, amount);
   return updated;
+};
+
+export const getPaymentLogs = async (userId, { type, skip = 0, take = 20 } = {}) => {
+  if (!userId) {
+    throw new CustomError(401, "AUTH_REQUIRED", PAYMENT_MESSAGES.AUTH_REQUIRED);
+  }
+  const { logs, total } = await findPaymentLogsByUserRepo(userId, { type, skip, take });
+  if (!logs || logs.length === 0) {
+    return { logs: [], total: 0 };
+  }
+  return { logs, total };
 }; 

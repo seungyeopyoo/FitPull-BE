@@ -1,5 +1,5 @@
 import express from "express";
-import { chargeBalanceController, useBalanceController } from "../controllers/payment.controller.js";
+import { chargeBalanceController, useBalanceController, paymentLogsController } from "../controllers/payment.controller.js";
 import { authenticate } from "../middlewares/auth.js";
 import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
 
@@ -112,11 +112,86 @@ import requireVerifiedPhone from "../middlewares/requireVerifiedPhone.js";
  *         description: 유저 없음
  */
 
+/**
+ * @swagger
+ * /api/payments/logs:
+ *   get:
+ *     summary: 유저 결제/잔고 내역 전체 조회
+ *     tags: [Payment]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [RENTAL_PAYMENT, STORAGE_FEE, DAMAGE_COMPENSATION, OWNER_PAYOUT, REFUND, ETC]
+ *         description: 결제/잔고 내역 타입 필터(선택)
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: 페이징 skip
+ *       - in: query
+ *         name: take
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: 페이징 take(한 번에 가져올 개수)
+ *     responses:
+ *       200:
+ *         description: 거래내역 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "잔고 사용되었습니다."
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     logs:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           amount:
+ *                             type: number
+ *                           paymentType:
+ *                             type: string
+ *                           memo:
+ *                             type: string
+ *                           createdAt:
+ *                             type: string
+ *                             format: date-time
+ *                           balanceBefore:
+ *                             type: number
+ *                           balanceAfter:
+ *                             type: number
+ *                           rentalRequestId:
+ *                             type: string
+ *                     total:
+ *                       type: number
+ *                       example: 42
+ *       401:
+ *         description: 인증 필요(JWT 토큰 누락/만료)
+ */
+
 const router = express.Router();
 
 // 잔고 충전
 router.post("/charge", authenticate, requireVerifiedPhone, chargeBalanceController);
 // 잔고 차감
 router.post("/use", authenticate, requireVerifiedPhone, useBalanceController);
+// 결제/잔고 내역 전체 조회
+router.get("/logs", authenticate, paymentLogsController);
 
 export default router; 

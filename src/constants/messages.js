@@ -22,6 +22,7 @@ export const PAYMENT_MESSAGES = {
   BALANCE_USED: "잔고가 사용되었습니다.",
   CHARGE_SUCCESS: "잔고 충전 성공",
   USE_SUCCESS: "잔고 사용 성공",
+  LOGS_FETCH_SUCCESS: "거래내역 조회 성공",
 }
 
 export const NOTIFICATION_MESSAGES = {
