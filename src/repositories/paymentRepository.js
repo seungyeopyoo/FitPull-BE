@@ -41,3 +41,31 @@ export const createPaymentLogRepo = async ({
     },
   });
 };
+
+// 유저 결제/잔고 내역 조회 
+export const findPaymentLogsByUserRepo = async (userId, { type, skip = 0, take = 20 } = {}) => {
+  const where = { userId };
+
+  if (type) where.paymentType = type;
+
+  const [logs, total] = await Promise.all([
+    prisma.paymentLog.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+      select: {
+        id: true,
+        amount: true,
+        paymentType: true,
+        memo: true,
+        createdAt: true,
+        balanceBefore: true,
+        balanceAfter: true,
+        rentalRequestId: true,
+      },
+    }),
+    prisma.paymentLog.count({ where }),
+  ]);
+  return { logs, total };
+};

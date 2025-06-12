@@ -59,6 +59,17 @@ async function main() {
   } else {
     console.log('관리자 계정이 이미 존재합니다.');
   }
+
+  // PlatformAccount seeding
+  const platformAccount = await prisma.platformAccount.findFirst();
+  if (!platformAccount) {
+    await prisma.platformAccount.create({
+      data: { balance: 0 }
+    });
+    console.log('PlatformAccount(회사 계정)가 balance 0으로 생성되었습니다.');
+  } else {
+    console.log('PlatformAccount(회사 계정)가 이미 존재합니다.');
+  }
 }
 
 main()

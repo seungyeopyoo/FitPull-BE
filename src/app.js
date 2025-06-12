@@ -14,6 +14,7 @@ import messageRouter from "./routes/message.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
 import aiRouter from "./routes/ai.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
+import platformRouter from "./routes/platform.routes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./docs/swagger.js";
 import cookieParser from "cookie-parser";
@@ -59,6 +60,7 @@ app.use("/api/messages", messageRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/payments", paymentRouter);
+app.use("/api/admin/platform", platformRouter);
 	
 // 기본 라우트
 app.get("/", (_, res) => {
@@ -69,8 +71,8 @@ app.use(errorHandler);
 
 
 const PORT = Number(process.env.PORT || "3000", 10);
-const server = http.createServer(app); // 소켓 연결 가능하도록 http 서버로 분리
-initSocket(server); // 👈 소켓 초기화
+const server = http.createServer(app); 
+initSocket(server); 
 
 // 서버 시작
 server.listen(PORT, "0.0.0.0", () => {
