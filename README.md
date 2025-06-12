@@ -48,6 +48,7 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┣ 📂constants
  ┃ ┣ 📜category.js
  ┃ ┣ 📜rentalDiscount.js
+ ┃ ┣ 📜commission.js
  ┃ ┣ 📜limits.js
  ┃ ┣ 📜messages.js
  ┃ ┣ 📜s3.js
@@ -59,6 +60,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜completedRental.controller.js
  ┃ ┣ 📜message.controller.js
  ┃ ┣ 📜notification.controller.js
+ ┃ ┣ 📜payment.controller.js
+ ┃ ┣ 📜platform.controller.js
  ┃ ┣ 📜product.controller.js
  ┃ ┣ 📜productStatusLog.controller.js
  ┃ ┣ 📜rentalRequest.controller.js
@@ -70,6 +73,7 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜adminOnly.js
  ┃ ┣ 📜auth.js
  ┃ ┣ 📜errorHandler.js
+ ┃ ┣ 📜requireVerifiedPhone.js
  ┃ ┣ 📜s3ImageUpload.js
  ┃ ┗ 📜upload.js
  ┣ 📂repositories
@@ -79,6 +83,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜completedRental.repository.js
  ┃ ┣ 📜message.repository.js
  ┃ ┣ 📜notification.repository.js
+ ┃ ┣ 📜payment.repository.js
+ ┃ ┣ 📜platform.repository.js
  ┃ ┣ 📜product.repository.js
  ┃ ┣ 📜productStatusLog.repository.js
  ┃ ┣ 📜rentalRequest.repository.js
@@ -91,6 +97,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜completedRental.routes.js
  ┃ ┣ 📜message.routes.js
  ┃ ┣ 📜notification.routes.js
+ ┃ ┣ 📜payment.routes.js
+ ┃ ┣ 📜platform.routes.js
  ┃ ┣ 📜product.routes.js
  ┃ ┣ 📜productStatusLog.routes.js
  ┃ ┣ 📜rentalRequest.routes.js
@@ -103,6 +111,8 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜completedRental.service.js
  ┃ ┣ 📜message.service.js
  ┃ ┣ 📜notification.service.js
+ ┃ ┣ 📜payment.service.js
+ ┃ ┣ 📜platform.service.js
  ┃ ┣ 📜product.service.js
  ┃ ┣ 📜productStatusLog.service.js
  ┃ ┣ 📜rentalRequest.service.js
@@ -114,10 +124,13 @@ FitPull Overflow는 "자신에게 꼭 맞는 모든 것을 대여한다"는 컨�
  ┃ ┣ 📜customError.js
  ┃ ┣ 📜jwt.js
  ┃ ┣ 📜nodemailer.js
+ ┃ ┣ 📜notificationCleaner.js
  ┃ ┣ 📜notify.js
+ ┃ ┣ 📜phoneVerification.js
  ┃ ┣ 📜redis.js
  ┃ ┣ 📜responseHandler.js
- ┃ ┗ 📜s3.js
+ ┃ ┣ 📜s3.js
+ ┃ ┗ 📜sms.js
  ┣ 📜app.js
  ┗ 📜data-source.js
  ┣ 📜.biome.json
