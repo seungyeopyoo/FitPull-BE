@@ -1,7 +1,7 @@
 import prisma from "../data-source.js";
 import { RENTAL_STATUS } from "../constants/status.js";
 import CustomError from "../utils/customError.js";
-import { RENTAL_REQUEST_MESSAGES } from "../constants/messages.js";
+import { RENTAL_REQUEST_MESSAGES, PLATFORM_MESSAGES } from "../constants/messages.js";
 
 export const findProductTitleById = async (productId) => {
 	const product = await prisma.product.findUnique({
@@ -176,6 +176,30 @@ export const createRentalRequestWithPaymentRepo = async ({
 				balanceBefore,
 				balanceAfter: updatedUser.balance,
 				paidAt: new Date(),
+			},
+		});
+
+		// 4. 회사(플랫폼) 잔고 증가
+		const platformAccount = await tx.platformAccount.findFirst();
+		if (!platformAccount) throw new CustomError(500, "PLATFORM_ACCOUNT_NOT_FOUND", PLATFORM_MESSAGES.PLATFORM_ACCOUNT_NOT_FOUND);
+		const platformBalanceBefore = platformAccount.balance;
+		const platformBalanceAfter = platformBalanceBefore + totalPrice;
+		await tx.platformAccount.update({
+			where: { id: platformAccount.id },
+			data: { balance: { increment: totalPrice } },
+		});
+
+		// 5. 회사 결제로그 생성
+		await tx.platformPaymentLog.create({
+			data: {
+				platformAccountId: platformAccount.id,
+				type: "INCOME",
+				amount: totalPrice,
+				memo: `[자동] 대여 결제: ${productTitle}`,
+				balanceBefore: platformBalanceBefore,
+				balanceAfter: platformBalanceAfter,
+				rentalRequestId: rentalRequest.id,
+				userId,
 			},
 		});
 
