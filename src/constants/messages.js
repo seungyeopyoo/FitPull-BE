@@ -1,3 +1,16 @@
+export const PLATFORM_MESSAGES = {
+  PLATFORM_BALANCE_ERROR: "플랫폼 잔고 조회에 실패했습니다.",
+  PLATFORM_BALANCE_GET_SUCCESS: "플랫폼 잔고 조회 성공",
+  PLATFORM_SUMMARY_GET_SUCCESS: "플랫폼 요약 조회 성공",
+  PLATFORM_SUMMARY_ERROR: "플랫폼 요약 조회에 실패했습니다.",
+  PLATFORM_LOGS_ERROR: "플랫폼 로그 조회에 실패했습니다.",
+  PLATFORM_LOGS_GET_SUCCESS: "플랫폼 로그 조회 성공",
+  INVALID_AMOUNT: "충전 금액이 올바르지 않습니다.",
+  PLATFORM_DEPOSIT_SUCCESS: "플랫폼 잔고 충전 성공",
+  PLATFORM_DEPOSIT_ERROR: "플랫폼 잔고 충전에 실패했습니다.",
+  PLATFORM_ACCOUNT_NOT_FOUND: "플랫폼 계정을 찾을 수 없습니다.",
+}
+
 export const AI_MESSAGES = {
   INVALID_PRODUCT_STATUS: "AI 분석은 대기 중(PENDING) 상품만 가능합니다.",
   AI_PARSE_ERROR: "AI 응답 파싱 오류",
