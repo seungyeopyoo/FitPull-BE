@@ -144,6 +144,18 @@ export const createRentalRequestWithPaymentRepo = async ({
 	productTitle,
 }) => {
 	return await prisma.$transaction(async (tx) => {
+		// 동시성 방지: 동일 유저/상품/기간에 이미 PENDING/APPROVED 상태의 rentalRequest가 있으면 중복 생성 방지
+		const exists = await tx.rentalRequest.findFirst({
+			where: {
+				userId,
+				productId,
+				status: { in: ["PENDING", "APPROVED"] },
+				startDate: { lte: new Date(endDate) },
+				endDate: { gte: new Date(startDate) },
+			},
+		});
+		if (exists) throw new CustomError(400, "ALREADY_REQUESTED", RENTAL_REQUEST_MESSAGES.ALREADY_REQUESTED);
+
 		// 1. 유저 잔고 차감
 		const updatedUser = await tx.user.update({
 			where: { id: userId },
@@ -213,6 +225,9 @@ export const refundRentalRequestRepo = async ({
 	rejectByAdmin = false,
 }) => {
 	return await prisma.$transaction(async (tx) => {
+		// 동시성 방지: row-level lock
+		await tx.$executeRaw`SELECT * FROM rental_requests WHERE id = ${rentalRequestId} FOR UPDATE`;
+
 		// 1. rentalRequest, user, product 조회
 		const rentalRequest = await tx.rentalRequest.findUnique({
 			where: { id: rentalRequestId },
@@ -220,14 +235,26 @@ export const refundRentalRequestRepo = async ({
 		});
 		if (!rentalRequest) throw new CustomError(404, "RENTAL_NOT_FOUND", RENTAL_REQUEST_MESSAGES.RENTAL_NOT_FOUND);
 
-		// 2. 유저 잔고 환불
+		// 2. 조건부 상태 변경 (PENDING/APPROVED만)
+		const updated = await tx.rentalRequest.updateMany({
+			where: {
+				id: rentalRequestId,
+				status: { in: ["PENDING", "APPROVED"] },
+			},
+			data: { status: rejectByAdmin ? "REJECTED" : "CANCELED" },
+		});
+		if (updated.count === 0) {
+			throw new CustomError(400, "ALREADY_PROCESSED", "이미 처리된 대여요청입니다.");
+		}
+
+		// 3. 유저 잔고 환불
 		const updatedUser = await tx.user.update({
 			where: { id: rentalRequest.userId },
 			data: { balance: { increment: rentalRequest.totalPrice } },
 			select: { balance: true },
 		});
 
-		// 3. 유저 환불 로그
+		// 4. 유저 환불 로그
 		await tx.paymentLog.create({
 			data: {
 				userId: rentalRequest.userId,
@@ -241,7 +268,7 @@ export const refundRentalRequestRepo = async ({
 			},
 		});
 
-		// 4. 회사(플랫폼) 잔고 감소
+		// 5. 회사(플랫폼) 잔고 감소
 		const platformAccount = await tx.platformAccount.findFirst();
 		if (!platformAccount) throw new CustomError(500, "PLATFORM_ACCOUNT_NOT_FOUND", PLATFORM_MESSAGES.PLATFORM_ACCOUNT_NOT_FOUND);
 		const platformBalanceBefore = platformAccount.balance;
@@ -251,7 +278,7 @@ export const refundRentalRequestRepo = async ({
 			data: { balance: { decrement: rentalRequest.totalPrice } },
 		});
 
-		// 5. 회사 환불 로그
+		// 6. 회사 환불 로그
 		await tx.platformPaymentLog.create({
 			data: {
 				platformAccountId: platformAccount.id,
@@ -263,12 +290,6 @@ export const refundRentalRequestRepo = async ({
 				rentalRequestId: rentalRequest.id,
 				userId: rentalRequest.userId,
 			},
-		});
-
-		// 6. rentalRequest 상태 변경
-		await tx.rentalRequest.update({
-			where: { id: rentalRequestId },
-			data: { status: rejectByAdmin ? "REJECTED" : "CANCELED" },
 		});
 
 		const updatedRentalRequest = await tx.rentalRequest.findUnique({

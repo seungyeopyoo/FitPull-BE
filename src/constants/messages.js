@@ -115,6 +115,7 @@ export const RENTAL_REQUEST_MESSAGES = {
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
   ALREADY_REJECTED: "이미 거절/취소된 대여요청입니다.",
+  ALREADY_REQUESTED: "이미 대여요청이 존재합니다.",
 };
 
 export const MESSAGE_RESPONSES = {
