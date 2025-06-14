@@ -3,10 +3,8 @@ import {
 	findPendingRequestsRepo,
 	updateRentalRequestStatusRepo,
 	checkRentalDateConflict,
-	findProductTitleById,
 	findRentalRequestSummaryById,
 	getRentalRequestById,
-	createRentalRequestWithPaymentRepo,
 	refundRentalRequestRepo,
 } from "../repositories/rentalRequest.repository.js";
 import { RENTAL_STATUS } from "../constants/status.js";
@@ -16,6 +14,7 @@ import CustomError from "../utils/customError.js";
 import { createNotification } from "./notification.service.js";
 import { RENTAL_DISCOUNT } from "../constants/rentalDiscount.js";
 import { findUserById } from "../repositories/user.repository.js";
+import prisma from "../data-source.js";
 
 
 export const createRentalRequestWithPayment = async (
@@ -66,17 +65,85 @@ export const createRentalRequestWithPayment = async (
 	}
 
 	// 트랜잭션: 잔고 차감, 대여요청 생성, 결제로그 생성
-	const rentalRequest = await createRentalRequestWithPaymentRepo({
-		userId,
-		productId,
-		startDate,
-		endDate,
-		howToReceive,
-		memo,
-		totalPrice,
-		balanceBefore: user.balance,
-		balanceAfter: user.balance - totalPrice,
-		productTitle: product.title,
+	const rentalRequest = await prisma.$transaction(async (tx) => {
+		//동시성 체크
+		const exists = await tx.rentalRequest.findFirst({
+			where: {
+				userId,
+				productId,
+				status: { in: ["PENDING", "APPROVED"] },
+				startDate: { lte: new Date(endDate) },
+				endDate: { gte: new Date(startDate) },
+			},
+		});
+		if (exists) {
+			throw new CustomError(400, "ALREADY_REQUESTED", RENTAL_REQUEST_MESSAGES.ALREADY_REQUESTED);
+		}
+
+		// 유저 잔액 차감
+		const updatedUser = await tx.user.update({
+			where: { id: userId },
+			data: { balance: { decrement: totalPrice } },
+			select: { balance: true },
+		});
+
+		// 대여 요청 생성
+		const rentalRequest = await tx.rentalRequest.create({
+			data: {
+				productId,
+				userId,
+				startDate: new Date(startDate),
+				endDate: new Date(endDate),
+				howToReceive,
+				memo,
+				totalPrice,
+				status: "PENDING",
+			},
+		});
+
+		// 유저 결제 로그 생성
+		await tx.paymentLog.create({
+			data: {
+				userId,
+				rentalRequestId: rentalRequest.id,
+				amount: totalPrice,
+				paymentType: "RENTAL_PAYMENT",
+				memo: `[자동] ${product.title} 대여 신청`,
+				balanceBefore: user.balance,
+				balanceAfter: updatedUser.balance,
+				paidAt: new Date(),
+			},
+		});
+
+		// 플랫폼 계정 조회
+		const platformAccount = await tx.platformAccount.findFirst();
+		if (!platformAccount) {
+			throw new CustomError(500, "PLATFORM_ACCOUNT_NOT_FOUND", PLATFORM_MESSAGES.PLATFORM_ACCOUNT_NOT_FOUND);
+		}
+		const platformBalanceBefore = platformAccount.balance;
+		const platformBalanceAfter = platformBalanceBefore + totalPrice;
+
+		// 플랫폼 수익 증가
+		await tx.platformAccount.update({
+			where: { id: platformAccount.id },
+			data: { balance: { increment: totalPrice } },
+		});
+
+		// 플랫폼 결제 로그
+		await tx.platformPaymentLog.create({
+			data: {
+				platformAccountId: platformAccount.id,
+				type: "INCOME",
+				amount: totalPrice,
+				memo: `[자동] 대여 결제: ${product.title}`,
+				balanceBefore: platformBalanceBefore,
+				balanceAfter: platformBalanceAfter,
+				rentalRequestId: rentalRequest.id,
+				userId,
+			},
+		});
+
+		return rentalRequest;
 	});
 
 	return rentalRequest;
