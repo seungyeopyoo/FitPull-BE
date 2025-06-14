@@ -25,6 +25,7 @@ export const createRentalRequestWithPayment = async (
 	howToReceive,
 	memo
 ) => {
+	try {
 	// 예약일 30일 제한
 	const now = new Date();
 	const oneMonthLater = new Date();
@@ -153,6 +154,12 @@ export const createRentalRequestWithPayment = async (
 	});
 
 	return rentalRequest;
+	} catch (err) {
+		if (err.code === "P2002" && err.meta?.target?.includes("rental_request_unique_active")) {
+			throw new CustomError(409, "ALREADY_REQUESTED", RENTAL_REQUEST_MESSAGES.ALREADY_REQUESTED);
+		}
+		throw err;
+	}
 };
 
 export const getMyRentalRequests = async (userId) => {
