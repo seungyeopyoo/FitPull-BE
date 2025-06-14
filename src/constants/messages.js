@@ -116,6 +116,7 @@ export const RENTAL_REQUEST_MESSAGES = {
   INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
   ALREADY_REJECTED: "이미 거절/취소된 대여요청입니다.",
   ALREADY_REQUESTED: "이미 대여요청이 존재합니다.",
+  INVALID_DATE_FORMAT: "날짜 형식이 올바르지 않습니다.",
 };
 
 export const MESSAGE_RESPONSES = {

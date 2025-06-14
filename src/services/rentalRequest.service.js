@@ -30,11 +30,17 @@ export const createRentalRequestWithPayment = async (
 	const oneMonthLater = new Date();
 	oneMonthLater.setDate(now.getDate() + 30);
 
-	// 날짜 유효성 체크
-	if (new Date(endDate) <= new Date(startDate)) {
+	const start = new Date(startDate);
+	const end = new Date(endDate);
+
+	if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+		throw new CustomError(400, "INVALID_DATE_FORMAT", RENTAL_REQUEST_MESSAGES.INVALID_DATE_FORMAT);
+	}
+
+	if (end <= start) {
 		throw new CustomError(400, "INVALID_RENTAL_DATE", RENTAL_REQUEST_MESSAGES.INVALID_RENTAL_DATE);
 	}
-	if (new Date(startDate) > oneMonthLater) {
+	if (start > oneMonthLater) {
 		throw new CustomError(400, "RENTAL_DATE_LIMIT", RENTAL_REQUEST_MESSAGES.START_DATE_LIMIT);
 	}
 
