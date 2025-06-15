@@ -280,6 +280,10 @@ export const cancelRentalRequest = async (rentalRequestId, userId, refundMemo = 
 		const platformAccount = await tx.platformAccount.findFirst();
 		if (!platformAccount) throw new CustomError(500, "PLATFORM_ACCOUNT_NOT_FOUND", PLATFORM_MESSAGES.PLATFORM_ACCOUNT_NOT_FOUND);
 
+		if (platformAccount.balance < rentalRequest.totalPrice) {
+			throw new CustomError(422, "PLATFORM_BALANCE_INSUFFICIENT", RENTAL_REQUEST_MESSAGES.PLATFORM_BALANCE_INSUFFICIENT);
+		}
+
 		await tx.platformAccount.update({
 			where: { id: platformAccount.id },
 			data: { balance: { decrement: rentalRequest.totalPrice } },
@@ -352,6 +356,10 @@ export const rejectRentalRequestByAdmin = async (rentalRequestId, refundMemo = n
 
 		const platformAccount = await tx.platformAccount.findFirst();
 		if (!platformAccount) throw new CustomError(500, "PLATFORM_ACCOUNT_NOT_FOUND", PLATFORM_MESSAGES.PLATFORM_ACCOUNT_NOT_FOUND);
+
+		if (platformAccount.balance < rentalRequest.totalPrice) {
+			throw new CustomError(422, "PLATFORM_BALANCE_INSUFFICIENT", RENTAL_REQUEST_MESSAGES.PLATFORM_BALANCE_INSUFFICIENT);
+		}
 
 		await tx.platformAccount.update({
 			where: { id: platformAccount.id },

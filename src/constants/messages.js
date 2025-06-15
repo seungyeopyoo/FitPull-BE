@@ -114,6 +114,7 @@ export const RENTAL_REQUEST_MESSAGES = {
   NO_PERMISSION: "권한이 없습니다.",
   USER_NOT_FOUND: "존재하지 않는 사용자입니다.",
   INSUFFICIENT_BALANCE: "잔고가 부족합니다.",
+  PLATFORM_BALANCE_INSUFFICIENT: "플랫폼 잔고가 부족하여 환불이 불가합니다. 관리자에게 문의하세요.",
   ALREADY_REJECTED: "이미 거절/취소된 대여요청입니다.",
   ALREADY_REQUESTED: "이미 대여요청이 존재합니다.",
   INVALID_DATE_FORMAT: "날짜 형식이 올바르지 않습니다.",
