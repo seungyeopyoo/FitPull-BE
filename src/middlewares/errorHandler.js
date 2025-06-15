@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import CustomError from '../utils/customError.js';
 
 function errorHandler(err, req, res, next) {

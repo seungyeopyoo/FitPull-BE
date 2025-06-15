@@ -1,15 +1,22 @@
-import { findProductByIdRepo, getAllProducts } from "../repositories/product.repository.js";
-import { saveAiPriceEstimation, saveAiProductRecommendation } from "../repositories/ai.repository.js";
-import { getReviewsByProductIdRepo } from "../repositories/review.repository.js";
-import CustomError from "../utils/customError.js";
-import { AI_MESSAGES } from "../constants/messages.js"; 
-import OpenAI from "openai";
+/* eslint-disable no-unused-vars */
+import {
+  findProductByIdRepo,
+  getAllProducts,
+} from '../repositories/product.repository.js';
+import {
+  saveAiPriceEstimation,
+  saveAiProductRecommendation,
+} from '../repositories/ai.repository.js';
+import { getReviewsByProductIdRepo } from '../repositories/review.repository.js';
+import CustomError from '../utils/customError.js';
+import { AI_MESSAGES } from '../constants/messages.js';
+import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-//이미지 인식용 테스트용 프롬프트 
+//이미지 인식용 테스트용 프롬프트
 // - 그리고 이미지에 보이는 특징(색상, 브랜드, 상태 등)을 한 문장으로 reason에 포함해줘
 
 export const estimatePriceFromAI = async (product) => {
@@ -43,30 +50,35 @@ export const estimatePriceFromAI = async (product) => {
 }
 
 상품명: ${title}
-설명: ${description ?? "설명 없음"}
-유저가 입력한 1일 대여 가격: ${price ?? "입력 없음"}
+설명: ${description ?? '설명 없음'}
+유저가 입력한 1일 대여 가격: ${price ?? '입력 없음'}
   `;
 
   // 멀티모달 메시지 구성
   const messages = [
     {
-      role: "user",
+      role: 'user',
       content: [
-        { type: "text", text: prompt },
-        ...(imageUrls?.length ? [{ type: "image_url", image_url: { url: imageUrls[0] } }] : [])
-      ]
-    }
+        { type: 'text', text: prompt },
+        ...(imageUrls?.length
+          ? [{ type: 'image_url', image_url: { url: imageUrls[0] } }]
+          : []),
+      ],
+    },
   ];
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: 'gpt-4o',
     messages,
     temperature: 0.3,
   });
   const contentRaw = completion.choices[0].message.content;
   let content = contentRaw;
-  if (content.startsWith("```") ) {
-    content = content.replace(/```[a-zA-Z]*\n?/, "").replace(/```/, "").trim();
+  if (content.startsWith('```')) {
+    content = content
+      .replace(/```[a-zA-Z]*\n?/, '')
+      .replace(/```/, '')
+      .trim();
   }
   let parsed;
   try {
@@ -74,8 +86,8 @@ export const estimatePriceFromAI = async (product) => {
   } catch (err) {
     throw new CustomError(
       500,
-      "AI_PARSE_ERROR",
-      `AI 응답을 파싱하는 데 실패했습니다. 실제 응답: ${contentRaw}`
+      'AI_PARSE_ERROR',
+      `AI 응답을 파싱하는 데 실패했습니다. 실제 응답: ${contentRaw}`,
     );
   }
   return parsed;
@@ -84,10 +96,18 @@ export const estimatePriceFromAI = async (product) => {
 export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
   const product = await findProductByIdRepo(productId);
   if (!product) {
-    throw new CustomError(404, "PRODUCT_NOT_FOUND", AI_MESSAGES.PRODUCT_NOT_FOUND);
+    throw new CustomError(
+      404,
+      'PRODUCT_NOT_FOUND',
+      AI_MESSAGES.PRODUCT_NOT_FOUND,
+    );
   }
-  if (product.status !== "PENDING") {
-    throw new CustomError(400, "INVALID_PRODUCT_STATUS", AI_MESSAGES.INVALID_PRODUCT_STATUS);
+  if (product.status !== 'PENDING') {
+    throw new CustomError(
+      400,
+      'INVALID_PRODUCT_STATUS',
+      AI_MESSAGES.INVALID_PRODUCT_STATUS,
+    );
   }
   const result = await estimatePriceFromAI(product);
   const { dailyRentalPrice, sources, isValid, reason, ...rest } = result;
@@ -107,12 +127,20 @@ export const requestAiPriceEstimation = async ({ productId, adminUser }) => {
 export const summarizeReviews = async (productId) => {
   const product = await findProductByIdRepo(productId);
   if (!product) {
-    throw new CustomError(404, "PRODUCT_NOT_FOUND", AI_MESSAGES.PRODUCT_NOT_FOUND);
+    throw new CustomError(
+      404,
+      'PRODUCT_NOT_FOUND',
+      AI_MESSAGES.PRODUCT_NOT_FOUND,
+    );
   }
   const reviews = await getReviewsByProductIdRepo(productId);
-  const contents = reviews.map((review) => review.comment).join("\n");
+  const contents = reviews.map((review) => review.comment).join('\n');
   if (!contents) {
-    throw new CustomError(404, "REVIEW_NOT_FOUND", AI_MESSAGES.REVIEW_NOT_FOUND);
+    throw new CustomError(
+      404,
+      'REVIEW_NOT_FOUND',
+      AI_MESSAGES.REVIEW_NOT_FOUND,
+    );
   }
   const prompt = `
   다음은 어떤 상품에 대한 리뷰들입니다. 전체적인 내용을 한국어로 간결히 요약해주세요.
@@ -121,8 +149,8 @@ export const summarizeReviews = async (productId) => {
   요약결과:
   `;
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{ role: "user", content: prompt }],
+    model: 'gpt-4o',
+    messages: [{ role: 'user', content: prompt }],
     temperature: 0.5,
   });
   return { summary: completion.choices[0].message.content };
@@ -130,15 +158,17 @@ export const summarizeReviews = async (productId) => {
 
 export const recommendProducts = async ({ prompt, userId }) => {
   if (!prompt) {
-    throw new CustomError(400, "PROMPT_REQUIRED", AI_MESSAGES.PROMPT_REQUIRED);
+    throw new CustomError(400, 'PROMPT_REQUIRED', AI_MESSAGES.PROMPT_REQUIRED);
   }
   const { products } = await getAllProducts({ take: 20 });
   if (products.length === 0) {
-    throw new CustomError(404, "NO_PRODUCTS", AI_MESSAGES.NO_PRODUCTS);
+    throw new CustomError(404, 'NO_PRODUCTS', AI_MESSAGES.NO_PRODUCTS);
   }
-  const itemsText = products.map((p, idx) => {
-    return `${idx + 1}. [ID: ${p.id}] ${p.title} - ${p.description ?? "설명 없음"}`;
-  }).join("\n");
+  const itemsText = products
+    .map((p, idx) => {
+      return `${idx + 1}. [ID: ${p.id}] ${p.title} - ${p.description ?? '설명 없음'}`;
+    })
+    .join('\n');
   const gptPrompt = `
 당신은 상품 추천 도우미입니다.
 
@@ -164,22 +194,25 @@ ${itemsText}
 적합한 상품이 없으면 [] 만 반환
 `;
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{ role: "user", content: gptPrompt }],
+    model: 'gpt-4o',
+    messages: [{ role: 'user', content: gptPrompt }],
     temperature: 0.5,
   });
   const content = completion.choices[0].message.content;
   let parsed;
   try {
-    parsed = JSON.parse(content.replace(/```json|```/g, "").trim());
+    parsed = JSON.parse(content.replace(/```json|```/g, '').trim());
   } catch (err) {
-    throw new CustomError(500, "AI_PARSE_ERROR", AI_MESSAGES.AI_PARSE_ERROR);
+    throw new CustomError(500, 'AI_PARSE_ERROR', AI_MESSAGES.AI_PARSE_ERROR);
   }
   if (!Array.isArray(parsed) || parsed.length === 0) {
-    return { recommendedProductIds: [], reason: "추천할 만한 상품이 없습니다." };
+    return {
+      recommendedProductIds: [],
+      reason: '추천할 만한 상품이 없습니다.',
+    };
   }
   const recommendedProductIds = parsed.map((item) => item.id);
-  const reason = parsed.map((item) => `- ${item.reason}`).join("\n");
+  const reason = parsed.map((item) => `- ${item.reason}`).join('\n');
   await saveAiProductRecommendation({
     prompt,
     recommendedProducts: recommendedProductIds,
